@@ -1,0 +1,12 @@
+F:\projects\TeethDen.Platform\src\Platform.Shared\bin\Debug\net10.0\Platform.Shared.deps.json
+F:\projects\TeethDen.Platform\src\Platform.Shared\bin\Debug\net10.0\Platform.Shared.dll
+F:\projects\TeethDen.Platform\src\Platform.Shared\bin\Debug\net10.0\Platform.Shared.pdb
+F:\projects\TeethDen.Platform\src\Platform.Shared\obj\Debug\net10.0\Platform.Shared.GeneratedMSBuildEditorConfig.editorconfig
+F:\projects\TeethDen.Platform\src\Platform.Shared\obj\Debug\net10.0\Platform.Shared.AssemblyInfoInputs.cache
+F:\projects\TeethDen.Platform\src\Platform.Shared\obj\Debug\net10.0\Platform.Shared.AssemblyInfo.cs
+F:\projects\TeethDen.Platform\src\Platform.Shared\obj\Debug\net10.0\Platform.Shared.csproj.CoreCompileInputs.cache
+F:\projects\TeethDen.Platform\src\Platform.Shared\obj\Debug\net10.0\Platform.Shared.sourcelink.json
+F:\projects\TeethDen.Platform\src\Platform.Shared\obj\Debug\net10.0\Platform.Shared.dll
+F:\projects\TeethDen.Platform\src\Platform.Shared\obj\Debug\net10.0\refint\Platform.Shared.dll
+F:\projects\TeethDen.Platform\src\Platform.Shared\obj\Debug\net10.0\Platform.Shared.pdb
+F:\projects\TeethDen.Platform\src\Platform.Shared\obj\Debug\net10.0\ref\Platform.Shared.dll

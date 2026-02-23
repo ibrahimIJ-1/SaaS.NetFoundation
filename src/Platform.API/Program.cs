@@ -1,5 +1,9 @@
-var builder = WebApplication.CreateBuilder(args);
+using Platform.Application;
+using Platform.Infrastructure;
 
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure();
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -13,6 +17,9 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 

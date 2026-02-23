@@ -406,7 +406,10 @@
         },
         "runtime": {
           "bin/placeholder/Platform.Application.dll": {}
-        }
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ]
       },
       "Platform.Domain/1.0.0": {
         "type": "project",

@@ -1,0 +1,16 @@
+F:\projects\TeethDen.Platform\src\Platform.Persistence\bin\Debug\net10.0\Platform.Persistence.deps.json
+F:\projects\TeethDen.Platform\src\Platform.Persistence\bin\Debug\net10.0\Platform.Persistence.dll
+F:\projects\TeethDen.Platform\src\Platform.Persistence\bin\Debug\net10.0\Platform.Persistence.pdb
+F:\projects\TeethDen.Platform\src\Platform.Persistence\bin\Debug\net10.0\Platform.Domain.dll
+F:\projects\TeethDen.Platform\src\Platform.Persistence\bin\Debug\net10.0\Platform.Domain.pdb
+F:\projects\TeethDen.Platform\src\Platform.Persistence\obj\Debug\net10.0\Platform.Persistence.csproj.AssemblyReference.cache
+F:\projects\TeethDen.Platform\src\Platform.Persistence\obj\Debug\net10.0\Platform.Persistence.GeneratedMSBuildEditorConfig.editorconfig
+F:\projects\TeethDen.Platform\src\Platform.Persistence\obj\Debug\net10.0\Platform.Persistence.AssemblyInfoInputs.cache
+F:\projects\TeethDen.Platform\src\Platform.Persistence\obj\Debug\net10.0\Platform.Persistence.AssemblyInfo.cs
+F:\projects\TeethDen.Platform\src\Platform.Persistence\obj\Debug\net10.0\Platform.Persistence.csproj.CoreCompileInputs.cache
+F:\projects\TeethDen.Platform\src\Platform.Persistence\obj\Debug\net10.0\Platform.Persistence.sourcelink.json
+F:\projects\TeethDen.Platform\src\Platform.Persistence\obj\Debug\net10.0\Platform.4C9FD83F.Up2Date
+F:\projects\TeethDen.Platform\src\Platform.Persistence\obj\Debug\net10.0\Platform.Persistence.dll
+F:\projects\TeethDen.Platform\src\Platform.Persistence\obj\Debug\net10.0\refint\Platform.Persistence.dll
+F:\projects\TeethDen.Platform\src\Platform.Persistence\obj\Debug\net10.0\Platform.Persistence.pdb
+F:\projects\TeethDen.Platform\src\Platform.Persistence\obj\Debug\net10.0\ref\Platform.Persistence.dll
