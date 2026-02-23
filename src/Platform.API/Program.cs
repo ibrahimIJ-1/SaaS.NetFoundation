@@ -1,9 +1,14 @@
+using Platform.API.Middleware;
 using Platform.Application;
 using Platform.Infrastructure;
+using Platform.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure();
+builder.Services.AddPersistence(builder.Configuration);
+
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -25,6 +30,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
+app.UseMiddleware<TenantResolutionMiddleware>();
 app.MapControllers();
 
 app.Run();

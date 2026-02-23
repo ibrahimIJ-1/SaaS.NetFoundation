@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Platform.Application.Abstractions;
+using Platform.Infrastructure.MultiTenancy;
 
 namespace Platform.Infrastructure
 {
@@ -7,6 +9,7 @@ namespace Platform.Infrastructure
         public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         {
             // Register external services, queues, email, etc.
+            services.AddScoped<ITenantProvider, TenantProvider>();
 
             return services;
         }
