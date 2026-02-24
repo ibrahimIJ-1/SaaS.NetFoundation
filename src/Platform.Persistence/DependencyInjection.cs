@@ -17,20 +17,18 @@ namespace Platform.Persistence
                 options.UseSqlServer(
                     configuration.GetConnectionString("MasterDb")));
 
-            services.AddScoped<ApplicationDbContext>(provider =>
+            services.AddDbContextFactory<ApplicationDbContext>((provider, optionsBuilder) =>
             {
                 var tenantProvider = provider.GetRequiredService<ITenantProvider>();
 
-                if (tenantProvider.CurrentTenant == null)
-                    throw new Exception("Tenant not resolved");
+                var connectionString = tenantProvider.CurrentTenant?.ConnectionString;
 
-                var optionsBuilder =
-                    new DbContextOptionsBuilder<ApplicationDbContext>();
-
-                optionsBuilder.UseSqlServer(
-                    tenantProvider.CurrentTenant.ConnectionString);
-
-                return new ApplicationDbContext(optionsBuilder.Options);
+                if (connectionString != null)
+                    optionsBuilder.UseSqlServer(connectionString);
+                else
+                    optionsBuilder.UseSqlServer(
+                        provider.GetRequiredService<IConfiguration>()
+                            .GetConnectionString("MasterDb")); // fallback DB for Swagger / design-time
             });
 
             services.AddHttpContextAccessor();

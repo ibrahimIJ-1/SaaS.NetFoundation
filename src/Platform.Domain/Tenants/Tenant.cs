@@ -6,12 +6,12 @@ namespace Platform.Domain.Tenants
 {
     public class Tenant : Common.BaseEntity
     {
-        public string Name { get; private set; } = default!;
-        public string Identifier { get; private set; } = default!; // subdomain or key
-        public string ConnectionString { get; private set; } = default!;
-        public bool IsActive { get; private set; }
+        public string Name { get;  set; } = default!;
+        public string Identifier { get;  set; } = default!; // subdomain or key
+        public string ConnectionString { get;  set; } = default!;
+        public bool IsActive { get;  set; }
 
-        private Tenant() { }
+        public Tenant() { }
 
         public Tenant(string name, string identifier, string connectionString)
         {

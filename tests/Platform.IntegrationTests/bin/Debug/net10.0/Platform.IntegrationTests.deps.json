@@ -42,6 +42,17 @@
           }
         }
       },
+      "Microsoft.AspNetCore.Identity.EntityFrameworkCore/10.0.3": {
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore.Relational": "10.0.3"
+        },
+        "runtime": {
+          "lib/net10.0/Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll": {
+            "assemblyVersion": "10.0.3.0",
+            "fileVersion": "10.0.326.7603"
+          }
+        }
+      },
       "Microsoft.AspNetCore.OpenApi/10.0.3": {
         "dependencies": {
           "Microsoft.OpenApi": "2.4.1"
@@ -746,7 +757,8 @@
       "Platform.Infrastructure/1.0.0": {
         "dependencies": {
           "Platform.Application": "1.0.0",
-          "Platform.Domain": "1.0.0"
+          "Platform.Domain": "1.0.0",
+          "Platform.Persistence": "1.0.0"
         },
         "runtime": {
           "Platform.Infrastructure.dll": {
@@ -757,6 +769,7 @@
       },
       "Platform.Persistence/1.0.0": {
         "dependencies": {
+          "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "10.0.3",
           "Microsoft.EntityFrameworkCore": "10.0.3",
           "Microsoft.EntityFrameworkCore.SqlServer": "10.0.3",
           "Platform.Application": "1.0.0",
@@ -798,6 +811,13 @@
       "sha512": "sha512-YhNMwOTwT+I2wIcJKSdP0ADyB2aK+JaYWZxO8LSRDm5w77LFr0ykR9xmt2ZV5T1gaI7xU6iNFIh/yW1dAlpddQ==",
       "path": "azure.identity/1.14.2",
       "hashPath": "azure.identity.1.14.2.nupkg.sha512"
+    },
+    "Microsoft.AspNetCore.Identity.EntityFrameworkCore/10.0.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-6SEGWi35DZ9syBqCT8v5vEkm9tWUayWxVkHWLwW2FdyXSwS0zzEpIzGPLVQGeug3VU8d+hK/PFxFwwZnblv/zA==",
+      "path": "microsoft.aspnetcore.identity.entityframeworkcore/10.0.3",
+      "hashPath": "microsoft.aspnetcore.identity.entityframeworkcore.10.0.3.nupkg.sha512"
     },
     "Microsoft.AspNetCore.OpenApi/10.0.3": {
       "type": "package",

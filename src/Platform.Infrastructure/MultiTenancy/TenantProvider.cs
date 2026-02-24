@@ -5,11 +5,18 @@ namespace Platform.Infrastructure.MultiTenancy
 {
     public class TenantProvider : ITenantProvider
     {
-        public TenantInfo? CurrentTenant { get; private set; }
+        private TenantInfo? _currentTenant;
+
+        public TenantInfo? CurrentTenant => _currentTenant;
 
         public void SetTenant(TenantInfo tenant)
         {
-            CurrentTenant = tenant;
+            _currentTenant = tenant;
+        }
+
+        public string? GetConnectionString()
+        {
+            return _currentTenant?.ConnectionString;
         }
     }
 }

@@ -9,6 +9,7 @@ F:\projects\TeethDen.Platform\src\Platform.API\bin\Debug\net10.0\Platform.API.pd
 F:\projects\TeethDen.Platform\src\Platform.API\bin\Debug\net10.0\Azure.Core.dll
 F:\projects\TeethDen.Platform\src\Platform.API\bin\Debug\net10.0\Azure.Identity.dll
 F:\projects\TeethDen.Platform\src\Platform.API\bin\Debug\net10.0\Humanizer.dll
+F:\projects\TeethDen.Platform\src\Platform.API\bin\Debug\net10.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
 F:\projects\TeethDen.Platform\src\Platform.API\bin\Debug\net10.0\Microsoft.AspNetCore.OpenApi.dll
 F:\projects\TeethDen.Platform\src\Platform.API\bin\Debug\net10.0\Microsoft.Bcl.AsyncInterfaces.dll
 F:\projects\TeethDen.Platform\src\Platform.API\bin\Debug\net10.0\Microsoft.Bcl.Cryptography.dll

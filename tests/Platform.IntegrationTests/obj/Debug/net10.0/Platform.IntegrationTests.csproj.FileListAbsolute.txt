@@ -16,6 +16,7 @@ F:\projects\TeethDen.Platform\tests\Platform.IntegrationTests\bin\Debug\net10.0\
 F:\projects\TeethDen.Platform\tests\Platform.IntegrationTests\bin\Debug\net10.0\Platform.IntegrationTests.pdb
 F:\projects\TeethDen.Platform\tests\Platform.IntegrationTests\bin\Debug\net10.0\Azure.Core.dll
 F:\projects\TeethDen.Platform\tests\Platform.IntegrationTests\bin\Debug\net10.0\Azure.Identity.dll
+F:\projects\TeethDen.Platform\tests\Platform.IntegrationTests\bin\Debug\net10.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
 F:\projects\TeethDen.Platform\tests\Platform.IntegrationTests\bin\Debug\net10.0\Microsoft.AspNetCore.OpenApi.dll
 F:\projects\TeethDen.Platform\tests\Platform.IntegrationTests\bin\Debug\net10.0\Microsoft.Bcl.AsyncInterfaces.dll
 F:\projects\TeethDen.Platform\tests\Platform.IntegrationTests\bin\Debug\net10.0\Microsoft.Bcl.Cryptography.dll

@@ -16,18 +16,23 @@ namespace Platform.API.Middleware
             _next = next;
         }
 
-        public async Task InvokeAsync(
-            HttpContext context,
-            TenantRegistryDbContext registryDb,
-            ITenantProvider tenantProvider)
+        public async Task InvokeAsync(HttpContext context, ITenantProvider tenantProvider, TenantRegistryDbContext registryDb)
         {
+            var endpoint = context.GetEndpoint();
+
+            // 🚀 Check if endpoint has SkipTenantResolution attribute
+            if (endpoint?.Metadata.GetMetadata<SkipTenantResolutionAttribute>() != null)
+            {
+                await _next(context);
+                return;
+            }
+
             var tenantId = context.Request.Headers["X-Tenant-ID"].FirstOrDefault();
 
             if (string.IsNullOrWhiteSpace(tenantId))
                 throw new Exception("Tenant header missing");
 
-            var tenant = await registryDb.Tenants
-                .FirstOrDefaultAsync(t => t.Identifier == tenantId);
+            var tenant = await registryDb.Tenants.FirstOrDefaultAsync(t => t.Identifier == tenantId);
 
             if (tenant == null || !tenant.IsActive)
                 throw new Exception("Invalid tenant");

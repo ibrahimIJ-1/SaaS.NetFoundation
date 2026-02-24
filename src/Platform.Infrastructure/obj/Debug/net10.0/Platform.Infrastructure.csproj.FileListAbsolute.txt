@@ -3,9 +3,11 @@ F:\projects\TeethDen.Platform\src\Platform.Infrastructure\bin\Debug\net10.0\Plat
 F:\projects\TeethDen.Platform\src\Platform.Infrastructure\bin\Debug\net10.0\Platform.Infrastructure.pdb
 F:\projects\TeethDen.Platform\src\Platform.Infrastructure\bin\Debug\net10.0\Platform.Application.dll
 F:\projects\TeethDen.Platform\src\Platform.Infrastructure\bin\Debug\net10.0\Platform.Domain.dll
+F:\projects\TeethDen.Platform\src\Platform.Infrastructure\bin\Debug\net10.0\Platform.Persistence.dll
 F:\projects\TeethDen.Platform\src\Platform.Infrastructure\bin\Debug\net10.0\Platform.Shared.dll
 F:\projects\TeethDen.Platform\src\Platform.Infrastructure\bin\Debug\net10.0\Platform.Application.pdb
 F:\projects\TeethDen.Platform\src\Platform.Infrastructure\bin\Debug\net10.0\Platform.Domain.pdb
+F:\projects\TeethDen.Platform\src\Platform.Infrastructure\bin\Debug\net10.0\Platform.Persistence.pdb
 F:\projects\TeethDen.Platform\src\Platform.Infrastructure\bin\Debug\net10.0\Platform.Shared.pdb
 F:\projects\TeethDen.Platform\src\Platform.Infrastructure\obj\Debug\net10.0\Platform.Infrastructure.csproj.AssemblyReference.cache
 F:\projects\TeethDen.Platform\src\Platform.Infrastructure\obj\Debug\net10.0\Platform.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig

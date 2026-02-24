@@ -10,6 +10,7 @@ namespace Platform.Infrastructure
         {
             // Register external services, queues, email, etc.
             services.AddScoped<ITenantProvider, TenantProvider>();
+            services.AddScoped<TenantDatabaseInitializer>();
 
             return services;
         }
