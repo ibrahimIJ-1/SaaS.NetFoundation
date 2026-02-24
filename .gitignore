@@ -1,0 +1,30 @@
+# .NET build outputs
+bin/
+obj/
+**/bin/
+**/obj/
+
+# Visual Studio / JetBrains
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.idea/
+.vscode/
+
+# Local configuration
+appsettings.Local.json
+*.local
+
+# Logs
+*.log
+
+# Secrets
+secrets.json
+*.pfx
+*.key
+
+# Packages
+*.nupkg
+*.snupkg
+.nuget/

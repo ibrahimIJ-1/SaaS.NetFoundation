@@ -21,7 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Platform.Application\Platform.Application.csproj" />
     <ProjectReference Include="..\Platform.Domain\Platform.Domain.csproj" />
   </ItemGroup>
 

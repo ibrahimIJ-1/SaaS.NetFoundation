@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Platform.API.Middleware;
 using Platform.Application;
 using Platform.Application.Abstractions;
@@ -12,54 +11,59 @@ using Platform.Persistence;
 using Platform.Persistence.Identity;
 using Platform.Persistence.Seed;
 using Platform.Persistence.Tenants;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Core layers
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure();
 builder.Services.AddPersistence(builder.Configuration);
+
+// Master DB
 builder.Services.AddDbContext<TenantRegistryDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MasterDb")));
+
+builder.Services.AddScoped<ITenantProvisioningService, TenantProvisioningService>();
+// Tenant provider
 builder.Services.AddScoped<ITenantProvider, TenantProvider>();
+
+// Tenant-aware Identity DbContext (DI) for resolved tenants
 builder.Services.AddDbContext<TenantIdentityDbContext>((provider, options) =>
 {
     var tenantProvider = provider.GetRequiredService<ITenantProvider>();
+    var configuration = provider.GetRequiredService<IConfiguration>();
 
-    var connectionString = tenantProvider.GetConnectionString();
+    var connectionString = tenantProvider.CurrentTenant?.ConnectionString
+        ?? configuration.GetConnectionString("MasterDb");
 
-    if (!string.IsNullOrEmpty(connectionString))
-    {
-        options.UseSqlServer(connectionString);
-    }
+    options.UseSqlServer(connectionString);
 });
 
-
+// Identity
 builder.Services
     .AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<TenantIdentityDbContext>()
     .AddDefaultTokenProviders();
-builder.Services.AddScoped<ITenantProvisioningService, TenantProvisioningService>();
 
-// Add services to the container.
+// Tenant-aware ApplicationDbContext
+builder.Services.AddDbContext<ApplicationDbContext>((provider, options) =>
+{
+    var tenantProvider = provider.GetRequiredService<ITenantProvider>();
+    var configuration = provider.GetRequiredService<IConfiguration>();
+    var connectionString = tenantProvider.CurrentTenant?.ConnectionString
+        ?? configuration.GetConnectionString("MasterDb");
+    options.UseSqlServer(connectionString);
+});
 
+// Controllers + Swagger + JWT Auth
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-
-builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-var jwtSettings = builder.Configuration.GetSection("Jwt");
-
-builder.Services
-    .AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.TokenValidationParameters = new TokenValidationParameters
+        var jwtSettings = builder.Configuration.GetSection("Jwt");
+        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateAudience = true,
@@ -67,11 +71,14 @@ builder.Services
             ValidateIssuerSigningKey = true,
             ValidIssuer = jwtSettings["Issuer"],
             ValidAudience = jwtSettings["Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtSettings["Key"]))
+            IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
+                System.Text.Encoding.UTF8.GetBytes(jwtSettings["Key"]))
         };
     });
+
 var app = builder.Build();
+
+// Seed master DB
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -79,21 +86,14 @@ using (var scope = app.Services.CreateScope())
     await MasterDbSeeder.SeedAsync(context);
 }
 
-// Configure the HTTP request pipeline.
+// Pipeline
 if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+    app.UseSwaggerUI();
 
 app.UseSwagger();
-app.UseSwaggerUI();
-app.UseAuthentication();
 app.UseMiddleware<TenantResolutionMiddleware>();
+app.UseAuthentication();
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
-
 app.MapControllers();
-
 app.Run();
