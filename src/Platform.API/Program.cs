@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Platform.API.Middleware;
 using Platform.Application;
 using Platform.Application.Abstractions;
@@ -10,11 +12,15 @@ using Platform.Persistence;
 using Platform.Persistence.Identity;
 using Platform.Persistence.Seed;
 using Platform.Persistence.Tenants;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure();
 builder.Services.AddPersistence(builder.Configuration);
+builder.Services.AddDbContext<TenantRegistryDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("MasterDb")));
 builder.Services.AddScoped<ITenantProvider, TenantProvider>();
 builder.Services.AddDbContext<TenantIdentityDbContext>((provider, options) =>
 {
@@ -43,6 +49,28 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+
+builder.Services
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings["Issuer"],
+            ValidAudience = jwtSettings["Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwtSettings["Key"]))
+        };
+    });
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
@@ -59,9 +87,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseSwagger();
 app.UseSwaggerUI();
+app.UseAuthentication();
 app.UseMiddleware<TenantResolutionMiddleware>();
 app.UseHttpsRedirection();
-app.UseAuthentication();
+
 app.UseAuthorization();
 
 

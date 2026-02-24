@@ -172,3 +172,4 @@ F:\projects\TeethDen.Platform\src\Platform.API\obj\Debug\net10.0\refint\Platform
 F:\projects\TeethDen.Platform\src\Platform.API\obj\Debug\net10.0\Platform.API.pdb
 F:\projects\TeethDen.Platform\src\Platform.API\obj\Debug\net10.0\Platform.API.genruntimeconfig.cache
 F:\projects\TeethDen.Platform\src\Platform.API\obj\Debug\net10.0\ref\Platform.API.dll
+F:\projects\TeethDen.Platform\src\Platform.API\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll

@@ -21,13 +21,17 @@ namespace Platform.API.Middleware
             var endpoint = context.GetEndpoint();
 
             // 🚀 Check if endpoint has SkipTenantResolution attribute
+
             if (endpoint?.Metadata.GetMetadata<SkipTenantResolutionAttribute>() != null)
             {
                 await _next(context);
                 return;
             }
 
-            var tenantId = context.Request.Headers["X-Tenant-ID"].FirstOrDefault();
+            var tenantId = context.User?.FindFirst("tenantId")?.Value;
+
+            if (string.IsNullOrWhiteSpace(tenantId))
+                throw new Exception("Tenant not found in token");
 
             if (string.IsNullOrWhiteSpace(tenantId))
                 throw new Exception("Tenant header missing");
