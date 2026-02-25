@@ -37,24 +37,22 @@ namespace Platform.API.Controllers
             if (string.IsNullOrWhiteSpace(tenantId))
                 return BadRequest("Tenant header required");
 
-            var tenant = await _registryDb.Tenants
-                .FirstOrDefaultAsync(t => t.Identifier == tenantId);
-            if (tenant == null)
-                return BadRequest("Tenant not found");
+            var tenant = await _registryDb.Tenants.FirstOrDefaultAsync(t => t.Identifier == tenantId);
+            if (tenant == null) return BadRequest("Tenant not found");
 
-            // 🔥 Manual Identity DbContext for login
+            // Create tenant Identity DbContext dynamically
             var options = new DbContextOptionsBuilder<TenantIdentityDbContext>()
                 .UseSqlServer(tenant.ConnectionString)
                 .Options;
 
             using var identityDb = new TenantIdentityDbContext(options);
 
-            var store = new UserStore<IdentityUser>(identityDb);
-            var userManager = new UserManager<IdentityUser>(
-                store, null,
-                new PasswordHasher<IdentityUser>(),
-                new List<IUserValidator<IdentityUser>>(),
-                new List<IPasswordValidator<IdentityUser>>(),
+            var userManager = new UserManager<ApplicationUser>(
+                new UserStore<ApplicationUser>(identityDb),
+                null,
+                new PasswordHasher<ApplicationUser>(),
+                new List<IUserValidator<ApplicationUser>>(),
+                new List<IPasswordValidator<ApplicationUser>>(),
                 new UpperInvariantLookupNormalizer(),
                 new IdentityErrorDescriber(),
                 null, null);
@@ -65,12 +63,11 @@ namespace Platform.API.Controllers
 
             var roles = await userManager.GetRolesAsync(user);
 
-            var jwt = GenerateJwt(user, roles, tenant.Identifier);
-
-            return Ok(new { token = jwt, tenantId = tenant.Identifier });
+            var token = GenerateJwt(user, roles, tenant.Identifier);
+            return Ok(new { token, tenantId = tenant.Identifier });
         }
 
-        private string GenerateJwt(IdentityUser user, IList<string> roles, string tenantId)
+        private string GenerateJwt(ApplicationUser user, IList<string> roles, string tenantId)
         {
             var jwtSettings = _configuration.GetSection("Jwt");
             var claims = new List<Claim>
@@ -79,7 +76,8 @@ namespace Platform.API.Controllers
             new Claim("tenantId", tenantId),
             new Claim(JwtRegisteredClaimNames.Email, user.Email!)
         };
-            claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
+
+            claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r))); // matches RoleClaimType
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Platform.Persistence.Identity
 {
-    public class TenantIdentityDbContext : IdentityDbContext<IdentityUser, IdentityRole, string>
+    public class TenantIdentityDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string>
     {
         public TenantIdentityDbContext(DbContextOptions<TenantIdentityDbContext> options)
             : base(options) { }

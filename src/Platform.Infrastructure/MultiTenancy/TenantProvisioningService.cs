@@ -72,7 +72,6 @@ namespace Platform.Infrastructure.MultiTenancy
             {
                 UserName = request.AdminEmail,
                 Email = request.AdminEmail,
-                TenantId = request.Identifier
             };
 
             await userManager.CreateAsync(admin, request.AdminPassword);

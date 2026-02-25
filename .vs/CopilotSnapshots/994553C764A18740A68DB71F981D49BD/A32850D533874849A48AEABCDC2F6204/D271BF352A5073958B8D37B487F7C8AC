@@ -28,14 +28,6 @@ namespace Platform.API.Middleware
                 return;
             }
 
-            // If a tenant was already resolved earlier (e.g. by TenantFromJwtMiddleware), use it.
-            if (!string.IsNullOrWhiteSpace(tenantProvider.CurrentTenant?.Id))
-            {
-                await _next(context);
-                return;
-            }
-
-            // Otherwise try to resolve tenant from authenticated user claim or header.
             var tenantId = context.User?.FindFirst("tenantId")?.Value
                            ?? context.Request.Headers["X-Tenant-ID"].FirstOrDefault();
 

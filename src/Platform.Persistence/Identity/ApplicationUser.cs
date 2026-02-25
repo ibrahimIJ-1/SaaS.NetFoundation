@@ -7,6 +7,6 @@ namespace Platform.Persistence.Identity
 {
     public class ApplicationUser : IdentityUser
     {
-        public string TenantId { get; set; } = default!;
+        public string? FullName { get; set; }
     }
 }
