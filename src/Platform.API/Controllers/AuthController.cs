@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Platform.Application.Abstractions;
 using Platform.Application.Auth;
 using Platform.Application.Multitenancy;
+using Platform.Domain.Tenants;
 using Platform.Infrastructure.MultiTenancy;
 using Platform.Persistence.Identity;
 using Platform.Persistence.Tenants;
@@ -22,12 +23,15 @@ namespace Platform.API.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly TenantRegistryDbContext _registryDb;
+        private readonly TenantIdentityDbContext _dbContext;
 
         public AuthController(IConfiguration configuration,
+        TenantIdentityDbContext dbContext,
                               TenantRegistryDbContext registryDb)
         {
             _configuration = configuration;
             _registryDb = registryDb;
+            _dbContext = dbContext;
         }
 
         [HttpPost("login")]
@@ -63,11 +67,17 @@ namespace Platform.API.Controllers
 
             var roles = await userManager.GetRolesAsync(user);
 
-            var token = GenerateJwt(user, roles, tenant.Identifier);
+            var permissions = await identityDb.RolePermissions
+    .Where(rp => roles.Contains(rp.Role.Name))
+    .Select(rp => rp.Permission.Name)
+    .Distinct()
+    .ToListAsync();
+
+            var token = GenerateJwt(user, roles, tenant.Identifier, permissions);
             return Ok(new { token, tenantId = tenant.Identifier });
         }
 
-        private string GenerateJwt(ApplicationUser user, IList<string> roles, string tenantId)
+        private string GenerateJwt(ApplicationUser user, IList<string> roles, string tenantId, IList<string> permissions)
         {
             var jwtSettings = _configuration.GetSection("Jwt");
             var claims = new List<Claim>
@@ -78,6 +88,10 @@ namespace Platform.API.Controllers
         };
 
             claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r))); // matches RoleClaimType
+            foreach (var permission in permissions)
+            {
+                claims.Add(new Claim("permission", permission));
+            }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

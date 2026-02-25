@@ -14,7 +14,7 @@ namespace Platform.Persistence.Identity
             var optionsBuilder = new DbContextOptionsBuilder<TenantIdentityDbContext>();
 
             optionsBuilder.UseSqlServer(
-                "Server=BRROZ\\SQLEXPRESS;Database=TenantIdentityTemplateDb;Trusted_Connection=True;MultipleActiveResultSets=true");
+                "Server=BRROZ\\SQLEXPRESS;Database=TenantIdentityTemplateDb;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;");
 
             return new TenantIdentityDbContext(optionsBuilder.Options);
         }

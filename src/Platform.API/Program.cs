@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -6,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Platform.API.Middleware;
 using Platform.Application;
 using Platform.Application.Abstractions;
+using Platform.Application.Common.Security;
 using Platform.Application.Multitenancy;
 using Platform.Infrastructure;
 using Platform.Infrastructure.MultiTenancy;
@@ -17,7 +19,10 @@ using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddAuthorization();
 
+builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
+builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 // CORS
 builder.Services.AddCors(options =>
 {

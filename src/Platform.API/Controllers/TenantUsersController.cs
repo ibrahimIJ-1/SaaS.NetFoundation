@@ -10,8 +10,7 @@ using Platform.Application.Multitenancy.Users.Queries.GetUserById;
 
 namespace Platform.API.Controllers
 {
-    [Authorize(Roles = "Admin")]
-    //[Authorize]
+    //[Authorize(Roles = "Admin")]
     [ApiController]
     [Route("api/tenant/users")]
     public class TenantUsersController : Controller
@@ -22,7 +21,7 @@ namespace Platform.API.Controllers
         {
             _mediator = mediator;
         }
-
+        [Authorize(Policy = "Permission.Users.View")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -33,7 +32,7 @@ namespace Platform.API.Controllers
 
             return Ok(result.Data);
         }
-
+        [Authorize(Policy = "Permission.Users.View")]
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetById(string userId)
         {
@@ -48,6 +47,7 @@ namespace Platform.API.Controllers
             return Ok(result.Data);
         }
 
+        [Authorize(Policy = "Permission.Users.Create")]
         [HttpPost]
         public async Task<IActionResult> Create(CreateUserCommand command)
         {
@@ -59,6 +59,7 @@ namespace Platform.API.Controllers
             return Ok();
         }
 
+        [Authorize(Policy = "Permission.Users.Update")]
         [HttpPut("{userId}")]
         public async Task<IActionResult> Update(string userId, [FromBody] UpdateUserCommand command)
         {
@@ -71,6 +72,7 @@ namespace Platform.API.Controllers
             return Ok();
         }
 
+        [Authorize(Policy = "Permission.Users.Delete")]
         [HttpDelete("{userId}")]
         public async Task<IActionResult> Delete(string userId)
         {

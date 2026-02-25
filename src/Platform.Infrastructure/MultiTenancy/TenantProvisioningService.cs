@@ -5,10 +5,9 @@ using Microsoft.Extensions.Configuration;
 using Platform.Application.Multitenancy;
 using Platform.Domain.Tenants;
 using Platform.Persistence.Identity;
+using Platform.Persistence.Permissions;
 using Platform.Persistence.Tenants;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Platform.Shared;
 
 namespace Platform.Infrastructure.MultiTenancy
 {
@@ -57,16 +56,47 @@ namespace Platform.Infrastructure.MultiTenancy
             // 5️⃣ Seed roles
             var roleStore = new RoleStore<IdentityRole>(tenantDb);
             var roleManager = new RoleManager<IdentityRole>(
-                roleStore, null, null, null, null);
+                roleStore,
+                null,
+                null,
+                null,
+                null);
 
             await roleManager.CreateAsync(new IdentityRole("Admin"));
             await roleManager.CreateAsync(new IdentityRole("User"));
+
+            // 6️⃣ Seed permissions
+            var permissions = PermissionDefinitions.All
+    .Select(p => new Permission
+    {
+        Id = Guid.NewGuid(),
+        Name = p
+    }).ToList();
+
+            await tenantDb.Permissions.AddRangeAsync(permissions);
+            await tenantDb.SaveChangesAsync();
+
+            // 7️⃣ Assign all permissions to Admin role
+            var adminRole = await roleManager.FindByNameAsync("Admin");
+
+            foreach (var permission in permissions)
+            {
+                tenantDb.RolePermissions.Add(new RolePermission
+                {
+                    RoleId = adminRole.Id,
+                    PermissionId = permission.Id,
+                });
+            }
+
+            await tenantDb.SaveChangesAsync();
 
             // 6️⃣ Create admin user
             var userStore = new UserStore<ApplicationUser>(tenantDb);
             var userManager = new UserManager<ApplicationUser>(
                 userStore, null, new PasswordHasher<ApplicationUser>(),
                 null, null, null, null, null, null);
+
+
 
             var admin = new ApplicationUser
             {
