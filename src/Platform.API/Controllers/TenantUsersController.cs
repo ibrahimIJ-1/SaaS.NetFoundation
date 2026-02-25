@@ -6,6 +6,7 @@ using Platform.Application.Multitenancy.Users.Commands.CreateUser;
 using Platform.Application.Multitenancy.Users.Commands.DeleteUser;
 using Platform.Application.Multitenancy.Users.Commands.UpdateUser;
 using Platform.Application.Multitenancy.Users.Queries.GetAllUsers;
+using Platform.Application.Multitenancy.Users.Queries.GetUserById;
 
 namespace Platform.API.Controllers
 {
@@ -29,6 +30,20 @@ namespace Platform.API.Controllers
 
             if (!result.IsSuccess)
                 return BadRequest(result.Errors);
+
+            return Ok(result.Data);
+        }
+
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetById(string userId)
+        {
+            var result = await _mediator.Send(new GetUserByIdQuery
+            {
+                UserId = userId
+            });
+
+            if (!result.IsSuccess)
+                return NotFound(result.Errors);
 
             return Ok(result.Data);
         }

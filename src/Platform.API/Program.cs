@@ -115,7 +115,7 @@ app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 app.UseAuthentication();                         // ✅ 1. Validate JWT first
 app.UseMiddleware<TenantFromJwtMiddleware>();     // ✅ 2. Extract tenant from authenticated JWT
-app.UseMiddleware<TenantResolutionMiddleware>();  // ✅ 3. Fallback tenant resolution
+//app.UseMiddleware<TenantResolutionMiddleware>();  // ✅ 3. Fallback tenant resolution
 app.UseAuthorization();                          // ✅ 4. Authorize
 
 if (app.Environment.IsDevelopment())

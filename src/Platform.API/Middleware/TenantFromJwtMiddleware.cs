@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Platform.Application.Abstractions;
 using Platform.Application.Multitenancy;
+using Platform.Infrastructure.MultiTenancy;
 using Platform.Persistence.Tenants;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -17,6 +18,13 @@ namespace Platform.API.Middleware
 
         public async Task InvokeAsync(HttpContext context, ITenantProvider tenantProvider, TenantRegistryDbContext registryDb)
         {
+            var endpoint = context.GetEndpoint();
+            if (endpoint?.Metadata.GetMetadata<SkipTenantResolutionAttribute>() != null)
+            {
+                await _next(context);
+                return;
+            }
+
             var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
             if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
             {
