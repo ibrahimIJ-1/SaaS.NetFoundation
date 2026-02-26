@@ -2,6 +2,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Platform.Application.Multitenancy.UserPermissionMatrix.Commands.SetUserRolesAndPermissions;
+using Platform.Application.Multitenancy.UserPermissionMatrix.Queries.GetUserPermissionMatrix;
+using Platform.Application.Multitenancy.Users.Commands.AssignRoles;
 using Platform.Application.Multitenancy.Users.Commands.CreateUser;
 using Platform.Application.Multitenancy.Users.Commands.DeleteUser;
 using Platform.Application.Multitenancy.Users.Commands.UpdateUser;
@@ -83,6 +86,42 @@ namespace Platform.API.Controllers
                 return BadRequest(result.Errors);
 
             return Ok();
+        }
+
+        [HttpPost("{userId}/roles")]
+        public async Task<IActionResult> AssignRoles(string userId, [FromBody] List<string> roleIds)
+        {
+            var result = await _mediator.Send(new AssignRolesCommand
+            {
+                UserId = userId,
+                RoleIds = roleIds
+            });
+
+            if (!result.IsSuccess) return BadRequest(result.Errors);
+            return Ok();
+        }
+
+        [HttpGet("permission-matrix")]
+        public async Task<IActionResult> GetPermissionMatrix()
+        {
+            var result = await _mediator.Send(new GetUserPermissionMatrixQuery());
+            return Ok(result);
+        }
+
+        [HttpPost("{userId}/roles-permissions")]
+        public async Task<IActionResult> SetUserRolesAndPermissions(
+    string userId,
+    [FromBody] SetUserRolesAndPermissionsCommand command)
+        {
+            if (userId != command.UserId)
+                return BadRequest("User ID mismatch.");
+
+            var result = await _mediator.Send(command);
+
+            if (!result.IsSuccess)
+                return BadRequest(result.Errors);
+
+            return Ok("Roles and permissions updated successfully.");
         }
     }
 }

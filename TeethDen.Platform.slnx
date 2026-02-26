@@ -6,6 +6,7 @@
     <Project Path="src/Platform.Infrastructure/Platform.Infrastructure.csproj" />
     <Project Path="src/Platform.Persistence/Platform.Persistence.csproj" />
     <Project Path="src/Platform.Shared/Platform.Shared.csproj" />
+    <Project Path="src/TenantMigrator/TenantMigrator.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Platform.IntegrationTests/Platform.IntegrationTests.csproj" />

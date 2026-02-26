@@ -1,27 +1,43 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Platform.Application.Common.Security;
+using Platform.Persistence.Identity;
+using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
-namespace Platform.Application.Common.Security
-{
-    public class PermissionAuthorizationHandler
+public class PermissionAuthorizationHandler
     : AuthorizationHandler<PermissionRequirement>
+{
+    private readonly TenantIdentityDbContext _dbContext;
+
+    public PermissionAuthorizationHandler(TenantIdentityDbContext dbContext)
     {
-        protected override Task HandleRequirementAsync(
-            AuthorizationHandlerContext context,
-            PermissionRequirement requirement)
+        _dbContext = dbContext;
+    }
+
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext context,
+        PermissionRequirement requirement)
+    {
+        var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null)
         {
-            var permissions = context.User
-                .FindAll("permission")
-                .Select(c => c.Value);
-
-            if (permissions.Contains(requirement.Permission))
-            {
-                context.Succeed(requirement);
-            }
-
-            return Task.CompletedTask;
+            context.Fail();
+            return;
         }
+
+        var permissions = await _dbContext.UserPermissions
+            .Where(up => up.UserId == userId)
+            .Select(up => up.Permission.Name)
+            .Union(
+                _dbContext.UserRoles
+                    .Where(ur => ur.UserId == userId)
+                    .Join(_dbContext.RolePermissions, ur => ur.RoleId, rp => rp.RoleId, (ur, rp) => rp.Permission.Name)
+            )
+            .ToListAsync();
+
+        if (permissions.Contains(requirement.Permission))
+            context.Succeed(requirement);
+        else
+            context.Fail();
     }
 }

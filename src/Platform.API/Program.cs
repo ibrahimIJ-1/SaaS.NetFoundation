@@ -21,7 +21,7 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthorization();
 
-builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 // CORS
 builder.Services.AddCors(options =>
