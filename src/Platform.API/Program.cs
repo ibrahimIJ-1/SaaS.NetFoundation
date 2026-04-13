@@ -1,3 +1,4 @@
+using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -8,9 +9,17 @@ using Platform.API.Middleware;
 using Platform.Application;
 using Platform.Application.Abstractions;
 using Platform.Application.Common.Security;
+using Platform.Application.Jobs.Interfaces;
+using Platform.Application.Messaging.Interfaces;
 using Platform.Application.Multitenancy;
+using Platform.Application.Realtime.Interfaces;
 using Platform.Infrastructure;
+using Platform.Infrastructure.Jobs.Services;
+using Platform.Infrastructure.Messaging;
 using Platform.Infrastructure.MultiTenancy;
+using Platform.Infrastructure.Notifications;
+using Platform.Infrastructure.Notifications.Jobs;
+using Platform.Infrastructure.Realtime.Hubs;
 using Platform.Persistence;
 using Platform.Persistence.Identity;
 using Platform.Persistence.Seed;
@@ -104,9 +113,35 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
+
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IJobService, JobService>();
+
+builder.Services.AddHangfire(config =>
+    config.UseSqlServerStorage(builder.Configuration.GetConnectionString("MasterDb")));
+
+builder.Services.AddHangfireServer();
+
+builder.Services.AddSignalR()
+    .AddStackExchangeRedis(builder.Configuration["Redis:ConnectionString"]);
+
+builder.Services.AddSingleton<RabbitMqConnection>(
+    new RabbitMqConnection("amqp://admin:admin@localhost:5672"));
+builder.Services.AddSingleton<IMessageBus, RabbitMqPublisher>();
+builder.Services.AddSingleton<RabbitMqConsumer>();
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var recurringJobManager = scope.ServiceProvider
+        .GetRequiredService<IRecurringJobManager>();
 
+    recurringJobManager.AddOrUpdate<NotificationRetryJob>(
+        "retry-notifications",
+        job => job.Execute(),
+        Cron.Minutely);
+}
 // Seed Master DB
 using (var scope = app.Services.CreateScope())
 {
@@ -121,7 +156,10 @@ app.UseHttpsRedirection();
 app.UseAuthentication();                         // ✅ 1. Validate JWT first
 app.UseMiddleware<TenantFromJwtMiddleware>();     // ✅ 2. Extract tenant from authenticated JWT
 //app.UseMiddleware<TenantResolutionMiddleware>();  // ✅ 3. Fallback tenant resolution
-app.UseAuthorization();                          // ✅ 4. Authorize
+app.UseAuthorization();   
+app.MapHub<NotificationHub>("/hubs/notifications");
+
+app.UseHangfireDashboard();// ✅ 4. Authorize
 
 if (app.Environment.IsDevelopment())
 {
@@ -130,4 +168,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapControllers();
+
+var consumer = app.Services.GetRequiredService<RabbitMqConsumer>();
+await consumer.StartAsync();
 app.Run();

@@ -9,5 +9,7 @@ namespace Platform.Application.Abstractions
         void SetTenant(TenantInfo tenant);
 
         string? GetConnectionString();
+
+        Task SetTenantByIdAsync(string tenantId);
     }
 }

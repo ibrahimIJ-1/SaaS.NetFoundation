@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Platform.Persistence.Notifications;
 using Platform.Persistence.Permissions;
 
 namespace Platform.Persistence.Identity
@@ -10,6 +11,7 @@ namespace Platform.Persistence.Identity
         public DbSet<Permission> Permissions => Set<Permission>();
         public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
         public DbSet<UserPermission> UserPermissions => Set<UserPermission>();
+        public DbSet<Notification> Notifications => Set<Notification>();
 
         public TenantIdentityDbContext(DbContextOptions<TenantIdentityDbContext> options)
             : base(options)
