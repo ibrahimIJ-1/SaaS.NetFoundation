@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,7 @@ using Platform.Application.Auth;
 using Platform.Application.Multitenancy;
 using Platform.Domain.Tenants;
 using Platform.Infrastructure.MultiTenancy;
+using Platform.Persistence;
 using Platform.Persistence.Identity;
 using Platform.Persistence.Tenants;
 using System.IdentityModel.Tokens.Jwt;
@@ -18,23 +20,26 @@ namespace Platform.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [SkipTenantResolution] // Important: No tenant required
     public class AuthController : ControllerBase
     {
         private readonly IConfiguration _configuration;
         private readonly TenantRegistryDbContext _registryDb;
         private readonly TenantIdentityDbContext _dbContext;
+        private readonly ApplicationDbContext _appDb;
 
         public AuthController(IConfiguration configuration,
-        TenantIdentityDbContext dbContext,
+                              TenantIdentityDbContext dbContext,
+                              ApplicationDbContext appDb,
                               TenantRegistryDbContext registryDb)
         {
             _configuration = configuration;
             _registryDb = registryDb;
             _dbContext = dbContext;
+            _appDb = appDb;
         }
 
         [HttpPost("login")]
+        [SkipTenantResolution]
         public async Task<IActionResult> Login([FromBody] LoginRequest request,
                                                [FromHeader(Name = "X-Tenant-ID")] string tenantId)
         {
@@ -65,16 +70,100 @@ namespace Platform.API.Controllers
             if (user == null || !await userManager.CheckPasswordAsync(user, request.Password))
                 return Unauthorized("Invalid credentials");
 
+            if (!user.IsActive)
+                return Unauthorized("Account is disabled");
+
             var roles = await userManager.GetRolesAsync(user);
 
             var permissions = await identityDb.RolePermissions
-    .Where(rp => roles.Contains(rp.Role.Name))
-    .Select(rp => rp.Permission.Name)
-    .Distinct()
-    .ToListAsync();
+                .Where(rp => roles.Contains(rp.Role.Name))
+                .Select(rp => rp.Permission.Name)
+                .Distinct()
+                .ToListAsync();
+
+            // Get feature flags
+            var appOptions = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseSqlServer(tenant.ConnectionString)
+                .Options;
+
+            using var appDb = new ApplicationDbContext(appOptions);
+
+            var features = await appDb.TenantFeatures
+                .Where(f => f.IsEnabled)
+                .Select(f => f.FeatureKey)
+                .ToListAsync();
 
             var token = GenerateJwt(user, roles, tenant.Identifier, permissions);
-            return Ok(new { token, tenantId = tenant.Identifier });
+            return Ok(new
+            {
+                token,
+                tenantId = tenant.Identifier,
+                user = new
+                {
+                    id = user.Id,
+                    email = user.Email,
+                    fullName = user.FullName,
+                    jobTitle = user.JobTitle,
+                    avatarUrl = user.AvatarUrl,
+                    preferredLanguage = user.PreferredLanguage,
+                    roles = roles,
+                    permissions = permissions,
+                    features = features
+                }
+            });
+        }
+
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMe()
+        {
+            var userId = User.FindFirstValue(JwtRegisteredClaimNames.Sub)
+                         ?? User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var user = await _dbContext.Users
+                .OfType<ApplicationUser>()
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null) return NotFound("User not found");
+
+            var userManager = new UserManager<ApplicationUser>(
+                new UserStore<ApplicationUser>(_dbContext),
+                null,
+                new PasswordHasher<ApplicationUser>(),
+                new List<IUserValidator<ApplicationUser>>(),
+                new List<IPasswordValidator<ApplicationUser>>(),
+                new UpperInvariantLookupNormalizer(),
+                new IdentityErrorDescriber(),
+                null, null);
+
+            var roles = await userManager.GetRolesAsync(user);
+
+            var permissions = await _dbContext.RolePermissions
+                .Where(rp => roles.Contains(rp.Role.Name))
+                .Select(rp => rp.Permission.Name)
+                .Distinct()
+                .ToListAsync();
+
+            var features = await _appDb.TenantFeatures
+                .Where(f => f.IsEnabled)
+                .Select(f => f.FeatureKey)
+                .ToListAsync();
+
+            return Ok(new
+            {
+                id = user.Id,
+                email = user.Email,
+                fullName = user.FullName,
+                jobTitle = user.JobTitle,
+                avatarUrl = user.AvatarUrl,
+                preferredLanguage = user.PreferredLanguage,
+                roles = roles,
+                permissions = permissions,
+                features = features
+            });
         }
 
         private string GenerateJwt(ApplicationUser user, IList<string> roles, string tenantId, IList<string> permissions)

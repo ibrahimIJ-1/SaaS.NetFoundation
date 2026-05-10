@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Platform.Persistence.Tenants;
 
 namespace Platform.Persistence.Identity
@@ -20,13 +20,29 @@ namespace Platform.Persistence.Identity
 
             foreach (var tenant in tenants)
             {
-                var optionsBuilder = new DbContextOptionsBuilder<TenantIdentityDbContext>();
-                optionsBuilder.UseSqlServer(tenant.ConnectionString);
+                Console.WriteLine($"Starting migration for tenant: {tenant.Identifier}");
 
-                using var tenantDb = new TenantIdentityDbContext(optionsBuilder.Options);
-                await tenantDb.Database.MigrateAsync();
+                // 1. Migrate Identity Context
+                var identityOptions = new DbContextOptionsBuilder<TenantIdentityDbContext>()
+                    .UseSqlServer(tenant.ConnectionString)
+                    .Options;
 
-                Console.WriteLine($"Migrated tenant {tenant.Identifier}");
+                using (var identityDb = new TenantIdentityDbContext(identityOptions))
+                {
+                    await identityDb.Database.MigrateAsync();
+                }
+
+                // 2. Migrate Application Context
+                var appOptions = new DbContextOptionsBuilder<ApplicationDbContext>()
+                    .UseSqlServer(tenant.ConnectionString)
+                    .Options;
+
+                using (var appDb = new ApplicationDbContext(appOptions))
+                {
+                    await appDb.Database.MigrateAsync();
+                }
+
+                Console.WriteLine($"Successfully migrated tenant: {tenant.Identifier}");
             }
         }
     }

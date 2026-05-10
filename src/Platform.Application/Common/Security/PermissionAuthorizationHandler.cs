@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Platform.Application.Common.Security;
 using Platform.Persistence.Identity;
 using System.Security.Claims;
@@ -25,17 +25,22 @@ public class PermissionAuthorizationHandler
             return;
         }
 
-        var permissions = await _dbContext.UserPermissions
+        var userPermissions = await _dbContext.UserPermissions
             .Where(up => up.UserId == userId)
             .Select(up => up.Permission.Name)
-            .Union(
-                _dbContext.UserRoles
-                    .Where(ur => ur.UserId == userId)
-                    .Join(_dbContext.RolePermissions, ur => ur.RoleId, rp => rp.RoleId, (ur, rp) => rp.Permission.Name)
-            )
             .ToListAsync();
 
-        if (permissions.Contains(requirement.Permission))
+        var rolePermissions = await _dbContext.UserRoles
+            .Where(ur => ur.UserId == userId)
+            .Join(_dbContext.RolePermissions, 
+                ur => ur.RoleId, 
+                rp => rp.RoleId, 
+                (ur, rp) => rp.Permission.Name)
+            .ToListAsync();
+
+        var allPermissions = userPermissions.Concat(rolePermissions).Distinct();
+
+        if (allPermissions.Contains(requirement.Permission))
             context.Succeed(requirement);
         else
             context.Fail();

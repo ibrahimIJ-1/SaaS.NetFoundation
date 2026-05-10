@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Platform.Application.Multitenancy;
+using Platform.Domain.Entities;
 using Platform.Domain.Tenants;
+using Platform.Persistence;
 using Platform.Persistence.Identity;
 using Platform.Persistence.Permissions;
 using Platform.Persistence.Tenants;
@@ -63,15 +65,21 @@ namespace Platform.Infrastructure.MultiTenancy
                 null);
 
             await roleManager.CreateAsync(new IdentityRole("Admin"));
+            await roleManager.CreateAsync(new IdentityRole("Doctor"));
+            await roleManager.CreateAsync(new IdentityRole("Receptionist"));
+            await roleManager.CreateAsync(new IdentityRole("Accountant"));
+            await roleManager.CreateAsync(new IdentityRole("Nurse"));
+            await roleManager.CreateAsync(new IdentityRole("InventoryManager"));
+            await roleManager.CreateAsync(new IdentityRole("BranchManager"));
             await roleManager.CreateAsync(new IdentityRole("User"));
 
             // 6️⃣ Seed permissions
             var permissions = PermissionDefinitions.All
-    .Select(p => new Permission
-    {
-        Id = Guid.NewGuid(),
-        Name = p
-    }).ToList();
+                .Select(p => new Permission
+                {
+                    Id = Guid.NewGuid(),
+                    Name = p
+                }).ToList();
 
             await tenantDb.Permissions.AddRangeAsync(permissions);
             await tenantDb.SaveChangesAsync();
@@ -90,18 +98,37 @@ namespace Platform.Infrastructure.MultiTenancy
 
             await tenantDb.SaveChangesAsync();
 
-            // 6️⃣ Create admin user
+            // 8️⃣ Seed feature flags (using AppDb)
+            var appOptions = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseSqlServer(tenantConnectionString)
+                .Options;
+
+            using var appDb = new ApplicationDbContext(appOptions);
+            await appDb.Database.MigrateAsync(); // Ensure business tables are created
+
+            var features = FeatureFlags.All
+                .Select(f => new TenantFeature
+                {
+                    FeatureKey = f,
+                    IsEnabled = true,
+                    Description = $"Enable/disable the {f} module"
+                }).ToList();
+
+            await appDb.TenantFeatures.AddRangeAsync(features);
+            await appDb.SaveChangesAsync();
+
+            // 9️⃣ Create admin user
             var userStore = new UserStore<ApplicationUser>(tenantDb);
             var userManager = new UserManager<ApplicationUser>(
                 userStore, null, new PasswordHasher<ApplicationUser>(),
                 null, null, null, null, null, null);
 
-
-
             var admin = new ApplicationUser
             {
                 UserName = request.AdminEmail,
                 Email = request.AdminEmail,
+                FullName = "System Administrator",
+                IsActive = true,
             };
 
             await userManager.CreateAsync(admin, request.AdminPassword);
