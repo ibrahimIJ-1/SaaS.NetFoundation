@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "F:\\projects\\TeethDen.Platform\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{6CA9EDB2-3C10-9B0A-3262-8112643A659A}|src\\Platform.API\\Platform.API.csproj|f:\\projects\\teethden.platform\\src\\platform.api\\controllers\\tenantbillingcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6CA9EDB2-3C10-9B0A-3262-8112643A659A}|src\\Platform.API\\Platform.API.csproj|solutionrelative:src\\platform.api\\controllers\\tenantbillingcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{6CA9EDB2-3C10-9B0A-3262-8112643A659A}|src\\Platform.API\\Platform.API.csproj|f:\\projects\\teethden.platform\\src\\platform.api\\controllers\\tenantappointmentscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{6CA9EDB2-3C10-9B0A-3262-8112643A659A}|src\\Platform.API\\Platform.API.csproj|solutionrelative:src\\platform.api\\controllers\\tenantappointmentscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -58,11 +62,24 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
+              "Title": "TenantBillingController.cs",
+              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.API\\Controllers\\TenantBillingController.cs",
+              "RelativeDocumentMoniker": "src\\Platform.API\\Controllers\\TenantBillingController.cs",
+              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.API\\Controllers\\TenantBillingController.cs",
+              "RelativeToolTip": "src\\Platform.API\\Controllers\\TenantBillingController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-09T12:48:23.983Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "AppointmentUpdateCommands.cs",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Application\\Clinical\\Appointments\\Commands\\AppointmentUpdateCommands.cs",
               "RelativeDocumentMoniker": "src\\Platform.Application\\Clinical\\Appointments\\Commands\\AppointmentUpdateCommands.cs",
@@ -74,7 +91,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "TenantAppointmentsController.cs",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.API\\Controllers\\TenantAppointmentsController.cs",
               "RelativeDocumentMoniker": "src\\Platform.API\\Controllers\\TenantAppointmentsController.cs",
@@ -87,7 +104,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "TenantIdentityDbContextModelSnapshot.cs",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\TenantIdentityDb\\TenantIdentityDbContextModelSnapshot.cs",
               "RelativeDocumentMoniker": "src\\Platform.Persistence\\Migrations\\TenantIdentityDb\\TenantIdentityDbContextModelSnapshot.cs",
@@ -99,7 +116,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "TenantIdentityDbContextFactory.cs",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Identity\\TenantIdentityDbContextFactory.cs",
               "RelativeDocumentMoniker": "src\\Platform.Persistence\\Identity\\TenantIdentityDbContextFactory.cs",
@@ -111,7 +128,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "TenantIdentityDbContext.cs",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Identity\\TenantIdentityDbContext.cs",
               "RelativeDocumentMoniker": "src\\Platform.Persistence\\Identity\\TenantIdentityDbContext.cs",
@@ -123,7 +140,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "TenantRegistryDbContextFactory.cs",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\TenantRegistryDbContextFactory.cs",
               "RelativeDocumentMoniker": "src\\Platform.Persistence\\TenantRegistryDbContextFactory.cs",
@@ -135,7 +152,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "TenantRegistryDbContextModelSnapshot.cs",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\TenantRegistryDbContextModelSnapshot.cs",
               "RelativeDocumentMoniker": "src\\Platform.Persistence\\Migrations\\TenantRegistryDbContextModelSnapshot.cs",
@@ -147,7 +164,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "launchSettings.json",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.API\\Properties\\launchSettings.json",
               "RelativeDocumentMoniker": "src\\Platform.API\\Properties\\launchSettings.json",
@@ -159,7 +176,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 11,
               "Title": "Platform.API",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.API\\Platform.API.csproj",
               "RelativeDocumentMoniker": "src\\Platform.API\\Platform.API.csproj",
@@ -170,7 +187,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 12,
               "Title": "appsettings.json",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.API\\appsettings.json",
               "RelativeDocumentMoniker": "src\\Platform.API\\appsettings.json",
@@ -182,7 +199,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "ApplicationDbContextFactory.cs",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\ApplicationDbContextFactory.cs",
               "RelativeDocumentMoniker": "src\\Platform.Persistence\\ApplicationDbContextFactory.cs",
@@ -194,7 +211,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "TenantRegistryDbContext.cs",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Tenants\\TenantRegistryDbContext.cs",
               "RelativeDocumentMoniker": "src\\Platform.Persistence\\Tenants\\TenantRegistryDbContext.cs",

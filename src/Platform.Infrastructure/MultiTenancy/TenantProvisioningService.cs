@@ -65,12 +65,6 @@ namespace Platform.Infrastructure.MultiTenancy
                 null);
 
             await roleManager.CreateAsync(new IdentityRole("Admin"));
-            await roleManager.CreateAsync(new IdentityRole("Doctor"));
-            await roleManager.CreateAsync(new IdentityRole("Receptionist"));
-            await roleManager.CreateAsync(new IdentityRole("Accountant"));
-            await roleManager.CreateAsync(new IdentityRole("Nurse"));
-            await roleManager.CreateAsync(new IdentityRole("InventoryManager"));
-            await roleManager.CreateAsync(new IdentityRole("BranchManager"));
             await roleManager.CreateAsync(new IdentityRole("User"));
 
             // 6️⃣ Seed permissions
