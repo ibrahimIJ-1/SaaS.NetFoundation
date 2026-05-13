@@ -13,13 +13,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useWorkflows, useCreateTransaction } from '@/hooks/use-workflows';
 import { useContacts } from '@/hooks/use-contacts';
+import { useCurrencies } from '@/hooks/use-currencies';
 import { WorkflowDefinition } from '@/types/workflow';
 
 const schema = z.object({
   workflowDefinitionId: z.string().min(1, 'اختر نوع الإجراء'),
   contactId: z.string().optional(),
   clientName: z.string().optional(),
-  actualPrice: z.coerce.number().min(0, 'السعر يجب أن يكون صحيحاً'),
+  actualPrice: z.coerce.number(),
+  currencyId: z.string().min(1, 'العملة مطلوبة'),
   notes: z.string().optional(),
 });
 type FormData = z.infer<typeof schema>;
@@ -33,19 +35,24 @@ interface StartTransactionModalProps {
 export function StartTransactionModal({ open, onClose, onSuccess }: StartTransactionModalProps) {
   const { data: workflows, isLoading: loadingWorkflows } = useWorkflows();
   const { data: contacts } = useContacts();
+  const { data: currencies } = useCurrencies();
   const { mutate: create, isPending } = useCreateTransaction();
-  const [selectedWorkflow, setSelectedWorkflow] = useState<WorkflowDefinition | null>(null);
-
+  
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { workflowDefinitionId: '', contactId: '', clientName: '', actualPrice: 0, notes: '' },
+    defaultValues: { workflowDefinitionId: '', contactId: '', clientName: '', actualPrice: 0, currencyId: '', notes: '' },
   });
 
+  const selectedWorkflowId = form.watch('workflowDefinitionId');
+  const selectedWorkflow = workflows?.find((w) => w.id === selectedWorkflowId);
+
   const handleWorkflowChange = (id: string) => {
-    const wf = workflows?.find((w) => w.id === id) ?? null;
-    setSelectedWorkflow(wf);
     form.setValue('workflowDefinitionId', id);
-    if (wf) form.setValue('actualPrice', wf.totalEstimatedPrice);
+    const wf = workflows?.find(w => w.id === id);
+    if (wf) {
+      form.setValue('actualPrice', wf.totalEstimatedPrice);
+      if (wf.currencyId) form.setValue('currencyId', wf.currencyId);
+    }
   };
 
   const handleContactChange = (id: string) => {
@@ -134,12 +141,31 @@ export function StartTransactionModal({ open, onClose, onSuccess }: StartTransac
             <Input placeholder="الاسم الكامل..." {...form.register('clientName')} />
           </div>
 
-          {/* Actual Price */}
           <div className="space-y-1">
             <Label>السعر المتفق عليه *</Label>
-            <Input type="number" min="0" step="500" {...form.register('actualPrice')} />
+            <Input type="number" {...form.register('actualPrice')} />
             {form.formState.errors.actualPrice && (
               <p className="text-xs text-red-500">{form.formState.errors.actualPrice.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-1">
+            <Label>العملة *</Label>
+            <Select 
+              value={form.watch('currencyId')} 
+              onValueChange={(v) => form.setValue('currencyId', v)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="اختر العملة" />
+              </SelectTrigger>
+              <SelectContent>
+                {currencies?.map(c => (
+                  <SelectItem key={c.id} value={c.id}>{c.name} ({c.symbol})</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {form.formState.errors.currencyId && (
+              <p className="text-xs text-red-500">{form.formState.errors.currencyId.message}</p>
             )}
           </div>
 

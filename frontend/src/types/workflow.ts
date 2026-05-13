@@ -22,6 +22,7 @@ export interface WorkflowDefinition {
   description?: string;
   totalEstimatedPrice: number;
   totalEstimatedExpenses: number;
+  currencyId?: string;
   steps: WorkflowStepDefinition[];
   createdOn: string;
 }
@@ -31,6 +32,7 @@ export interface CreateWorkflowStepRequest {
   description?: string;
   estimatedPrice: number;
   estimatedExpense: number;
+  currencyId?: string;
   requiredFileNames: string[];
   defaultAssigneeContactIds: string[];
 }
@@ -40,6 +42,7 @@ export interface CreateWorkflowRequest {
   description?: string;
   totalEstimatedPrice: number;
   totalEstimatedExpenses: number;
+  currencyId?: string;
   steps: CreateWorkflowStepRequest[];
 }
 
@@ -57,6 +60,8 @@ export interface TransactionStep {
   completionDate?: string;
   assignedPersonsJson: string;
   uploadedFilesJson?: string;
+  currencyId?: string;
+  exchangeRate: number;
   estimatedPrice: number;
   estimatedExpense: number;
   requiredFileNames: string[];
@@ -68,6 +73,8 @@ export interface LegalTransaction {
   status: TransactionStatus;
   actualPrice: number;
   notes?: string;
+  currencyId?: string;
+  exchangeRate: number;
   createdOn: string;
   clientName: string;
   workflowDefinitionId: string;
@@ -85,6 +92,8 @@ export interface TransactionListItem {
   transactionNumber: string;
   status: TransactionStatus;
   actualPrice: number;
+  currencyId?: string;
+  exchangeRate: number;
   createdOn: string;
   clientName: string;
   workflowName: string;
@@ -109,6 +118,7 @@ export interface CreateTransactionRequest {
   clientName?: string;
   actualPrice: number;
   notes?: string;
+  currencyId?: string;
 }
 
 export interface UpdateStepRequest {
@@ -117,4 +127,5 @@ export interface UpdateStepRequest {
   actualExpense?: number;
   expenseDescription?: string;
   notes?: string;
+  currencyId?: string;
 }

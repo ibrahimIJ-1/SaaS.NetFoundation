@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTransactions, useTransactionStats } from '@/hooks/use-workflows';
+import { useCurrencies } from '@/hooks/use-currencies';
 import { StartTransactionModal } from '@/components/transactions/start-transaction-modal';
 import { TransactionListItem, TransactionStatus } from '@/types/workflow';
 import { cn } from '@/lib/utils';
@@ -32,7 +33,9 @@ function StatCard({ label, value, sub, positive }: { label: string; value: strin
   );
 }
 
-function TransactionCard({ tx }: { tx: TransactionListItem }) {
+function TransactionCard({ tx, currencies }: { tx: TransactionListItem; currencies?: any[] }) {
+  const currency = currencies?.find(c => c.id === tx.currencyId);
+  const symbol = currency?.symbol || '';
   const cfg = statusConfig[tx.status];
   const Icon = cfg.icon;
   const progressPct = tx.totalSteps > 0 ? Math.round((tx.completedSteps / tx.totalSteps) * 100) : 0;
@@ -71,16 +74,16 @@ function TransactionCard({ tx }: { tx: TransactionListItem }) {
         <div className="grid grid-cols-3 gap-2 text-xs border-t border-border pt-3">
           <div>
             <p className="text-muted-foreground">السعر</p>
-            <p className="font-semibold text-foreground">{tx.actualPrice.toLocaleString('ar-IQ')}</p>
+            <p className="font-semibold text-foreground">{tx.actualPrice.toLocaleString('ar-IQ')} {symbol}</p>
           </div>
           <div>
             <p className="text-muted-foreground">المصاريف</p>
-            <p className="font-semibold text-amber-400">{tx.totalActualExpenses.toLocaleString('ar-IQ')}</p>
+            <p className="font-semibold text-amber-400">{tx.totalActualExpenses.toLocaleString('ar-IQ')} {symbol}</p>
           </div>
           <div>
             <p className="text-muted-foreground">الصافي</p>
             <p className={cn('font-bold', netProfit >= 0 ? 'text-emerald-400' : 'text-red-400')}>
-              {netProfit.toLocaleString('ar-IQ')}
+              {netProfit.toLocaleString('ar-IQ')} {symbol}
             </p>
           </div>
         </div>
@@ -99,6 +102,9 @@ export default function TransactionsPage() {
     statusFilter !== 'all' ? { status: statusFilter } : undefined
   );
   const { data: stats } = useTransactionStats();
+  const { data: currencies } = useCurrencies();
+  
+  const baseSymbol = currencies?.find(c => c.isBase)?.symbol || '';
 
   const filtered = transactions?.filter((t) =>
     t.contactName.includes(search) ||
@@ -130,12 +136,12 @@ export default function TransactionsPage() {
           <StatCard label="المعاملات المكتملة" value={stats.completed.toString()} />
           <StatCard
             label="إجمالي الإيرادات"
-            value={`${stats.totalRevenue.toLocaleString('ar-IQ')}`}
+            value={`${stats.totalRevenue.toLocaleString('ar-IQ')} ${baseSymbol}`}
           />
           <StatCard
             label="صافي الربح"
-            value={`${stats.netProfit.toLocaleString('ar-IQ')}`}
-            sub={`مصاريف: ${stats.totalExpenses.toLocaleString('ar-IQ')}`}
+            value={`${stats.netProfit.toLocaleString('ar-IQ')} ${baseSymbol}`}
+            sub={`مصاريف: ${stats.totalExpenses.toLocaleString('ar-IQ')} ${baseSymbol}`}
             positive={stats.netProfit >= 0}
           />
         </div>
@@ -166,6 +172,9 @@ export default function TransactionsPage() {
         <Link href="/transactions/workflows">
           <Button variant="outline">إدارة قوالب الإجراءات</Button>
         </Link>
+        <Link href="/transactions/currencies">
+          <Button variant="outline">إدارة العملات</Button>
+        </Link>
       </div>
 
       {/* Content */}
@@ -192,7 +201,7 @@ export default function TransactionsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {filtered?.map((tx) => (
-            <TransactionCard key={tx.id} tx={tx} />
+            <TransactionCard key={tx.id} tx={tx} currencies={currencies} />
           ))}
         </div>
       )}

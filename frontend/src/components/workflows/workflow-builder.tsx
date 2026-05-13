@@ -11,12 +11,15 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { CreateWorkflowRequest, WorkflowDefinition } from '@/types/workflow';
 import { cn } from '@/lib/utils';
+import { useCurrencies } from '@/hooks/use-currencies';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const stepSchema = z.object({
   name: z.string().min(1, 'اسم الخطوة مطلوب'),
   description: z.string().optional(),
-  estimatedPrice: z.coerce.number().min(0, 'يجب أن يكون صفراً أو أكثر'),
-  estimatedExpense: z.coerce.number().min(0, 'يجب أن يكون صفراً أو أكثر'),
+  estimatedPrice: z.coerce.number(),
+  estimatedExpense: z.coerce.number(),
+  currencyId: z.string().optional(),
   requiredFileNames: z.array(z.string()),
   defaultAssigneeContactIds: z.array(z.string()),
 });
@@ -24,8 +27,9 @@ const stepSchema = z.object({
 const workflowSchema = z.object({
   name: z.string().min(1, 'اسم الإجراء مطلوب'),
   description: z.string().optional(),
-  totalEstimatedPrice: z.coerce.number().min(0),
-  totalEstimatedExpenses: z.coerce.number().min(0),
+  totalEstimatedPrice: z.coerce.number(),
+  totalEstimatedExpenses: z.coerce.number(),
+  currencyId: z.string().optional(),
   steps: z.array(stepSchema).min(1, 'يجب إضافة خطوة واحدة على الأقل'),
 });
 
@@ -38,6 +42,7 @@ interface WorkflowBuilderProps {
 }
 
 export function WorkflowBuilder({ defaultValues, onSubmit, isSubmitting }: WorkflowBuilderProps) {
+  const { data: currencies } = useCurrencies();
   const [expandedSteps, setExpandedSteps] = useState<Set<number>>(new Set([0]));
   const [fileInput, setFileInput] = useState<Record<number, string>>({});
 
@@ -49,6 +54,7 @@ export function WorkflowBuilder({ defaultValues, onSubmit, isSubmitting }: Workf
           description: defaultValues.description ?? '',
           totalEstimatedPrice: defaultValues.totalEstimatedPrice,
           totalEstimatedExpenses: defaultValues.totalEstimatedExpenses,
+          currencyId: defaultValues.currencyId ?? '',
           steps: defaultValues.steps.map((s) => ({
             name: s.name,
             description: s.description ?? '',
@@ -63,6 +69,7 @@ export function WorkflowBuilder({ defaultValues, onSubmit, isSubmitting }: Workf
           description: '',
           totalEstimatedPrice: 0,
           totalEstimatedExpenses: 0,
+          currencyId: '',
           steps: [
             {
               name: '',
@@ -152,6 +159,22 @@ export function WorkflowBuilder({ defaultValues, onSubmit, isSubmitting }: Workf
               step="500"
               {...form.register('totalEstimatedExpenses')}
             />
+          </div>
+          <div className="space-y-1">
+            <Label>العملة الافتراضية</Label>
+            <Select 
+              value={form.watch('currencyId')} 
+              onValueChange={(val) => form.setValue('currencyId', val)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="اختر العملة" />
+              </SelectTrigger>
+              <SelectContent>
+                {currencies?.map(c => (
+                  <SelectItem key={c.id} value={c.id}>{c.name} ({c.symbol})</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
@@ -270,11 +293,28 @@ export function WorkflowBuilder({ defaultValues, onSubmit, isSubmitting }: Workf
                     </div>
                     <div className="space-y-1">
                       <Label>السعر التقديري</Label>
-                      <Input type="number" min="0" step="500" {...form.register(`steps.${idx}.estimatedPrice`)} />
+                      <Input type="number" {...form.register(`steps.${idx}.estimatedPrice`)} />
                     </div>
                     <div className="space-y-1">
                       <Label>المصاريف التقديرية</Label>
-                      <Input type="number" min="0" step="500" {...form.register(`steps.${idx}.estimatedExpense`)} />
+                      <Input type="number" {...form.register(`steps.${idx}.estimatedExpense`)} />
+                    </div>
+                    <div className="space-y-1">
+                      <Label>العملة (اختياري)</Label>
+                      <Select 
+                        value={form.watch(`steps.${idx}.currencyId` as const)} 
+                        onValueChange={(val) => form.setValue(`steps.${idx}.currencyId` as const, val)}
+                      >
+                        <SelectTrigger className="h-10">
+                          <SelectValue placeholder="نفس عملة القالب" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">نفس عملة القالب</SelectItem>
+                          {currencies?.map(c => (
+                            <SelectItem key={c.id} value={c.id}>{c.name} ({c.symbol})</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
 

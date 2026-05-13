@@ -9,17 +9,21 @@ import {
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useWorkflows, useCreateWorkflow, useUpdateWorkflow, useDeleteWorkflow } from '@/hooks/use-workflows';
+import { useCurrencies } from '@/hooks/use-currencies';
 import { WorkflowBuilder } from '@/components/workflows/workflow-builder';
 import { WorkflowDefinition, CreateWorkflowRequest } from '@/types/workflow';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
-function WorkflowCard({ workflow, onEdit, onDelete }: {
+function WorkflowCard({ workflow, onEdit, onDelete, currencies }: {
   workflow: WorkflowDefinition;
   onEdit: (w: WorkflowDefinition) => void;
   onDelete: (id: string) => void;
+  currencies?: any[];
 }) {
   const [expanded, setExpanded] = useState(false);
+  const currency = currencies?.find(c => c.id === workflow.currencyId);
+  const symbol = currency?.symbol || '';
 
   return (
     <div className="bg-card border border-border rounded-xl overflow-hidden hover:border-legal-gold/30 transition-all">
@@ -40,13 +44,13 @@ function WorkflowCard({ workflow, onEdit, onDelete }: {
           <span className="hidden md:block">
             السعر:{' '}
             <span className="font-medium text-foreground">
-              {workflow.totalEstimatedPrice.toLocaleString('ar-IQ')}
+              {workflow.totalEstimatedPrice.toLocaleString('ar-IQ')} {symbol}
             </span>
           </span>
           <span className="hidden md:block">
             مصاريف:{' '}
             <span className="font-medium text-amber-400">
-              {workflow.totalEstimatedExpenses.toLocaleString('ar-IQ')}
+              {workflow.totalEstimatedExpenses.toLocaleString('ar-IQ')} {symbol}
             </span>
           </span>
           <div className="flex items-center gap-1">
@@ -81,7 +85,7 @@ function WorkflowCard({ workflow, onEdit, onDelete }: {
                 </span>
                 <span className="flex-1 text-foreground">{step.name}</span>
                 <span className="text-muted-foreground text-xs">
-                  {step.estimatedPrice.toLocaleString('ar-IQ')} + مصاريف {step.estimatedExpense.toLocaleString('ar-IQ')}
+                  {step.estimatedPrice.toLocaleString('ar-IQ')} {symbol} + مصاريف {step.estimatedExpense.toLocaleString('ar-IQ')} {symbol}
                 </span>
               </div>
             ))}
@@ -117,6 +121,7 @@ function EditWorkflowDialog({ workflow, open, onClose }: {
 
 export default function WorkflowsPage() {
   const { data: workflows, isLoading, error } = useWorkflows();
+  const { data: currencies } = useCurrencies();
   const { mutate: create, isPending: creating } = useCreateWorkflow();
   const { mutate: deleteWorkflow } = useDeleteWorkflow();
 
@@ -181,6 +186,7 @@ export default function WorkflowsPage() {
               workflow={wf}
               onEdit={setEditTarget}
               onDelete={setDeleteId}
+              currencies={currencies}
             />
           ))}
         </div>

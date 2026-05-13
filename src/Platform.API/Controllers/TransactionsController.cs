@@ -132,6 +132,15 @@ namespace Platform.API.Controllers
                 if (contact != null) clientName = contact.FullName;
             }
 
+            // Resolve Currency and Rate
+            var currencyId = request.CurrencyId ?? workflow.CurrencyId;
+            var exchangeRate = 1.0m;
+            if (currencyId.HasValue)
+            {
+                var currency = await _db.Currencies.FindAsync(currencyId.Value);
+                if (currency != null) exchangeRate = currency.ExchangeRate;
+            }
+
             var transaction = new LegalTransaction
             {
                 TransactionNumber = transactionNumber,
@@ -141,7 +150,9 @@ namespace Platform.API.Controllers
                 ActualPrice = request.ActualPrice > 0 ? request.ActualPrice : workflow.TotalEstimatedPrice,
                 Notes = request.Notes,
                 Status = TransactionStatus.Active,
-                CreatedOn = DateTime.UtcNow
+                CreatedOn = DateTime.UtcNow,
+                CurrencyId = currencyId,
+                ExchangeRate = exchangeRate
             };
 
             // Clone steps from template
@@ -157,7 +168,9 @@ namespace Platform.API.Controllers
                     ActualPrice = stepDef.EstimatedPrice,
                     ActualExpense = 0,
                     AssignedPersonsJson = assigneesJson,
-                    CreatedOn = DateTime.UtcNow
+                    CreatedOn = DateTime.UtcNow,
+                    CurrencyId = currencyId,
+                    ExchangeRate = exchangeRate
                 });
             }
 
@@ -185,6 +198,13 @@ namespace Platform.API.Controllers
             if (step == null) return NotFound(new { message = "Step not found." });
 
             // Update fields
+            if (request.CurrencyId.HasValue)
+            {
+                step.CurrencyId = request.CurrencyId.Value;
+                var currency = await _db.Currencies.FindAsync(request.CurrencyId.Value);
+                if (currency != null) step.ExchangeRate = currency.ExchangeRate;
+            }
+
             if (request.Status.HasValue) step.Status = request.Status.Value;
             if (request.ActualPrice.HasValue) step.ActualPrice = request.ActualPrice.Value;
             if (request.ActualExpense.HasValue) step.ActualExpense = request.ActualExpense.Value;
@@ -280,16 +300,21 @@ namespace Platform.API.Controllers
         {
             var active = await _db.LegalTransactions.CountAsync(t => t.Status == TransactionStatus.Active);
             var completed = await _db.LegalTransactions.CountAsync(t => t.Status == TransactionStatus.Completed);
-            var totalRevenue = await _db.LegalTransactions.SumAsync(t => t.ActualPrice);
-            var totalExpenses = await _db.TransactionStepInstances.SumAsync(s => s.ActualExpense);
+            
+            // Normalize values to base currency (using the snapshot exchange rate of each transaction/step)
+            var transactions = await _db.LegalTransactions.ToListAsync();
+            var steps = await _db.TransactionStepInstances.ToListAsync();
+
+            var totalRevenueBase = transactions.Sum(t => t.ActualPrice * t.ExchangeRate);
+            var totalExpensesBase = steps.Sum(s => s.ActualExpense * s.ExchangeRate);
 
             return Ok(new
             {
                 Active = active,
                 Completed = completed,
-                TotalRevenue = totalRevenue,
-                TotalExpenses = totalExpenses,
-                NetProfit = totalRevenue - totalExpenses
+                TotalRevenue = totalRevenueBase,
+                TotalExpenses = totalExpensesBase,
+                NetProfit = totalRevenueBase - totalExpensesBase
             });
         }
 
@@ -301,6 +326,7 @@ namespace Platform.API.Controllers
             public string? ClientName { get; set; }
             public decimal ActualPrice { get; set; }
             public string? Notes { get; set; }
+            public Guid? CurrencyId { get; set; }
         }
 
         public class UpdateStepRequest
@@ -310,6 +336,7 @@ namespace Platform.API.Controllers
             public decimal? ActualExpense { get; set; }
             public string? ExpenseDescription { get; set; }
             public string? Notes { get; set; }
+            public Guid? CurrencyId { get; set; }
         }
     }
 }

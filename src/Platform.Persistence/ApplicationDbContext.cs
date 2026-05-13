@@ -40,6 +40,7 @@ namespace Platform.Persistence
         public DbSet<WorkflowStepDefinition> WorkflowStepDefinitions => Set<WorkflowStepDefinition>();
         public DbSet<LegalTransaction> LegalTransactions => Set<LegalTransaction>();
         public DbSet<TransactionStepInstance> TransactionStepInstances => Set<TransactionStepInstance>();
+        public DbSet<Currency> Currencies => Set<Currency>();
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -193,12 +194,31 @@ namespace Platform.Persistence
                 .HasOne(s => s.StepDefinition)
                 .WithMany()
                 .HasForeignKey(s => s.StepDefinitionId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<LegalTransaction>()
                 .HasOne(t => t.WorkflowDefinition)
                 .WithMany()
                 .HasForeignKey(t => t.WorkflowDefinitionId)
+                .OnDelete(DeleteBehavior.Restrict);
+ 
+            // Currency relationships
+            modelBuilder.Entity<Currency>()
+                .HasMany(c => c.WorkflowDefinitions)
+                .WithOne(w => w.Currency)
+                .HasForeignKey(w => w.CurrencyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Currency>()
+                .HasMany(c => c.Transactions)
+                .WithOne(t => t.Currency)
+                .HasForeignKey(t => t.CurrencyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Currency>()
+                .HasMany(c => c.TransactionStepInstances)
+                .WithOne(s => s.Currency)
+                .HasForeignKey(s => s.CurrencyId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

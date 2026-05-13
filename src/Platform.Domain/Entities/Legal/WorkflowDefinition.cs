@@ -1,6 +1,7 @@
 using Platform.Domain.Common;
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Platform.Domain.Entities.Legal
 {
@@ -11,6 +12,10 @@ namespace Platform.Domain.Entities.Legal
         public decimal TotalEstimatedPrice { get; set; }
         public decimal TotalEstimatedExpenses { get; set; }
         
+        public Guid? CurrencyId { get; set; }
+        [JsonIgnore]
+        public virtual Currency? Currency { get; set; }
+
         public ICollection<WorkflowStepDefinition> Steps { get; set; } = new List<WorkflowStepDefinition>();
     }
 

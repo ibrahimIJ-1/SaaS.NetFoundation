@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Platform.Persistence;
 
@@ -11,9 +12,11 @@ using Platform.Persistence;
 namespace Platform.Persistence.Migrations.ApplicationDb
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260513130136_AddMultiCurrency")]
+    partial class AddMultiCurrency
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1193,7 +1196,7 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("StepDefinitionId")
+                    b.Property<Guid>("StepDefinitionId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("StepName")
@@ -1654,7 +1657,8 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                     b.HasOne("Platform.Domain.Entities.Legal.WorkflowStepDefinition", "StepDefinition")
                         .WithMany()
                         .HasForeignKey("StepDefinitionId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Currency");
 

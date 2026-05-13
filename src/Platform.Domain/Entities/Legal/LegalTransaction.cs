@@ -1,6 +1,7 @@
-using Platform.Domain.Common;
 using System;
+using Platform.Domain.Common;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Platform.Domain.Entities.Legal
 {
@@ -24,6 +25,11 @@ namespace Platform.Domain.Entities.Legal
         public decimal ActualPrice { get; set; }
         public string? Notes { get; set; }
 
+        public Guid? CurrencyId { get; set; }
+        [JsonIgnore]
+        public virtual Currency? Currency { get; set; }
+        public decimal ExchangeRate { get; set; } = 1.0m;
+
         public ICollection<TransactionStepInstance> Steps { get; set; } = new List<TransactionStepInstance>();
     }
 
@@ -32,8 +38,8 @@ namespace Platform.Domain.Entities.Legal
         public Guid LegalTransactionId { get; set; }
         public virtual LegalTransaction LegalTransaction { get; set; } = default!;
 
-        public Guid StepDefinitionId { get; set; }
-        public virtual WorkflowStepDefinition StepDefinition { get; set; } = default!;
+        public Guid? StepDefinitionId { get; set; }
+        public virtual WorkflowStepDefinition? StepDefinition { get; set; }
 
         public string StepName { get; set; } = default!; // snapshot at creation time
         public int Order { get; set; }
@@ -53,6 +59,11 @@ namespace Platform.Domain.Entities.Legal
 
         public DateTime? CompletionDate { get; set; }
         public string? Notes { get; set; }
+
+        public Guid? CurrencyId { get; set; }
+        [JsonIgnore]
+        public virtual Currency? Currency { get; set; }
+        public decimal ExchangeRate { get; set; } = 1.0m;
 
         /// <summary>Comma-separated list of uploaded file paths or names</summary>
         public string? UploadedFilesJson { get; set; }
