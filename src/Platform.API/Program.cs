@@ -114,6 +114,7 @@ builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -162,6 +163,7 @@ app.UseMiddleware<TenantFromJwtMiddleware>();     // ✅ 2. Extract tenant from 
 //app.UseMiddleware<TenantResolutionMiddleware>();  // ✅ 3. Fallback tenant resolution
 app.UseAuthorization();   
 app.MapHub<NotificationHub>("/hubs/notifications");
+app.MapHub<ChatHub>("/hubs/chat");
 
 app.UseHangfireDashboard();// ✅ 4. Authorize
 

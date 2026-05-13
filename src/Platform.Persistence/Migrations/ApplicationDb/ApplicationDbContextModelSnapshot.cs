@@ -22,274 +22,599 @@ namespace Platform.Persistence.Migrations.ApplicationDb
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Platform.Domain.Clinical.Appointment", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.CaseDocument", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("ChairId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DoctorId")
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ExtractedText")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("EndTime")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("FileUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsActive")
+                    b.Property<bool>("IsSharedWithClient")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Notes")
+                    b.Property<bool>("IsSigned")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("PatientId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Reason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("StartTime")
+                    b.Property<DateTime?>("LastModifiedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Status")
+                    b.Property<Guid>("LegalCaseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("NeedsSignature")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("ParentDocumentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("UploadDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UploadedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Version")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ChairId");
+                    b.HasIndex("LegalCaseId");
 
-                    b.HasIndex("PatientId");
-
-                    b.ToTable("Appointments");
+                    b.ToTable("CaseDocuments");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.Chair", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.CaseNote", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("IsOperational")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
+                    b.Property<string>("AuthorName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("RoomId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoomId");
-
-                    b.ToTable("Chairs");
-                });
-
-            modelBuilder.Entity("Platform.Domain.Clinical.DentalChart", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("LastUpdated")
+                    b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("PatientId")
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("LegalCaseId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("PatientId")
-                        .IsUnique();
-
-                    b.ToTable("DentalCharts");
-                });
-
-            modelBuilder.Entity("Platform.Domain.Clinical.InsuranceClaim", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal?>("ApprovedAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("ClaimNumber")
+                    b.Property<string>("NoteText")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("InvoiceId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("PolicyId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("RejectionReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("RequestedAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("ResolutionDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("SubmissionDate")
-                        .HasColumnType("datetime2");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("InvoiceId");
+                    b.HasIndex("LegalCaseId");
 
-                    b.HasIndex("PolicyId");
-
-                    b.ToTable("InsuranceClaims");
+                    b.ToTable("CaseNotes");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.InsurancePolicy", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.CaseStage", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("CoveragePercentage")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("GroupNumber")
+                    b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
 
-                    b.Property<Guid>("PatientId")
+                    b.Property<Guid>("LegalCaseId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("PolicyNumber")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("ProviderId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("UsedLimit")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("YearlyLimit")
-                        .HasColumnType("decimal(18,2)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("PatientId");
+                    b.HasIndex("LegalCaseId");
 
-                    b.HasIndex("ProviderId");
-
-                    b.ToTable("InsurancePolicies");
+                    b.ToTable("CaseStages");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.InsuranceProvider", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.ChatMessage", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Code")
+                    b.Property<string>("Content")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ContactPerson")
+                    b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("LegalCaseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ReceiverId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LegalCaseId");
+
+                    b.ToTable("ChatMessages");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.CommissionRule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CaseTypeFilter")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("FixedAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LawyerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LawyerName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Percentage")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CommissionRules");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.Contact", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CompanyName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("FullName")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IdentificationNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsClient")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("JobTitle")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Tags")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.ToTable("InsuranceProviders");
+                    b.ToTable("Contacts");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.InventoryCategory", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.ContactInteraction", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("AuthorName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Name")
+                    b.Property<Guid>("ContactId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("InteractionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.ToTable("InventoryCategories");
+                    b.HasIndex("ContactId");
+
+                    b.ToTable("ContactInteractions");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.InventoryItem", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.CourtSession", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CategoryId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("CurrentStock")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("MinimumStockThreshold")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
+                    b.Property<string>("CourtName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SKU")
+                    b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UnitOfMeasure")
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Decision")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("UnitPrice")
+                    b.Property<string>("JudgeName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("LegalCaseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RoomNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("SessionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LegalCaseId");
+
+                    b.ToTable("CourtSessions");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.DocumentAnnotation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AuthorName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("DocumentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsPrivate")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PageNumber")
+                        .HasColumnType("int");
+
+                    b.Property<double>("X")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Y")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentId");
+
+                    b.ToTable("DocumentAnnotations");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.DocumentHighlight", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("DocumentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Label")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PageNumber")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RectsJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TextContent")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("X1")
+                        .HasColumnType("float");
+
+                    b.Property<double>("X2")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Y1")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Y2")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentId");
+
+                    b.ToTable("DocumentHighlights");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.DocumentSignature", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("DocumentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("IPAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SignatureHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SignatureImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SignedByUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("SignedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SignerName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentId");
+
+                    b.ToTable("DocumentSignatures");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.Expense", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ExpenseDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("InvoiceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsBilled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("LegalCaseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ReceiptUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
+                    b.HasIndex("LegalCaseId");
 
-                    b.ToTable("InventoryItems");
+                    b.ToTable("Expenses");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.Invoice", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.Invoice", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("DueDate")
@@ -299,35 +624,54 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("IssueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("LegalCaseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("PaidAmount")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<Guid>("PatientId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("SubTotal")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TaxTotal")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<Guid?>("VisitId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("PatientId");
-
-                    b.HasIndex("VisitId");
+                    b.HasIndex("LegalCaseId");
 
                     b.ToTable("Invoices");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.InvoiceItem", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.InvoiceItem", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -336,11 +680,20 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                     b.Property<Guid>("InvoiceId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("TreatmentPlanItemId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TaxRate")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Total")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("decimal(18,2)");
@@ -349,193 +702,328 @@ namespace Platform.Persistence.Migrations.ApplicationDb
 
                     b.HasIndex("InvoiceId");
 
-                    b.HasIndex("TreatmentPlanItemId");
-
                     b.ToTable("InvoiceItems");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.LabOrder", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.KnowledgeArticle", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("DoctorId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("Area")
+                        .HasColumnType("int");
 
-                    b.Property<DateTime?>("ExpectedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("LabProviderId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Notes")
+                    b.Property<string>("AuthorName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("OrderDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("OrderNumber")
+                    b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("PatientId")
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DocumentUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsFirmWide")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.PrimitiveCollection<string>("Tags")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("KnowledgeArticles");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.LegalCase", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("ReceivedDate")
+                    b.Property<string>("AssignedLawyerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AssignedLawyerName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CaseNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CaseType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClientId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClientName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CloseDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("ContactId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CourtInfo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("OpenDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("int");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("TotalCost")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<string>("Tags")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LabProviderId");
+                    b.HasIndex("CaseNumber")
+                        .IsUnique();
 
-                    b.HasIndex("PatientId");
+                    b.HasIndex("ContactId");
 
-                    b.ToTable("LabOrders");
+                    b.ToTable("LegalCases");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.LabProvider", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.LegalTask", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Address")
+                    b.Property<string>("AssigneeId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ContactPerson")
+                    b.Property<string>("AssigneeName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Email")
+                    b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("LegalCaseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LegalCaseId");
+
+                    b.ToTable("LegalTasks");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.LegalTemplate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Language")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
-                    b.ToTable("LabProviders");
+                    b.ToTable("LegalTemplates");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.LabWorkItem", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.LegalTransaction", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("Cost")
+                    b.Property<decimal>("ActualPrice")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("ClientName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("LabOrderId")
+                    b.Property<Guid?>("ContactId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Shade")
+                    b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ToothNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LabOrderId");
-
-                    b.ToTable("LabWorkItems");
-                });
-
-            modelBuilder.Entity("Platform.Domain.Clinical.MedicalHistory", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Allergies")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BloodType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ChronicDiseases")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CurrentMedications")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("GeneralNotes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("PatientId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PatientId")
-                        .IsUnique();
-
-                    b.ToTable("MedicalHistories");
-                });
-
-            modelBuilder.Entity("Platform.Domain.Clinical.Patient", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DateOfBirth")
+                    b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Email")
+                    b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("EmergencyContactName")
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("EmergencyContactPhone")
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TransactionNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid>("WorkflowDefinitionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContactId");
+
+                    b.HasIndex("TransactionNumber")
+                        .IsUnique();
+
+                    b.HasIndex("WorkflowDefinitionId");
+
+                    b.ToTable("LegalTransactions");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.Opponent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FirstName")
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LawyerName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("LegalCaseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Gender")
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PartyType")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NationalId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Patients");
+                    b.HasIndex("LegalCaseId");
+
+                    b.ToTable("Opponents");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.Payment", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.Payment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -544,11 +1032,20 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<DateTime>("Date")
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("InvoiceId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("Method")
                         .HasColumnType("int");
@@ -556,7 +1053,10 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("TransactionId")
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReferenceNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -566,81 +1066,136 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                     b.ToTable("Payments");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.Room", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.SavedSearch", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Icon")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("SearchParamsJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Rooms");
+                    b.ToTable("SavedSearches");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.SessionRecord", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.TransactionStepInstance", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Anesthesia")
+                    b.Property<decimal>("ActualExpense")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("ActualPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("AssignedPersonsJson")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CompletionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ExpenseDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("LegalTransactionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("StepDefinitionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("StepName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UploadedFilesJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LegalTransactionId");
+
+                    b.HasIndex("StepDefinitionId");
+
+                    b.ToTable("TransactionStepInstances");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.TrustTransaction", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("EndTime")
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("MaterialsUsed")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("TreatmentPlanItemId")
+                    b.Property<Guid>("LegalCaseId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("VisitId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TreatmentPlanItemId");
-
-                    b.HasIndex("VisitId");
-
-                    b.ToTable("SessionRecords");
-                });
-
-            modelBuilder.Entity("Platform.Domain.Clinical.StockTransaction", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("InventoryItemId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("PerformedByUserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
 
                     b.Property<string>("ReferenceNumber")
                         .HasColumnType("nvarchar(max)");
@@ -653,164 +1208,97 @@ namespace Platform.Persistence.Migrations.ApplicationDb
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InventoryItemId");
+                    b.HasIndex("LegalCaseId");
 
-                    b.ToTable("StockTransactions");
+                    b.ToTable("TrustTransactions");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.ToothCondition", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.WorkflowDefinition", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("DentalChartId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Notes")
+                    b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ToothNumber")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DentalChartId");
-
-                    b.ToTable("ToothConditions");
-                });
-
-            modelBuilder.Entity("Platform.Domain.Clinical.TreatmentPlan", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DoctorId")
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("PatientId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PatientId");
-
-                    b.ToTable("TreatmentPlans");
-                });
-
-            modelBuilder.Entity("Platform.Domain.Clinical.TreatmentPlanItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CompletionDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("Cost")
+                    b.Property<decimal>("TotalEstimatedExpenses")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<Guid?>("PerformedInVisitId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ProcedureName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Surface")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ToothNumber")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("TreatmentPlanId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<decimal>("TotalEstimatedPrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PerformedInVisitId");
-
-                    b.HasIndex("TreatmentPlanId");
-
-                    b.ToTable("TreatmentPlanItems");
+                    b.ToTable("WorkflowDefinitions");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.Visit", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.WorkflowStepDefinition", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("AppointmentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Assessment")
+                    b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ChiefComplaint")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("Date")
+                    b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DoctorId")
+                    b.Property<string>("DefaultAssigneeContactIds")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ObjectiveNotes")
+                    b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("PatientId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<decimal>("EstimatedExpense")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("Plan")
+                    b.Property<decimal>("EstimatedPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Status")
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Order")
                         .HasColumnType("int");
 
-                    b.Property<string>("SubjectiveNotes")
+                    b.Property<string>("RequiredFileNames")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("WorkflowDefinitionId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppointmentId")
-                        .IsUnique()
-                        .HasFilter("[AppointmentId] IS NOT NULL");
+                    b.HasIndex("WorkflowDefinitionId");
 
-                    b.HasIndex("PatientId");
-
-                    b.ToTable("Visits");
+                    b.ToTable("WorkflowStepDefinitions");
                 });
 
             modelBuilder.Entity("Platform.Domain.Entities.Product", b =>
@@ -904,176 +1392,129 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                     b.ToTable("Notifications");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.Appointment", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.CaseDocument", b =>
                 {
-                    b.HasOne("Platform.Domain.Clinical.Chair", "Chair")
-                        .WithMany()
-                        .HasForeignKey("ChairId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("Platform.Domain.Clinical.Patient", "Patient")
-                        .WithMany("Appointments")
-                        .HasForeignKey("PatientId")
+                    b.HasOne("Platform.Domain.Entities.Legal.LegalCase", "LegalCase")
+                        .WithMany("Documents")
+                        .HasForeignKey("LegalCaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Chair");
-
-                    b.Navigation("Patient");
+                    b.Navigation("LegalCase");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.Chair", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.CaseNote", b =>
                 {
-                    b.HasOne("Platform.Domain.Clinical.Room", "Room")
-                        .WithMany("Chairs")
-                        .HasForeignKey("RoomId")
+                    b.HasOne("Platform.Domain.Entities.Legal.LegalCase", "LegalCase")
+                        .WithMany("Notes")
+                        .HasForeignKey("LegalCaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Room");
+                    b.Navigation("LegalCase");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.DentalChart", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.CaseStage", b =>
                 {
-                    b.HasOne("Platform.Domain.Clinical.Patient", "Patient")
-                        .WithOne("DentalChart")
-                        .HasForeignKey("Platform.Domain.Clinical.DentalChart", "PatientId")
+                    b.HasOne("Platform.Domain.Entities.Legal.LegalCase", "LegalCase")
+                        .WithMany("Stages")
+                        .HasForeignKey("LegalCaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Patient");
+                    b.Navigation("LegalCase");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.InsuranceClaim", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.ChatMessage", b =>
                 {
-                    b.HasOne("Platform.Domain.Clinical.Invoice", "Invoice")
+                    b.HasOne("Platform.Domain.Entities.Legal.LegalCase", "LegalCase")
                         .WithMany()
-                        .HasForeignKey("InvoiceId")
+                        .HasForeignKey("LegalCaseId");
+
+                    b.Navigation("LegalCase");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.ContactInteraction", b =>
+                {
+                    b.HasOne("Platform.Domain.Entities.Legal.Contact", "Contact")
+                        .WithMany("Interactions")
+                        .HasForeignKey("ContactId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Platform.Domain.Clinical.InsurancePolicy", "Policy")
+                    b.Navigation("Contact");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.CourtSession", b =>
+                {
+                    b.HasOne("Platform.Domain.Entities.Legal.LegalCase", "LegalCase")
+                        .WithMany("Sessions")
+                        .HasForeignKey("LegalCaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LegalCase");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.DocumentAnnotation", b =>
+                {
+                    b.HasOne("Platform.Domain.Entities.Legal.CaseDocument", "Document")
+                        .WithMany("Annotations")
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Document");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.DocumentHighlight", b =>
+                {
+                    b.HasOne("Platform.Domain.Entities.Legal.CaseDocument", "Document")
+                        .WithMany("Highlights")
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Document");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.DocumentSignature", b =>
+                {
+                    b.HasOne("Platform.Domain.Entities.Legal.CaseDocument", "Document")
                         .WithMany()
-                        .HasForeignKey("PolicyId")
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Document");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.Expense", b =>
+                {
+                    b.HasOne("Platform.Domain.Entities.Legal.LegalCase", "LegalCase")
+                        .WithMany("Expenses")
+                        .HasForeignKey("LegalCaseId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
+
+                    b.Navigation("LegalCase");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.Invoice", b =>
+                {
+                    b.HasOne("Platform.Domain.Entities.Legal.LegalCase", "LegalCase")
+                        .WithMany("Invoices")
+                        .HasForeignKey("LegalCaseId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Invoice");
-
-                    b.Navigation("Policy");
+                    b.Navigation("LegalCase");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.InsurancePolicy", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.InvoiceItem", b =>
                 {
-                    b.HasOne("Platform.Domain.Clinical.Patient", "Patient")
-                        .WithMany()
-                        .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Platform.Domain.Clinical.InsuranceProvider", "Provider")
-                        .WithMany("Policies")
-                        .HasForeignKey("ProviderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Patient");
-
-                    b.Navigation("Provider");
-                });
-
-            modelBuilder.Entity("Platform.Domain.Clinical.InventoryItem", b =>
-                {
-                    b.HasOne("Platform.Domain.Clinical.InventoryCategory", "Category")
+                    b.HasOne("Platform.Domain.Entities.Legal.Invoice", "Invoice")
                         .WithMany("Items")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-                });
-
-            modelBuilder.Entity("Platform.Domain.Clinical.Invoice", b =>
-                {
-                    b.HasOne("Platform.Domain.Clinical.Patient", "Patient")
-                        .WithMany()
-                        .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Platform.Domain.Clinical.Visit", "Visit")
-                        .WithMany()
-                        .HasForeignKey("VisitId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Patient");
-
-                    b.Navigation("Visit");
-                });
-
-            modelBuilder.Entity("Platform.Domain.Clinical.InvoiceItem", b =>
-                {
-                    b.HasOne("Platform.Domain.Clinical.Invoice", "Invoice")
-                        .WithMany("Items")
-                        .HasForeignKey("InvoiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Platform.Domain.Clinical.TreatmentPlanItem", "TreatmentPlanItem")
-                        .WithMany()
-                        .HasForeignKey("TreatmentPlanItemId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Invoice");
-
-                    b.Navigation("TreatmentPlanItem");
-                });
-
-            modelBuilder.Entity("Platform.Domain.Clinical.LabOrder", b =>
-                {
-                    b.HasOne("Platform.Domain.Clinical.LabProvider", "Provider")
-                        .WithMany("Orders")
-                        .HasForeignKey("LabProviderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Platform.Domain.Clinical.Patient", "Patient")
-                        .WithMany()
-                        .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Patient");
-
-                    b.Navigation("Provider");
-                });
-
-            modelBuilder.Entity("Platform.Domain.Clinical.LabWorkItem", b =>
-                {
-                    b.HasOne("Platform.Domain.Clinical.LabOrder", "LabOrder")
-                        .WithMany("Items")
-                        .HasForeignKey("LabOrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("LabOrder");
-                });
-
-            modelBuilder.Entity("Platform.Domain.Clinical.MedicalHistory", b =>
-                {
-                    b.HasOne("Platform.Domain.Clinical.Patient", "Patient")
-                        .WithOne("MedicalHistory")
-                        .HasForeignKey("Platform.Domain.Clinical.MedicalHistory", "PatientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Patient");
-                });
-
-            modelBuilder.Entity("Platform.Domain.Clinical.Payment", b =>
-                {
-                    b.HasOne("Platform.Domain.Clinical.Invoice", "Invoice")
-                        .WithMany("Payments")
                         .HasForeignKey("InvoiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1081,171 +1522,152 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                     b.Navigation("Invoice");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.SessionRecord", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.LegalCase", b =>
                 {
-                    b.HasOne("Platform.Domain.Clinical.TreatmentPlanItem", "TreatmentPlanItem")
-                        .WithMany("SessionRecords")
-                        .HasForeignKey("TreatmentPlanItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Platform.Domain.Clinical.Visit", "Visit")
-                        .WithMany("SessionRecords")
-                        .HasForeignKey("VisitId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("TreatmentPlanItem");
-
-                    b.Navigation("Visit");
-                });
-
-            modelBuilder.Entity("Platform.Domain.Clinical.StockTransaction", b =>
-                {
-                    b.HasOne("Platform.Domain.Clinical.InventoryItem", "InventoryItem")
-                        .WithMany("Transactions")
-                        .HasForeignKey("InventoryItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("InventoryItem");
-                });
-
-            modelBuilder.Entity("Platform.Domain.Clinical.ToothCondition", b =>
-                {
-                    b.HasOne("Platform.Domain.Clinical.DentalChart", "DentalChart")
-                        .WithMany("ToothConditions")
-                        .HasForeignKey("DentalChartId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("DentalChart");
-                });
-
-            modelBuilder.Entity("Platform.Domain.Clinical.TreatmentPlan", b =>
-                {
-                    b.HasOne("Platform.Domain.Clinical.Patient", "Patient")
-                        .WithMany("TreatmentPlans")
-                        .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Patient");
-                });
-
-            modelBuilder.Entity("Platform.Domain.Clinical.TreatmentPlanItem", b =>
-                {
-                    b.HasOne("Platform.Domain.Clinical.Visit", "PerformedInVisit")
-                        .WithMany("PerformedProcedures")
-                        .HasForeignKey("PerformedInVisitId")
+                    b.HasOne("Platform.Domain.Entities.Legal.Contact", "Contact")
+                        .WithMany("Cases")
+                        .HasForeignKey("ContactId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("Platform.Domain.Clinical.TreatmentPlan", "TreatmentPlan")
-                        .WithMany("Items")
-                        .HasForeignKey("TreatmentPlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PerformedInVisit");
-
-                    b.Navigation("TreatmentPlan");
+                    b.Navigation("Contact");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.Visit", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.LegalTask", b =>
                 {
-                    b.HasOne("Platform.Domain.Clinical.Appointment", "Appointment")
-                        .WithOne("Visit")
-                        .HasForeignKey("Platform.Domain.Clinical.Visit", "AppointmentId")
+                    b.HasOne("Platform.Domain.Entities.Legal.LegalCase", "LegalCase")
+                        .WithMany()
+                        .HasForeignKey("LegalCaseId");
+
+                    b.Navigation("LegalCase");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.LegalTransaction", b =>
+                {
+                    b.HasOne("Platform.Domain.Entities.Legal.Contact", "Contact")
+                        .WithMany()
+                        .HasForeignKey("ContactId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("Platform.Domain.Clinical.Patient", "Patient")
-                        .WithMany("Visits")
-                        .HasForeignKey("PatientId")
+                    b.HasOne("Platform.Domain.Entities.Legal.WorkflowDefinition", "WorkflowDefinition")
+                        .WithMany()
+                        .HasForeignKey("WorkflowDefinitionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Appointment");
+                    b.Navigation("Contact");
 
-                    b.Navigation("Patient");
+                    b.Navigation("WorkflowDefinition");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.Appointment", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.Opponent", b =>
                 {
-                    b.Navigation("Visit");
-                });
-
-            modelBuilder.Entity("Platform.Domain.Clinical.DentalChart", b =>
-                {
-                    b.Navigation("ToothConditions");
-                });
-
-            modelBuilder.Entity("Platform.Domain.Clinical.InsuranceProvider", b =>
-                {
-                    b.Navigation("Policies");
-                });
-
-            modelBuilder.Entity("Platform.Domain.Clinical.InventoryCategory", b =>
-                {
-                    b.Navigation("Items");
-                });
-
-            modelBuilder.Entity("Platform.Domain.Clinical.InventoryItem", b =>
-                {
-                    b.Navigation("Transactions");
-                });
-
-            modelBuilder.Entity("Platform.Domain.Clinical.Invoice", b =>
-                {
-                    b.Navigation("Items");
-
-                    b.Navigation("Payments");
-                });
-
-            modelBuilder.Entity("Platform.Domain.Clinical.LabOrder", b =>
-                {
-                    b.Navigation("Items");
-                });
-
-            modelBuilder.Entity("Platform.Domain.Clinical.LabProvider", b =>
-                {
-                    b.Navigation("Orders");
-                });
-
-            modelBuilder.Entity("Platform.Domain.Clinical.Patient", b =>
-                {
-                    b.Navigation("Appointments");
-
-                    b.Navigation("DentalChart")
+                    b.HasOne("Platform.Domain.Entities.Legal.LegalCase", "LegalCase")
+                        .WithMany("Opponents")
+                        .HasForeignKey("LegalCaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("MedicalHistory")
+                    b.Navigation("LegalCase");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.Payment", b =>
+                {
+                    b.HasOne("Platform.Domain.Entities.Legal.Invoice", "Invoice")
+                        .WithMany()
+                        .HasForeignKey("InvoiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("TreatmentPlans");
-
-                    b.Navigation("Visits");
+                    b.Navigation("Invoice");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.Room", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.TransactionStepInstance", b =>
                 {
-                    b.Navigation("Chairs");
+                    b.HasOne("Platform.Domain.Entities.Legal.LegalTransaction", "LegalTransaction")
+                        .WithMany("Steps")
+                        .HasForeignKey("LegalTransactionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Platform.Domain.Entities.Legal.WorkflowStepDefinition", "StepDefinition")
+                        .WithMany()
+                        .HasForeignKey("StepDefinitionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("LegalTransaction");
+
+                    b.Navigation("StepDefinition");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.TreatmentPlan", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.TrustTransaction", b =>
+                {
+                    b.HasOne("Platform.Domain.Entities.Legal.LegalCase", "LegalCase")
+                        .WithMany("TrustTransactions")
+                        .HasForeignKey("LegalCaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LegalCase");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.WorkflowStepDefinition", b =>
+                {
+                    b.HasOne("Platform.Domain.Entities.Legal.WorkflowDefinition", "WorkflowDefinition")
+                        .WithMany("Steps")
+                        .HasForeignKey("WorkflowDefinitionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WorkflowDefinition");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.CaseDocument", b =>
+                {
+                    b.Navigation("Annotations");
+
+                    b.Navigation("Highlights");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.Contact", b =>
+                {
+                    b.Navigation("Cases");
+
+                    b.Navigation("Interactions");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.Invoice", b =>
                 {
                     b.Navigation("Items");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.TreatmentPlanItem", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.LegalCase", b =>
                 {
-                    b.Navigation("SessionRecords");
+                    b.Navigation("Documents");
+
+                    b.Navigation("Expenses");
+
+                    b.Navigation("Invoices");
+
+                    b.Navigation("Notes");
+
+                    b.Navigation("Opponents");
+
+                    b.Navigation("Sessions");
+
+                    b.Navigation("Stages");
+
+                    b.Navigation("TrustTransactions");
                 });
 
-            modelBuilder.Entity("Platform.Domain.Clinical.Visit", b =>
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.LegalTransaction", b =>
                 {
-                    b.Navigation("PerformedProcedures");
+                    b.Navigation("Steps");
+                });
 
-                    b.Navigation("SessionRecords");
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.WorkflowDefinition", b =>
+                {
+                    b.Navigation("Steps");
                 });
 #pragma warning restore 612, 618
         }

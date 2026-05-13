@@ -5,6 +5,8 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/providers/auth-provider';
 import Sidebar from '@/components/layout/sidebar';
 import Topbar from '@/components/layout/topbar';
+import { GlobalSearchPalette } from '@/components/search/global-search-palette';
+import { useState } from 'react';
 
 export default function DashboardLayout({
   children,
@@ -14,12 +16,24 @@ export default function DashboardLayout({
   const { user, isLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {
     if (!isLoading && !user && pathname !== '/login') {
       router.push('/login');
     }
   }, [user, isLoading, router, pathname]);
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setSearchOpen((open) => !open);
+      }
+    };
+    document.addEventListener('keydown', down);
+    return () => document.removeEventListener('keydown', down);
+  }, []);
 
   if (isLoading) {
     return (
@@ -50,6 +64,8 @@ export default function DashboardLayout({
           </div>
         </main>
       </div>
+
+      <GlobalSearchPalette open={searchOpen} setOpen={setSearchOpen} />
     </div>
   );
 }

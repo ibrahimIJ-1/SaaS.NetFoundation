@@ -106,6 +106,7 @@ namespace Platform.API.Controllers
                     jobTitle = user.JobTitle,
                     avatarUrl = user.AvatarUrl,
                     preferredLanguage = user.PreferredLanguage,
+                    contactId = user.ContactId,
                     roles = roles,
                     permissions = permissions,
                     features = features
@@ -160,6 +161,7 @@ namespace Platform.API.Controllers
                 jobTitle = user.JobTitle,
                 avatarUrl = user.AvatarUrl,
                 preferredLanguage = user.PreferredLanguage,
+                contactId = user.ContactId,
                 roles = roles,
                 permissions = permissions,
                 features = features
@@ -175,6 +177,11 @@ namespace Platform.API.Controllers
             new Claim("tenantId", tenantId),
             new Claim(JwtRegisteredClaimNames.Email, user.Email!)
         };
+
+            if (user.ContactId.HasValue)
+            {
+                claims.Add(new Claim("contactId", user.ContactId.Value.ToString()));
+            }
 
             claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r))); // matches RoleClaimType
             foreach (var permission in permissions)

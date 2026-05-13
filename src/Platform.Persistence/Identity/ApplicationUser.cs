@@ -9,5 +9,6 @@ namespace Platform.Persistence.Identity
         public string? AvatarUrl { get; set; }
         public bool IsActive { get; set; } = true;
         public string PreferredLanguage { get; set; } = "en";
+        public Guid? ContactId { get; set; }
     }
 }

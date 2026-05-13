@@ -9,7 +9,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-heading);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -46,11 +46,20 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Qanuni Brand Colors */
+  --color-legal-primary: var(--legal-primary);
+  --color-legal-secondary: var(--legal-secondary);
+  --color-legal-gold: var(--legal-gold);
+  --color-legal-gold-light: var(--legal-gold-light);
+  --color-legal-success: var(--legal-success);
+  --color-legal-warning: var(--legal-warning);
+  --color-legal-danger: var(--legal-danger);
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --background: oklch(0.985 0 0); /* F8FAFC */
+  --foreground: oklch(0.145 0 0); /* 0F172A */
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
@@ -72,7 +81,7 @@
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
+  --radius: 0.75rem; /* Increased for softer UI */
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -81,17 +90,26 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* Legal tokens - Professional Slate & Muted Gold */
+  --legal-primary: #1c252e;    /* Professional Dark Slate */
+  --legal-secondary: #2b3641;  /* Muted Slate Gray */
+  --legal-gold: #c5a059;       /* Professional Muted Gold */
+  --legal-gold-light: #d4b96a;
+  --legal-success: #059669;    /* Sober Emerald */
+  --legal-warning: #d97706;    /* Sober Amber */
+  --legal-danger: #e11d48;     /* Sober Rose */
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  --background: oklch(0.145 0 0); /* 0F172A */
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
+  --card: oklch(0.205 0 0); /* 1E293B */
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+  --primary: oklch(0.735 0.119 86.852); /* C8A75D - Gold in dark mode */
+  --primary-foreground: oklch(0.145 0 0);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
@@ -101,20 +119,29 @@
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --ring: oklch(0.735 0.119 86.852);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
+  --sidebar: oklch(0.145 0 0); /* 0F172A */
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-primary: oklch(0.735 0.119 86.852); /* Gold */
+  --sidebar-primary-foreground: oklch(0.145 0 0);
+  --sidebar-accent: oklch(0.205 0 0); /* 1E293B */
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar-ring: oklch(0.735 0.119 86.852);
+
+  /* Legal tokens dark mode */
+  --legal-primary: #1c252e;
+  --legal-secondary: #2b3641;
+  --legal-gold: #c5a059;
+  --legal-gold-light: #d4b96a;
+  --legal-success: #059669;
+  --legal-warning: #d97706;
+  --legal-danger: #e11d48;
 }
 
 @layer base {
@@ -127,4 +154,116 @@
   html {
     @apply font-sans;
   }
+}
+
+/* ──────────────────────────────────────────────────
+   FullCalendar — Qanuni Professional Theme
+────────────────────────────────────────────────── */
+.legal-calendar .fc {
+  --fc-border-color: hsl(var(--border));
+  --fc-page-bg-color: transparent;
+  --fc-neutral-bg-color: hsl(var(--secondary) / 0.3);
+  --fc-neutral-text-color: hsl(var(--muted-foreground));
+  --fc-today-bg-color: rgba(197, 160, 89, 0.08);
+  --fc-now-indicator-color: #c5a059;
+  font-family: inherit;
+}
+
+.legal-calendar .fc-col-header-cell-cushion,
+.legal-calendar .fc-daygrid-day-number,
+.legal-calendar .fc-timegrid-slot-label-cushion {
+  color: hsl(var(--foreground));
+  text-decoration: none;
+}
+
+.legal-calendar .fc-toolbar-title {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+}
+
+.legal-calendar .fc-button {
+  background-color: hsl(var(--secondary)) !important;
+  border-color: hsl(var(--border)) !important;
+  color: hsl(var(--foreground)) !important;
+  border-radius: 0.5rem !important;
+  font-size: 0.8rem !important;
+  padding: 0.35rem 0.75rem !important;
+  box-shadow: none !important;
+  transition: background-color 0.15s;
+}
+
+.legal-calendar .fc-button:hover {
+  background-color: hsl(var(--secondary) / 0.7) !important;
+}
+
+.legal-calendar .fc-button-active,
+.legal-calendar .fc-button:focus {
+  background-color: rgba(197, 160, 89, 0.15) !important;
+  border-color: #c5a059 !important;
+  color: #c5a059 !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.legal-calendar .fc-col-header-cell {
+  background: hsl(var(--secondary) / 0.5);
+  border-color: hsl(var(--border));
+  padding: 6px 0;
+}
+
+.legal-calendar .fc-daygrid-day {
+  border-color: hsl(var(--border));
+}
+
+.legal-calendar .fc-scrollgrid {
+  border-color: hsl(var(--border)) !important;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.legal-calendar .fc-scrollgrid-section > * {
+  border-color: hsl(var(--border)) !important;
+}
+
+.legal-calendar .fc-event {
+  border-radius: 5px !important;
+  padding: 2px 6px !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  border: none !important;
+}
+
+.legal-calendar .fc-event:hover {
+  filter: brightness(1.15);
+}
+
+.legal-calendar .fc-day-today {
+  background: rgba(197, 160, 89, 0.06) !important;
+}
+
+.legal-calendar .fc-timegrid-now-indicator-line {
+  border-color: #c5a059;
+}
+
+.legal-calendar .fc-timegrid-now-indicator-arrow {
+  border-top-color: #c5a059;
+  border-bottom-color: #c5a059;
+}
+
+.legal-calendar .fc-more-popover {
+  background: hsl(var(--card));
+  border-color: hsl(var(--border));
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+
+.legal-calendar .fc-more-popover .fc-popover-title {
+  background: hsl(var(--secondary));
+  color: hsl(var(--foreground));
+  border-radius: 0.75rem 0.75rem 0 0;
+  padding: 8px 12px;
+  font-size: 0.8rem;
 }

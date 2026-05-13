@@ -8,32 +8,32 @@ export default function Topbar() {
   const { tenantId } = useAuth();
 
   return (
-    <header className="h-16 bg-slate-900/50 backdrop-blur-md border-b border-slate-800 flex items-center justify-between px-6 sticky top-0 z-10">
+    <header className="h-16 bg-legal-primary/80 backdrop-blur-md border-b border-legal-secondary flex items-center justify-between px-6 sticky top-0 z-10">
       <div className="flex items-center flex-1">
-        <button className="md:hidden mr-4 text-slate-400 hover:text-slate-200">
+        <button className="md:hidden ml-4 text-slate-400 hover:text-slate-200">
           <Menu className="h-6 w-6" />
         </button>
         
         <div className="max-w-md w-full hidden md:block relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
             <Search className="h-4 w-4 text-slate-500" />
           </div>
           <Input 
             type="search" 
-            placeholder="Search patients, appointments..." 
-            className="pl-10 bg-slate-950/50 border-slate-800 text-slate-200 placeholder:text-slate-500 w-full" 
+            placeholder="البحث عن القضايا، الموكلين، المستندات..." 
+            className="pr-10 bg-legal-secondary/50 border-legal-secondary text-slate-200 placeholder:text-slate-500 w-full focus-visible:ring-legal-gold" 
           />
         </div>
       </div>
       
-      <div className="flex items-center space-x-4">
-        <div className="hidden sm:flex flex-col items-end mr-4">
-          <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Active Clinic</span>
-          <span className="text-sm font-medium text-teal-400">{tenantId}</span>
+      <div className="flex items-center space-x-4 space-x-reverse">
+        <div className="hidden sm:flex flex-col items-start ml-4">
+          <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold">المكتب الحالي</span>
+          <span className="text-sm font-medium text-legal-gold">{tenantId || 'المكتب الرئيسي'}</span>
         </div>
         
-        <button className="relative p-2 text-slate-400 hover:text-slate-200 rounded-full hover:bg-slate-800 transition-colors">
-          <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+        <button className="relative p-2 text-slate-400 hover:text-legal-gold rounded-full hover:bg-legal-secondary transition-colors">
+          <span className="absolute top-1 left-1 w-2 h-2 bg-legal-danger rounded-full border-2 border-legal-primary"></span>
           <Bell className="h-5 w-5" />
         </button>
       </div>

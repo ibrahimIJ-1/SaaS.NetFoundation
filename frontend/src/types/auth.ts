@@ -8,6 +8,7 @@ export interface User {
   roles: string[];
   permissions: string[];
   features: string[];
+  contactId?: string;
 }
 
 export interface AuthResponse {
