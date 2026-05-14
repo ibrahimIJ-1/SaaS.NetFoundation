@@ -5,6 +5,7 @@ import { useForm, Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useRecordTrust } from "@/hooks/use-billing";
+import { useBaseCurrency } from "@/hooks/use-base-currency";
 import {
   Dialog,
   DialogContent,
@@ -50,6 +51,8 @@ export function RecordTrustModal({
   onOpenChange,
 }: RecordTrustModalProps) {
   const recordTrust = useRecordTrust();
+  const baseCurrency = useBaseCurrency();
+  const sym = baseCurrency?.symbol || '';
 
   const form = useForm<z.infer<typeof trustSchema>>({
     resolver: zodResolver(trustSchema) as Resolver<z.infer<typeof trustSchema>>,
@@ -114,7 +117,7 @@ export function RecordTrustModal({
               name="amount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>المبلغ ($)</FormLabel>
+                  <FormLabel>المبلغ ({sym})</FormLabel>
                   <FormControl>
                     <Input
                       type="number"

@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import {
   useFinancialStats,
   useInvoices,
   useRecentPayments,
 } from "@/hooks/use-billing";
+import { useCases } from "@/hooks/use-cases";
 import { GlassCard } from "@/components/ui/glass-card";
 import { StatCard } from "@/components/ui/stat-card";
 import {
@@ -24,6 +26,22 @@ import Link from "next/link";
 import { cn, formatCurrency } from "@/lib/utils";
 import { useBaseCurrency } from "@/hooks/use-base-currency";
 import { InvoiceStatus } from "@/types/billing";
+import { RecordTrustModal } from "@/components/billing/record-trust-modal";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 const STATUS_CONFIG: Record<InvoiceStatus, { label: string; color: string }> = {
   Draft: {
@@ -55,11 +73,15 @@ const STATUS_CONFIG: Record<InvoiceStatus, { label: string; color: string }> = {
 export default function BillingDashboard() {
   const { data: stats, isLoading: statsLoading } = useFinancialStats();
   const { data: invoices, isLoading: invoicesLoading } = useInvoices();
-
   const { data: payments, isLoading: paymentsLoading } = useRecentPayments();
+  const { data: allCases } = useCases();
   const baseCurrency = useBaseCurrency();
   const sym = baseCurrency?.symbol || '';
   const fmt = (v: number | undefined | null) => v ? `${v.toLocaleString()} ${sym}` : `0 ${sym}`;
+
+  const [showTrustModal, setShowTrustModal] = useState(false);
+  const [trustCaseId, setTrustCaseId] = useState<string | null>(null);
+  const [showCasePicker, setShowCasePicker] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -306,12 +328,50 @@ export default function BillingDashboard() {
             <div className="text-3xl font-bold text-foreground mb-4">
                         {fmt(stats?.trustBalance)}
             </div>
-            <Button className="w-full bg-legal-gold hover:bg-legal-gold-light text-legal-primary font-bold">
+            <Button className="w-full bg-legal-gold hover:bg-legal-gold-light text-legal-primary font-bold"
+              onClick={() => setShowCasePicker(true)}
+            >
+              <Plus className="w-4 h-4 ml-2" />
               إيداع جديد
             </Button>
           </GlassCard>
         </div>
       </div>
+
+      <Dialog open={showCasePicker} onOpenChange={setShowCasePicker}>
+        <DialogContent className="sm:max-w-[425px] text-right" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <Wallet className="w-5 h-5 text-legal-gold" />
+              إيداع في حساب الأمانة
+            </DialogTitle>
+            <DialogDescription>اختر القضية لإيداع المبلغ.</DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Select onValueChange={(value: string | null) => { if (value) { setTrustCaseId(value); setShowCasePicker(false); setTimeout(() => setShowTrustModal(true), 100); } }}>
+              <SelectTrigger className="text-right">
+                <SelectValue placeholder="اختر القضية..." />
+              </SelectTrigger>
+              <SelectContent align="end">
+                {allCases?.map((c: any) => (
+                  <SelectItem key={c.id} value={c.id}>{c.caseNumber} - {c.title}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <DialogFooter className="flex-row-reverse">
+            <Button variant="outline" onClick={() => setShowCasePicker(false)}>إلغاء</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {trustCaseId && (
+        <RecordTrustModal
+          caseId={trustCaseId}
+          open={showTrustModal}
+          onOpenChange={(open) => { setShowTrustModal(open); if (!open) setTrustCaseId(null); }}
+        />
+      )}
     </div>
   );
 }

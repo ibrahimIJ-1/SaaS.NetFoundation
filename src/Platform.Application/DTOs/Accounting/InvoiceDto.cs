@@ -65,6 +65,7 @@ namespace Platform.Application.DTOs.Accounting
     {
         public Guid Id { get; set; }
         public string InvoiceNumber { get; set; } = default!;
+        public Guid LegalCaseId { get; set; }
         public string? CaseTitle { get; set; }
         public string? CaseNumber { get; set; }
         public DateTime IssueDate { get; set; }

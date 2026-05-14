@@ -23,7 +23,7 @@ export const billingService = {
   },
 
   getFinancialStats: async (): Promise<FinancialStats> => {
-    const response = await apiClient.get('/invoices/stats');
+    const response = await apiClient.get('/financials/dashboard-stats');
     return response.data;
   },
 
@@ -72,7 +72,11 @@ export const billingService = {
   },
 
   recordTrust: async (caseId: string, data: any): Promise<any> => {
-    const response = await apiClient.post('/financials/trust', data);
+    const response = await apiClient.post('/financials/trust', {
+      ...data,
+      legalCaseId: caseId,
+      transactionDate: new Date().toISOString(),
+    });
     return response.data;
   }
 };

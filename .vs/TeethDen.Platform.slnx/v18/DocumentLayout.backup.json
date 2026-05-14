@@ -202,8 +202,7 @@
               "RelativeToolTip": "src\\Platform.Persistence\\TenantRegistryDbContextFactory.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-06T20:11:59.697Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-06T20:11:59.697Z"
             },
             {
               "$type": "Document",
@@ -225,7 +224,7 @@
               "RelativeDocumentMoniker": "src\\Platform.Persistence\\Identity\\TenantMigrationService.cs",
               "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Identity\\TenantMigrationService.cs",
               "RelativeToolTip": "src\\Platform.Persistence\\Identity\\TenantMigrationService.cs",
-              "ViewState": "AgIAABsAAAAAAAAAAAAcwCkAAAAUAAAAAAAAAA==",
+              "ViewState": "AgIAABsAAAAAAAAAAAAcwCUAAAAdAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-05-10T09:28:01.773Z",
               "EditorCaption": ""

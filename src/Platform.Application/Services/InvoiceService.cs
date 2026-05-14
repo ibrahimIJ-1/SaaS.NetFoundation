@@ -35,6 +35,7 @@ namespace Platform.Application.Services
             {
                 Id = i.Id,
                 InvoiceNumber = i.InvoiceNumber,
+                LegalCaseId = i.LegalCaseId,
                 CaseTitle = cases.TryGetValue(i.LegalCaseId, out var c) ? c.Title : null,
                 CaseNumber = cases.TryGetValue(i.LegalCaseId, out var cn) ? cn.CaseNumber : null,
                 IssueDate = i.IssueDate,
@@ -109,6 +110,7 @@ namespace Platform.Application.Services
             {
                 Id = i.Id,
                 InvoiceNumber = i.InvoiceNumber,
+                LegalCaseId = i.LegalCaseId,
                 CaseTitle = null,
                 CaseNumber = null,
                 IssueDate = i.IssueDate,
