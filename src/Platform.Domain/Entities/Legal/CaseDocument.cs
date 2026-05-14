@@ -18,6 +18,7 @@ namespace Platform.Domain.Entities.Legal
         public bool IsSigned { get; set; } = false;
         public int Version { get; set; } = 1;
         public Guid? ParentDocumentId { get; set; }
+        public string? OcrStatus { get; set; }
 
 
         public LegalCase LegalCase { get; set; } = null!;

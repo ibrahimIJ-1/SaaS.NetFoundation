@@ -23,6 +23,8 @@ export function useDocument(id: string) {
     queryKey: ['documents', id],
     queryFn: () => documentService.getDocumentById(id),
     enabled: !!id,
+    refetchInterval: (query: any) =>
+      query.state.data?.ocrStatus === "Processing" ? 3000 : false,
   });
 }
 
@@ -195,10 +197,9 @@ export function useRunOcr() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (documentId: string) => documentService.runOcr(documentId),
-    onSuccess: (data: any) => {
-      queryClient.invalidateQueries({ queryKey: ['documents'] });
-      queryClient.invalidateQueries({ queryKey: ['documents', data.originalId] });
-      toast.success("تم استخراج النص بواسطة OCR");
-    }
+    onSuccess: (_data, documentId) => {
+      queryClient.invalidateQueries({ queryKey: ['documents', documentId] });
+      toast.success("تم بدء معالجة OCR");
+    },
   });
 }

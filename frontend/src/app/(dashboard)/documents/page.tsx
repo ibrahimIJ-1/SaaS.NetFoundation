@@ -15,7 +15,8 @@ export default function GlobalDocumentsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
 
-  const filteredDocs = documents?.filter(doc => 
+  const rootDocs = documents?.filter(d => !d.parentDocumentId);
+  const filteredDocs = rootDocs?.filter(doc => 
     doc.fileName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     doc.uploadedBy.toLowerCase().includes(searchTerm.toLowerCase())
   );

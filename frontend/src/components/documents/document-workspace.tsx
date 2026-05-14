@@ -425,11 +425,15 @@ export function DocumentWorkspace({
               variant="outline"
               size="sm"
               onClick={() => runOcr.mutate(doc.id)}
-              disabled={runOcr.isPending}
+              disabled={runOcr.isPending || doc.ocrStatus === "Processing"}
               className="gap-2"
             >
               <ScanSearch className="w-4 h-4" />
-              {runOcr.isPending ? "جارٍ OCR..." : "OCR"}
+              {runOcr.isPending || doc.ocrStatus === "Processing"
+                ? "جارٍ OCR..."
+                : doc.ocrStatus === "Completed"
+                  ? "OCR✔"
+                  : "OCR"}
             </Button>
           )}
           <Button

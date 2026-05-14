@@ -105,8 +105,13 @@ export const documentService = {
     return response.data;
   },
 
-  runOcr: async (documentId: string): Promise<{ originalId: string; ocrDocument: CaseDocument }> => {
+  runOcr: async (documentId: string): Promise<{ documentId: string; status: string }> => {
     const response = await apiClient.post(`/documents/${documentId}/ocr`);
     return response.data;
-  }
+  },
+
+  getOcrStatus: async (documentId: string): Promise<{ id: string; ocrStatus: string }> => {
+    const response = await apiClient.get(`/documents/${documentId}/ocr-status`);
+    return response.data;
+  },
 };

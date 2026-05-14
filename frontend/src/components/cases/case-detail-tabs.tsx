@@ -373,7 +373,7 @@ export function CaseDetailTabs({ caseData }: CaseDetailTabsProps) {
                   جاري التحميل...
                 </div>
               ) : (
-                documents?.map((doc) => (
+                documents?.filter(d => !d.parentDocumentId).map((doc) => (
                   <div
                     key={doc.id}
                     className="flex items-center justify-between p-4 bg-secondary/20 rounded-xl border border-border group hover:border-legal-gold/30 transition-all"
@@ -465,7 +465,7 @@ export function CaseDetailTabs({ caseData }: CaseDetailTabsProps) {
                   </div>
                 ))
               )}
-              {!documents?.length && !docsLoading && (
+              {!documents?.filter(d => !d.parentDocumentId).length && !docsLoading && (
                 <div className="py-12 text-center text-muted-foreground border-2 border-dashed border-border rounded-xl">
                   لا توجد مستندات مرفوعة لهذه القضية حتى الآن.
                 </div>

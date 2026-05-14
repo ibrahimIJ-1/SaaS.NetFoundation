@@ -52,7 +52,10 @@ export interface CaseDocument {
   isSharedWithClient: boolean;
   needsSignature: boolean;
   isSigned: boolean;
+  version?: number;
+  parentDocumentId?: string;
   extractedText?: string;
+  ocrStatus?: string;
   highlights?: DocumentHighlight[];
   annotations?: DocumentAnnotation[];
   videoAnnotations?: DocumentVideoAnnotation[];

@@ -1,3 +1,4 @@
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -5,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Platform.Application.Abstractions;
 using Platform.Application.Common.Interfaces;
 using Platform.Domain.Entities.Legal;
+using Platform.Infrastructure.Jobs.Handlers;
 using Platform.Persistence;
 using System;
 using System.Collections.Generic;
@@ -25,6 +27,7 @@ namespace Platform.API.Controllers
         private readonly IDocumentConversionService _conversionService;
         private readonly IDocumentOcrService _documentOcrService;
         private readonly IDocumentCreatorService _documentCreatorService;
+        private readonly ITenantProvider _tenantProvider;
 
         public DocumentsController(
             ApplicationDbContext dbContext,
@@ -32,7 +35,8 @@ namespace Platform.API.Controllers
             IOCRService ocrService,
             IDocumentConversionService conversionService,
             IDocumentOcrService documentOcrService,
-            IDocumentCreatorService documentCreatorService)
+            IDocumentCreatorService documentCreatorService,
+            ITenantProvider tenantProvider)
         {
             _dbContext = dbContext;
             _storageService = storageService;
@@ -40,6 +44,7 @@ namespace Platform.API.Controllers
             _conversionService = conversionService;
             _documentOcrService = documentOcrService;
             _documentCreatorService = documentCreatorService;
+            _tenantProvider = tenantProvider;
         }
 
         [HttpGet("shared")]
@@ -446,7 +451,7 @@ namespace Platform.API.Controllers
             }
         }
 
-        // --- OCR: run OCR on an existing document ---
+        // --- OCR: queue background OCR job ---
 
         [HttpPost("{id}/ocr")]
         public async Task<IActionResult> RunOcr(Guid id)
@@ -457,60 +462,30 @@ namespace Platform.API.Controllers
             if (!_documentOcrService.CanOcr(document.ContentType, document.FileName))
                 return BadRequest("OCR is not supported for this file type.");
 
-            // Stream the original file from storage (simplified — uses fileUrl as key)
-            var fileKey = document.FileUrl.Contains(".amazonaws.com/")
-                ? document.FileUrl.Split(".amazonaws.com/")[1]
-                : document.FileUrl;
+            if (document.OcrStatus == "Processing")
+                return Accepted(new { documentId = id, status = "Processing" });
 
-            // We need a way to download from S3. For now, we'll use the upload pattern:
-            // Download original to memory, process with OCR, upload result.
+            var connStr = _tenantProvider.CurrentTenant?.ConnectionString;
+            if (string.IsNullOrEmpty(connStr))
+                return BadRequest("Tenant connection string not configured");
 
-            // Since IStorageService doesn't have a download method, we'll signal the limitation.
-            // In production, add IStorageService.GetFileAsync() or use HttpClient on the public URL.
-            // For this implementation, we'll require the document to be re-uploaded for OCR,
-            // OR we use an HttpClient to fetch the file from its public URL.
+            document.OcrStatus = "Processing";
+            await _dbContext.SaveChangesAsync();
 
-            try
-            {
-                using var httpClient = new HttpClient { Timeout = TimeSpan.FromMinutes(5) };
-                using var originalStream = await httpClient.GetStreamAsync(document.FileUrl);
+            BackgroundJob.Enqueue<OcrJob>(job => job.Execute(id, connStr));
 
-                using var ocrPdfStream = await _documentOcrService.OcrToSearchablePdfAsync(
-                    originalStream, document.FileName);
+            return Accepted(new { documentId = id, status = "Processing" });
+        }
 
-                var ocrFileName = $"{document.LegalCaseId}/{Guid.NewGuid()}_ocr_{document.FileName}.pdf";
-                var ocrPdfUrl = await _storageService.UploadFileAsync(ocrPdfStream, ocrFileName, "application/pdf");
+        [HttpGet("{id}/ocr-status")]
+        public async Task<IActionResult> GetOcrStatus(Guid id)
+        {
+            var document = await _dbContext.CaseDocuments
+                .Select(d => new { d.Id, d.OcrStatus })
+                .FirstOrDefaultAsync(d => d.Id == id);
 
-                // Save as a new version linked to the original document
-                var latestVersion = await _dbContext.CaseDocuments
-                    .Where(d => d.ParentDocumentId == document.Id || d.Id == document.Id)
-                    .MaxAsync(d => (int?)d.Version) ?? 1;
-
-                var rootId = document.ParentDocumentId ?? document.Id;
-
-                var ocrDocument = new CaseDocument
-                {
-                    LegalCaseId = document.LegalCaseId,
-                    FileName = Path.GetFileNameWithoutExtension(document.FileName) + "_OCR.pdf",
-                    FileUrl = ocrPdfUrl,
-                    ContentType = "application/pdf",
-                    UploadDate = DateTime.UtcNow,
-                    UploadedBy = User.Identity?.Name ?? "OCR",
-                    Version = latestVersion + 1,
-                    ParentDocumentId = rootId
-                };
-
-                _dbContext.CaseDocuments.Add(ocrDocument);
-                await _dbContext.SaveChangesAsync();
-
-                return Ok(new { originalId = id, ocrDocument });
-            }
-            catch (HttpRequestException ex)
-            {
-                return BadRequest(
-                    "Cannot access the document file for OCR. Ensure the document URL is publicly accessible, " +
-                    "or upload the file directly for OCR. Details: " + ex.Message);
-            }
+            if (document == null) return NotFound();
+            return Ok(document);
         }
 
         [HttpPost("{id}/sign")]
