@@ -16,8 +16,13 @@ namespace Platform.API.Controllers
     public class TransactionsController : ControllerBase
     {
         private readonly ApplicationDbContext _db;
+        private readonly ILogger<TransactionsController> _logger;
 
-        public TransactionsController(ApplicationDbContext db) => _db = db;
+        public TransactionsController(ApplicationDbContext db, ILogger<TransactionsController> logger)
+        {
+            _db = db;
+            _logger = logger;
+        }
 
         // ── GET /api/transactions ───────────────────────────────────────────
         [HttpGet]
@@ -177,8 +182,7 @@ namespace Platform.API.Controllers
             _db.LegalTransactions.Add(transaction);
             await _db.SaveChangesAsync();
 
-            // Mock notification
-            Console.WriteLine($"[NOTIFY] Transaction {transactionNumber} started. First step: {workflow.Steps.FirstOrDefault()?.Name}");
+            _logger.LogInformation("Transaction {TransactionNumber} started. First step: {StepName}", transactionNumber, workflow.Steps.FirstOrDefault()?.Name);
 
             return CreatedAtAction(nameof(GetById), new { id = transaction.Id }, new { transaction.Id, transaction.TransactionNumber });
         }
@@ -222,7 +226,7 @@ namespace Platform.API.Controllers
                 if (nextStep != null)
                 {
                     nextStep.Status = StepStatus.InProgress;
-                    Console.WriteLine($"[NOTIFY] Step '{nextStep.StepName}' is now active for transaction {transaction.TransactionNumber}");
+                    _logger.LogInformation("Step {StepName} is now active for transaction {TransactionNumber}", nextStep.StepName, transaction.TransactionNumber);
                 }
                 else
                 {

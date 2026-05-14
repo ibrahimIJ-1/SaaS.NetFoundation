@@ -43,6 +43,11 @@ namespace Platform.Persistence
         public DbSet<TransactionStepInstance> TransactionStepInstances => Set<TransactionStepInstance>();
         public DbSet<Currency> Currencies => Set<Currency>();
         
+        // Double-Entry Accounting
+        public DbSet<Account> Accounts => Set<Account>();
+        public DbSet<JournalEntry> JournalEntries => Set<JournalEntry>();
+        public DbSet<JournalEntryLine> JournalEntryLines => Set<JournalEntryLine>();
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -226,6 +231,59 @@ namespace Platform.Persistence
                 .HasMany(c => c.TransactionStepInstances)
                 .WithOne(s => s.Currency)
                 .HasForeignKey(s => s.CurrencyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Currency>()
+                .HasMany(c => c.Invoices)
+                .WithOne(i => i.Currency)
+                .HasForeignKey(i => i.CurrencyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Currency>()
+                .HasMany(c => c.Payments)
+                .WithOne(p => p.Currency)
+                .HasForeignKey(p => p.CurrencyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Currency>()
+                .HasMany(c => c.Expenses)
+                .WithOne(e => e.Currency)
+                .HasForeignKey(e => e.CurrencyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Currency>()
+                .HasMany(c => c.TrustTransactions)
+                .WithOne(t => t.Currency)
+                .HasForeignKey(t => t.CurrencyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Account hierarchy (self-referencing)
+            modelBuilder.Entity<Account>()
+                .HasMany(a => a.Children)
+                .WithOne(a => a.ParentAccount)
+                .HasForeignKey(a => a.ParentAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Account>()
+                .HasIndex(a => a.AccountCode)
+                .IsUnique();
+
+            // Journal Entry
+            modelBuilder.Entity<JournalEntry>()
+                .HasIndex(e => e.EntryNumber)
+                .IsUnique();
+
+            modelBuilder.Entity<JournalEntry>()
+                .HasMany(e => e.Lines)
+                .WithOne(l => l.JournalEntry)
+                .HasForeignKey(l => l.JournalEntryId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Journal Entry Line
+            modelBuilder.Entity<JournalEntryLine>()
+                .HasOne(l => l.Account)
+                .WithMany(a => a.JournalEntryLines)
+                .HasForeignKey(l => l.AccountId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

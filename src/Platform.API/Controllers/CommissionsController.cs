@@ -1,11 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Platform.Domain.Entities.Legal;
-using Platform.Persistence;
+using Platform.Application.DTOs.Accounting;
+using Platform.Application.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Platform.API.Controllers
@@ -15,53 +13,36 @@ namespace Platform.API.Controllers
     [Route("api/commissions")]
     public class CommissionsController : ControllerBase
     {
-        private readonly ApplicationDbContext _dbContext;
+        private readonly ICommissionService _commissionService;
 
-        public CommissionsController(ApplicationDbContext dbContext)
+        public CommissionsController(ICommissionService commissionService)
         {
-            _dbContext = dbContext;
+            _commissionService = commissionService;
         }
 
         [HttpGet("rules")]
-        public async Task<IActionResult> GetRules()
+        public async Task<ActionResult<List<CommissionRuleDto>>> GetRules()
         {
-            var rules = await _dbContext.CommissionRules.ToListAsync();
-            return Ok(rules);
+            return Ok(await _commissionService.GetRulesAsync());
         }
 
         [HttpPost("rules")]
-        public async Task<IActionResult> CreateRule([FromBody] CommissionRule rule)
+        public async Task<ActionResult<CommissionRuleDto>> CreateRule([FromBody] CreateCommissionRuleDto request)
         {
-            _dbContext.CommissionRules.Add(rule);
-            await _dbContext.SaveChangesAsync();
-            return Ok(rule);
+            return Ok(await _commissionService.CreateRuleAsync(request));
         }
 
         [HttpGet("calculate/{lawyerId}")]
-        public async Task<IActionResult> CalculateCommission(string lawyerId)
+        public async Task<ActionResult<CommissionSummaryDto>> CalculateCommission(string lawyerId)
         {
-            var rule = await _dbContext.CommissionRules
-                .FirstOrDefaultAsync(r => r.LawyerId == lawyerId && r.IsActive);
-
-            if (rule == null) return NotFound("No active commission rule found for this lawyer.");
-
-            // Get all paid invoices for cases assigned to this lawyer
-            var paidInvoices = await _dbContext.Invoices
-                .Include(i => i.LegalCase)
-                .Where(i => i.LegalCase.AssignedLawyerId == lawyerId && i.PaidAmount > 0)
-                .ToListAsync();
-
-            var totalRevenue = paidInvoices.Sum(i => i.PaidAmount);
-            var commissionAmount = (totalRevenue * rule.Percentage / 100) + (paidInvoices.Count * rule.FixedAmount);
-
-            return Ok(new
+            try
             {
-                LawyerId = lawyerId,
-                LawyerName = rule.LawyerName,
-                TotalRevenue = totalRevenue,
-                CommissionAmount = commissionAmount,
-                CaseCount = paidInvoices.Count
-            });
+                return Ok(await _commissionService.CalculateAsync(lawyerId));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
         }
     }
 }

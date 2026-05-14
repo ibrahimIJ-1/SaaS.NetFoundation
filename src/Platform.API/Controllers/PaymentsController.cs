@@ -1,10 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Platform.Domain.Entities.Legal;
-using Platform.Persistence;
+using Platform.Application.DTOs.Accounting;
+using Platform.Application.Services;
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Platform.API.Controllers
@@ -14,108 +13,56 @@ namespace Platform.API.Controllers
     [Route("api/payments")]
     public class PaymentsController : ControllerBase
     {
-        private readonly ApplicationDbContext _dbContext;
+        private readonly IPaymentService _paymentService;
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public PaymentsController(IPaymentService paymentService)
         {
-            var payments = await _dbContext.Payments
-                .Include(p => p.Invoice)
-                .ThenInclude(i => i.LegalCase)
-                .OrderByDescending(p => p.PaymentDate)
-                .ToListAsync();
-
-            return Ok(payments);
+            _paymentService = paymentService;
         }
 
-        public PaymentsController(ApplicationDbContext dbContext)
+        [HttpGet]
+        public async Task<ActionResult<List<PaymentListDto>>> GetAll()
         {
-            _dbContext = dbContext;
+            return Ok(await _paymentService.GetAllAsync());
         }
 
         [HttpGet("invoice/{invoiceId}")]
-        public async Task<IActionResult> GetByInvoice(Guid invoiceId)
+        public async Task<ActionResult<List<PaymentListDto>>> GetByInvoice(Guid invoiceId)
         {
-            var payments = await _dbContext.Payments
-                .Where(p => p.InvoiceId == invoiceId)
-                .OrderByDescending(p => p.PaymentDate)
-                .ToListAsync();
+            return Ok(await _paymentService.GetByInvoiceAsync(invoiceId));
+        }
 
-            return Ok(payments);
+        [HttpGet("recent")]
+        public async Task<ActionResult<List<PaymentListDto>>> GetRecent()
+        {
+            return Ok(await _paymentService.GetRecentAsync(10));
         }
 
         [HttpPost]
-        public async Task<IActionResult> RecordPayment([FromBody] RecordPaymentRequest request)
+        public async Task<ActionResult<PaymentDto>> RecordPayment([FromBody] RecordPaymentRequestDto request)
         {
-            var invoice = await _dbContext.Invoices.FindAsync(request.InvoiceId);
-            if (invoice == null) return NotFound("Invoice not found.");
-
-            var payment = new Payment
+            try
             {
-                InvoiceId = request.InvoiceId,
-                Amount = request.Amount,
-                PaymentDate = request.PaymentDate,
-                Method = request.Method,
-                ReferenceNumber = request.ReferenceNumber,
-                Notes = request.Notes
-            };
-
-            _dbContext.Payments.Add(payment);
-
-            // Update Invoice Paid Amount
-            invoice.PaidAmount += payment.Amount;
-
-            // Update Status automatically
-            if (invoice.PaidAmount >= invoice.TotalAmount)
-            {
-                invoice.Status = InvoiceStatus.Paid;
+                return Ok(await _paymentService.RecordPaymentAsync(request));
             }
-            else if (invoice.PaidAmount > 0)
+            catch (InvalidOperationException ex)
             {
-                invoice.Status = InvoiceStatus.Partial;
+                return BadRequest(new { error = ex.Message });
             }
-
-            await _dbContext.SaveChangesAsync();
-
-            return Ok(payment);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePayment(Guid id)
         {
-            var payment = await _dbContext.Payments.FindAsync(id);
-            if (payment == null) return NotFound();
-
-            var invoice = await _dbContext.Invoices.FindAsync(payment.InvoiceId);
-            if (invoice != null)
+            try
             {
-                invoice.PaidAmount -= payment.Amount;
-                
-                // Revert status if necessary
-                if (invoice.PaidAmount <= 0)
-                {
-                    invoice.Status = InvoiceStatus.Sent; // Or Draft depending on workflow
-                }
-                else if (invoice.PaidAmount < invoice.TotalAmount)
-                {
-                    invoice.Status = InvoiceStatus.Partial;
-                }
+                await _paymentService.DeletePaymentAsync(id);
+                return NoContent();
             }
-
-            _dbContext.Payments.Remove(payment);
-            await _dbContext.SaveChangesAsync();
-
-            return NoContent();
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
         }
-    }
-
-    public class RecordPaymentRequest
-    {
-        public Guid InvoiceId { get; set; }
-        public decimal Amount { get; set; }
-        public DateTime PaymentDate { get; set; }
-        public PaymentMethod Method { get; set; }
-        public string? ReferenceNumber { get; set; }
-        public string? Notes { get; set; }
     }
 }

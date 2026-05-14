@@ -127,9 +127,11 @@ export default function InvoicesPage() {
                   </td>
                   <td className="p-4">
                     <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-legal-gold">
-                        <Eye className="w-4 h-4" />
-                      </Button>
+                      <Link href={`/billing/invoices/${invoice.id}`}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-legal-gold">
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      </Link>
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-green-400">
                         <CreditCard className="w-4 h-4" />
                       </Button>

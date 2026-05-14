@@ -15,7 +15,9 @@ namespace Platform.Domain.Entities.Legal
         [Required] public string Category { get; set; } = default!; // e.g., Court Fees, Travel, Printing
         public bool IsBilled { get; set; }
         public Guid? InvoiceId { get; set; }
-        
+        public Guid? CurrencyId { get; set; }
+        public virtual Currency? Currency { get; set; }
+        public decimal ExchangeRate { get; set; } = 1.0m;
         public string? ReceiptUrl { get; set; }
         public string CreatedBy { get; set; } = default!;
     }

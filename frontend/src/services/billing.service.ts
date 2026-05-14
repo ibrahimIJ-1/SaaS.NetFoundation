@@ -1,5 +1,5 @@
 import { apiClient } from './api-client';
-import { Invoice, InvoiceItem, Payment, FinancialStats, UnbilledSummaryItem } from '@/types/billing';
+import { Invoice, Payment, FinancialStats, UnbilledSummaryItem } from '@/types/billing';
 
 export const billingService = {
   getInvoices: async (): Promise<Invoice[]> => {
@@ -28,7 +28,7 @@ export const billingService = {
   },
 
   getRecentPayments: async (): Promise<Payment[]> => {
-    const response = await apiClient.get('/invoices/payments/recent');
+    const response = await apiClient.get('/payments/recent');
     return response.data;
   },
 
@@ -50,31 +50,29 @@ export const billingService = {
 
   // Expenses
   getExpenses: async (caseId?: string): Promise<any[]> => {
-    const response = await apiClient.get('/financial/expenses', {
-      params: { caseId }
-    });
+    const url = caseId ? `/expenses/case/${caseId}` : '/expenses';
+    const response = await apiClient.get(url);
     return response.data;
   },
 
   createExpense: async (data: any): Promise<any> => {
-    const response = await apiClient.post('/financial/expenses', data);
+    const response = await apiClient.post('/expenses', data);
     return response.data;
   },
 
   // Payments & Trust
-  recordPayment: async (id: string, data: any): Promise<Payment> => {
-    const response = await apiClient.post(`/invoices/${id}/payments`, data);
+  recordPayment: async (invoiceId: string, data: any): Promise<Payment> => {
+    const response = await apiClient.post('/payments', { ...data, invoiceId });
     return response.data;
   },
 
   getTrustTransactions: async (caseId: string): Promise<{ balance: number, transactions: any[] }> => {
-    const response = await apiClient.get(`/financial/trust/${caseId}`);
+    const response = await apiClient.get(`/financials/trust/case/${caseId}`);
     return response.data;
   },
 
   recordTrust: async (caseId: string, data: any): Promise<any> => {
-    const response = await apiClient.post(`/financial/trust/${caseId}`, data);
+    const response = await apiClient.post('/financials/trust', data);
     return response.data;
   }
 };
-

@@ -29,6 +29,12 @@ namespace Platform.Domain.Entities.Legal
         [Column(TypeName = "decimal(18,2)")]
         public decimal PaidAmount { get; set; }
 
+        public Guid? CurrencyId { get; set; }
+        public virtual Currency? Currency { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal ExchangeRate { get; set; } = 1.0m;
+
         public InvoiceStatus Status { get; set; }
         public string? Notes { get; set; }
 

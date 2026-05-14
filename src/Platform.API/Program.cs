@@ -44,7 +44,7 @@ builder.Services.AddCors(options =>
 });
 
 // Core layers
-builder.Services.AddApplication();
+builder.Services.AddApplication(builder.Configuration);
 builder.Services.AddInfrastructure();
 builder.Services.AddPersistence(builder.Configuration);
 

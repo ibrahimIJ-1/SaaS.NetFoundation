@@ -1,129 +1,88 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Platform.Domain.Entities.Legal;
-using Platform.Persistence;
+using Platform.Application.DTOs.Accounting;
+using Platform.Application.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Platform.API.Controllers
 {
+    [Authorize]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/invoices")]
     public class InvoicesController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IInvoiceService _invoiceService;
 
-        public InvoicesController(ApplicationDbContext context)
+        public InvoicesController(IInvoiceService invoiceService)
         {
-            _context = context;
+            _invoiceService = invoiceService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Invoice>>> GetInvoices()
+        public async Task<ActionResult<List<InvoiceListDto>>> GetInvoices()
         {
-            return await _context.Invoices
-                .Include(i => i.LegalCase)
-                .OrderByDescending(i => i.IssueDate)
-                .ToListAsync();
+            return Ok(await _invoiceService.GetAllAsync());
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Invoice>> GetInvoice(Guid id)
+        public async Task<ActionResult<InvoiceDto>> GetInvoice(Guid id)
         {
-            var invoice = await _context.Invoices
-                .Include(i => i.LegalCase)
-                .Include(i => i.Items)
-                .FirstOrDefaultAsync(i => i.Id == id);
-
+            var invoice = await _invoiceService.GetByIdAsync(id);
             if (invoice == null) return NotFound();
-            return invoice;
+            return Ok(invoice);
+        }
+
+        [HttpGet("case/{caseId}")]
+        public async Task<ActionResult<List<InvoiceListDto>>> GetByCase(Guid caseId)
+        {
+            return Ok(await _invoiceService.GetByCaseAsync(caseId));
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<InvoiceDto>> Create([FromBody] CreateInvoiceRequestDto request)
+        {
+            try
+            {
+                var invoice = await _invoiceService.CreateAsync(request);
+                return CreatedAtAction(nameof(GetInvoice), new { id = invoice.Id }, invoice);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [HttpPatch("{id}/status")]
+        public async Task<ActionResult<InvoiceDto>> UpdateStatus(Guid id, [FromBody] UpdateInvoiceStatusDto request)
+        {
+            try
+            {
+                return Ok(await _invoiceService.UpdateStatusAsync(id, request));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         [HttpPost("bulk-generate")]
-        public async Task<ActionResult> BulkGenerate([FromBody] List<Guid> caseIds)
+        public async Task<ActionResult<BulkGenerateResultDto>> BulkGenerate([FromBody] BulkGenerateRequestDto request)
         {
-            var cases = await _context.LegalCases
-                .Where(c => caseIds.Contains(c.Id))
-                .Include(c => c.Expenses.Where(e => !e.IsBilled))
-                .ToListAsync();
-
-            var generatedInvoices = new List<Invoice>();
-
-            foreach (var legalCase in cases)
-            {
-                var unbilledExpenses = legalCase.Expenses.Where(e => !e.IsBilled).ToList();
-                if (!unbilledExpenses.Any()) continue;
-
-                var invoice = new Invoice
-                {
-                    LegalCaseId = legalCase.Id,
-
-                    InvoiceNumber = $"INV-{DateTime.UtcNow:yyyyMMdd}-{legalCase.CaseNumber}",
-                    IssueDate = DateTime.UtcNow,
-                    DueDate = DateTime.UtcNow.AddDays(15),
-                    Status = InvoiceStatus.Draft,
-                    TotalAmount = unbilledExpenses.Sum(e => e.Amount),
-                    PaidAmount = 0
-                };
-
-
-                foreach (var expense in unbilledExpenses)
-                {
-                    invoice.Items.Add(new InvoiceItem
-                    {
-                        Description = expense.Description,
-                        UnitPrice = expense.Amount,
-                        Quantity = 1,
-                        Total = expense.Amount
-                    });
-
-                    expense.IsBilled = true;
-                    expense.InvoiceId = invoice.Id;
-                }
-
-                _context.Invoices.Add(invoice);
-                generatedInvoices.Add(invoice);
-            }
-
-            await _context.SaveChangesAsync();
-            return Ok(new { count = generatedInvoices.Count });
+            return Ok(await _invoiceService.BulkGenerateAsync(request));
         }
 
         [HttpGet("unbilled-summary")]
-        public async Task<ActionResult> GetUnbilledSummary()
+        public async Task<ActionResult<List<UnbilledSummaryDto>>> GetUnbilledSummary()
         {
-            var summary = await _context.LegalCases
-                .Include(c => c.Expenses)
-                .Where(c => c.Expenses.Any(e => !e.IsBilled))
-                .Select(c => new
-                {
-                    CaseId = c.Id,
-                    CaseTitle = c.Title,
-                    CaseNumber = c.CaseNumber,
-                    UnbilledAmount = c.Expenses.Where(e => !e.IsBilled).Sum(e => e.Amount),
-                    UnbilledCount = c.Expenses.Count(e => e.IsBilled == false)
-                })
-                .ToListAsync();
-
-            return Ok(summary);
+            return Ok(await _invoiceService.GetUnbilledSummaryAsync());
         }
 
         [HttpGet("stats")]
-        public async Task<ActionResult> GetStats()
+        public async Task<ActionResult<InvoiceStatsDto>> GetStats()
         {
-            var invoices = await _context.Invoices.ToListAsync();
-            var trustBalance = await _context.TrustTransactions.SumAsync(t => t.Type == TrustTransactionType.Deposit ? t.Amount : -t.Amount);
-
-
-            return Ok(new
-            {
-                TotalInvoiced = invoices.Sum(i => i.TotalAmount),
-                TotalCollected = invoices.Sum(i => i.PaidAmount),
-                PendingAmount = invoices.Where(i => i.Status != InvoiceStatus.Paid && i.Status != InvoiceStatus.Cancelled).Sum(i => i.TotalAmount - i.PaidAmount),
-                TrustBalance = trustBalance
-            });
+            return Ok(await _invoiceService.GetStatsAsync());
         }
     }
 }

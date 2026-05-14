@@ -33,6 +33,10 @@ export interface Invoice {
   status: InvoiceStatus;
   notes?: string;
   items: InvoiceItem[];
+  currencyId?: string;
+  currencyCode?: string;
+  exchangeRate: number;
+  createdOn: string;
 }
 
 export interface Payment {
@@ -99,8 +103,7 @@ export interface UnbilledSummaryItem {
   caseId: string;
   caseTitle: string;
   caseNumber: string;
-  clientName: string;
+  clientName?: string;
   unbilledExpenseCount: number;
   unbilledExpenseTotal: number;
 }
-

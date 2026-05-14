@@ -21,8 +21,7 @@ namespace Platform.API.Controllers
         public async Task<IActionResult> GetAll()
         {
             var currencies = await _db.Currencies.OrderByDescending(c => c.IsBase).ToListAsync();
-            
-            // Seed if empty
+
             if (!currencies.Any())
             {
                 var iqd = new Currency { Code = "IQD", Name = "دينار عراقي", Symbol = "د.ع", ExchangeRate = 1.0m, IsBase = true };
@@ -31,7 +30,7 @@ namespace Platform.API.Controllers
                 await _db.SaveChangesAsync();
                 currencies = await _db.Currencies.OrderByDescending(c => c.IsBase).ToListAsync();
             }
-            
+
             return Ok(currencies);
         }
 
@@ -58,7 +57,7 @@ namespace Platform.API.Controllers
             existing.Name = currency.Name;
             existing.Symbol = currency.Symbol;
             existing.ExchangeRate = currency.ExchangeRate;
-            
+
             if (currency.IsBase && !existing.IsBase)
             {
                 var currentBase = await _db.Currencies.FirstOrDefaultAsync(c => c.IsBase);

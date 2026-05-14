@@ -1,6 +1,7 @@
 'use client';
 
 import { useInvoices, useTrustTransactions, useRecordTrust } from '@/hooks/use-billing';
+import { useBaseCurrency } from '@/hooks/use-base-currency';
 import { GlassCard } from '@/components/ui/glass-card';
 import { Button } from '@/components/ui/button';
 import { 
@@ -26,6 +27,8 @@ interface CaseBillingTabProps {
 export function CaseBillingTab({ caseId }: CaseBillingTabProps) {
   const { data: invoices, isLoading: invoicesLoading } = useInvoices();
   const { data: trustData, isLoading: trustLoading } = useTrustTransactions(caseId);
+  const baseCurrency = useBaseCurrency();
+  const sym = baseCurrency?.symbol || '';
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
   const [showTrustModal, setShowTrustModal] = useState(false);
 
@@ -41,15 +44,15 @@ export function CaseBillingTab({ caseId }: CaseBillingTabProps) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <GlassCard className="p-4 border-l-4 border-l-legal-gold">
           <p className="text-xs text-muted-foreground mb-1">إجمالي المبالغ المفوترة</p>
-          <div className="text-2xl font-bold text-foreground font-mono">${totalInvoiced.toLocaleString()}</div>
+          <div className="text-2xl font-bold text-foreground font-mono">{totalInvoiced.toLocaleString()} {sym}</div>
         </GlassCard>
         <GlassCard className="p-4 border-l-4 border-l-green-500">
           <p className="text-xs text-muted-foreground mb-1">المبالغ المدفوعة</p>
-          <div className="text-2xl font-bold text-foreground font-mono">${totalPaid.toLocaleString()}</div>
+          <div className="text-2xl font-bold text-foreground font-mono">{totalPaid.toLocaleString()} {sym}</div>
         </GlassCard>
         <GlassCard className={cn("p-4 border-l-4", balance > 0 ? "border-l-red-500" : "border-l-slate-500")}>
           <p className="text-xs text-muted-foreground mb-1">المستحق المتبقي</p>
-          <div className="text-2xl font-bold text-foreground font-mono">${balance.toLocaleString()}</div>
+          <div className="text-2xl font-bold text-foreground font-mono">{balance.toLocaleString()} {sym}</div>
         </GlassCard>
       </div>
 
@@ -83,7 +86,7 @@ export function CaseBillingTab({ caseId }: CaseBillingTabProps) {
                   </div>
                   <div className="text-left flex items-center gap-4">
                     <div>
-                      <p className="font-bold text-sm text-foreground">${invoice.totalAmount.toLocaleString()}</p>
+                      <p className="font-bold text-sm text-foreground">{invoice.totalAmount.toLocaleString()} {sym}</p>
                       <p className={cn(
                         "text-[10px] px-1.5 py-0.5 rounded-full border w-fit mr-auto mt-1",
                         invoice.status === 'Paid' ? "text-green-400 border-green-500/30" : "text-orange-400 border-orange-500/30"
@@ -111,7 +114,7 @@ export function CaseBillingTab({ caseId }: CaseBillingTabProps) {
               حساب الأمانة
             </h3>
             <div className="text-sm font-bold text-legal-gold font-mono">
-              رصيد: ${trustData?.balance.toLocaleString() ?? '0'}
+              رصيد: {trustData?.balance.toLocaleString() ?? '0'} {sym}
             </div>
           </div>
 
@@ -139,7 +142,7 @@ export function CaseBillingTab({ caseId }: CaseBillingTabProps) {
                     "font-bold font-mono",
                     t.type === 'Deposit' ? "text-green-500" : "text-red-500"
                   )}>
-                    {t.type === 'Deposit' ? '+' : '-'}${t.amount.toLocaleString()}
+                    {t.type === 'Deposit' ? '+' : '-'}{t.amount.toLocaleString()} {sym}
                   </div>
                 </div>
               ))

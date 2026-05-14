@@ -6,9 +6,11 @@ export interface Expense {
   description?: string;
   amount: number;
   expenseDate: string;
-  category: number; // Enum: 0=CourtFees, 1=Travel, 2=OfficeRent, etc.
+  category: string;
   receiptUrl?: string;
   legalCaseId?: string;
+  isBilled: boolean;
+  invoiceId?: string;
 }
 
 export interface CommissionSummary {
@@ -26,7 +28,15 @@ export const financialService = {
   },
 
   createExpense: async (expense: Partial<Expense>): Promise<Expense> => {
-    const response = await apiClient.post('/expenses', expense);
+    const response = await apiClient.post('/expenses', {
+      title: expense.title,
+      description: expense.description,
+      amount: expense.amount,
+      expenseDate: expense.expenseDate,
+      category: expense.category,
+      receiptUrl: expense.receiptUrl,
+      legalCaseId: expense.legalCaseId,
+    });
     return response.data;
   },
 

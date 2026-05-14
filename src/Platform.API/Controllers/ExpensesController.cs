@@ -1,11 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Platform.Domain.Entities.Legal;
-using Platform.Persistence;
+using Platform.Application.DTOs.Accounting;
+using Platform.Application.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Platform.API.Controllers
@@ -15,49 +13,43 @@ namespace Platform.API.Controllers
     [Route("api/expenses")]
     public class ExpensesController : ControllerBase
     {
-        private readonly ApplicationDbContext _dbContext;
+        private readonly IExpenseService _expenseService;
 
-        public ExpensesController(ApplicationDbContext dbContext)
+        public ExpensesController(IExpenseService expenseService)
         {
-            _dbContext = dbContext;
+            _expenseService = expenseService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<ActionResult<List<ExpenseDto>>> GetAll()
         {
-            var expenses = await _dbContext.Expenses
-                .OrderByDescending(e => e.ExpenseDate)
-                .ToListAsync();
-            return Ok(expenses);
+            return Ok(await _expenseService.GetAllAsync());
         }
 
         [HttpGet("case/{caseId}")]
-        public async Task<IActionResult> GetByCase(Guid caseId)
+        public async Task<ActionResult<List<ExpenseDto>>> GetByCase(Guid caseId)
         {
-            var expenses = await _dbContext.Expenses
-                .Where(e => e.LegalCaseId == caseId)
-                .OrderByDescending(e => e.ExpenseDate)
-                .ToListAsync();
-            return Ok(expenses);
+            return Ok(await _expenseService.GetByCaseAsync(caseId));
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Expense expense)
+        public async Task<ActionResult<ExpenseDto>> Create([FromBody] CreateExpenseRequestDto request)
         {
-            _dbContext.Expenses.Add(expense);
-            await _dbContext.SaveChangesAsync();
-            return Ok(expense);
+            return Ok(await _expenseService.CreateAsync(request));
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var expense = await _dbContext.Expenses.FindAsync(id);
-            if (expense == null) return NotFound();
-
-            _dbContext.Expenses.Remove(expense);
-            await _dbContext.SaveChangesAsync();
-            return NoContent();
+            try
+            {
+                await _expenseService.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (InvalidOperationException)
+            {
+                return NotFound();
+            }
         }
     }
 }

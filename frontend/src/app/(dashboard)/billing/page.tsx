@@ -21,7 +21,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
+import { useBaseCurrency } from "@/hooks/use-base-currency";
 import { InvoiceStatus } from "@/types/billing";
 
 const STATUS_CONFIG: Record<InvoiceStatus, { label: string; color: string }> = {
@@ -56,6 +57,9 @@ export default function BillingDashboard() {
   const { data: invoices, isLoading: invoicesLoading } = useInvoices();
 
   const { data: payments, isLoading: paymentsLoading } = useRecentPayments();
+  const baseCurrency = useBaseCurrency();
+  const sym = baseCurrency?.symbol || '';
+  const fmt = (v: number | undefined | null) => v ? `${v.toLocaleString()} ${sym}` : `0 ${sym}`;
 
   return (
     <div className="space-y-6">
@@ -92,46 +96,30 @@ export default function BillingDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="إجمالي الإيرادات"
-          value={
-            stats && stats.totalRevenue
-              ? `$${stats.totalRevenue?.toLocaleString()}`
-              : "$0"
-          }
+          value={fmt(stats?.totalRevenue)}
           icon={TrendingUp}
           trend="+12% هذا الشهر"
           trendUp={true}
         />
         <StatCard
           title="مستحقات معلقة"
-          value={
-            stats && stats.totalOutstanding
-              ? `$${stats.totalOutstanding.toLocaleString()}`
-              : "$0"
-          }
+          value={fmt(stats?.totalOutstanding)}
           icon={AlertCircle}
           trend="من 15 فاتورة"
           trendUp={false}
         />
         <StatCard
           title="حساب الأمانة"
-          value={
-            stats && stats.trustBalance
-              ? `$${stats.trustBalance.toLocaleString()}`
-              : "$0"
-          }
+          value={fmt(stats?.trustBalance)}
           icon={Wallet}
           trend="رصيد الموكلين"
           trendUp={true}
         />
         <StatCard
           title="إيرادات الشهر"
-          value={
-            stats && stats.monthlyRevenue
-              ? `$${stats.monthlyRevenue.toLocaleString()}`
-              : "$0"
-          }
+          value={fmt(stats?.monthlyRevenue)}
           icon={ArrowUpRight}
-          trend="الهدف: $20,000"
+          trend={`الهدف: ${fmt(20000)}`}
           trendUp={true}
         />
       </div>
@@ -192,7 +180,7 @@ export default function BillingDashboard() {
                         </div>
                       </td>
                       <td className="py-4 font-medium text-foreground">
-                        ${invoice.totalAmount.toLocaleString()}
+                        {fmt(invoice.totalAmount)}
                       </td>
                       <td className="py-4">
                         <span
@@ -215,7 +203,7 @@ export default function BillingDashboard() {
                                 title="إرسال تذكير واتساب"
                                 onClick={() => {
                                   const message = encodeURIComponent(
-                                    `عزيزي ${invoice.legalCase?.contact?.fullName}، نود تذكيركم بالفاتورة رقم ${invoice.invoiceNumber} بمبلغ ${invoice.totalAmount.toLocaleString()} ريال. يرجى التفضل بالسداد في أقرب وقت. شكراً لكم.`,
+                                    `عزيزي ${invoice.legalCase?.contact?.fullName}، نود تذكيركم بالفاتورة رقم ${invoice.invoiceNumber} بمبلغ ${invoice.totalAmount.toLocaleString()} ${sym}. يرجى التفضل بالسداد في أقرب وقت. شكراً لكم.`,
                                   );
                                   window.open(
                                     `https://wa.me/${invoice.legalCase?.contact?.phoneNumber}?text=${message}`,
@@ -285,7 +273,7 @@ export default function BillingDashboard() {
                     </div>
                     <div className="text-left">
                       <p className="font-bold text-green-400">
-                        +${payment.amount.toLocaleString()}
+                          +{fmt(payment.amount)}
                       </p>
                       <p className="text-[10px] text-muted-foreground">
                         {payment.method}
@@ -316,7 +304,7 @@ export default function BillingDashboard() {
               إجمالي المبالغ المودعة من قبل الموكلين لتغطية المصاريف المستقبلية.
             </p>
             <div className="text-3xl font-bold text-foreground mb-4">
-              ${stats?.trustBalance.toLocaleString() ?? "0"}
+                        {fmt(stats?.trustBalance)}
             </div>
             <Button className="w-full bg-legal-gold hover:bg-legal-gold-light text-legal-primary font-bold">
               إيداع جديد

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Platform.Application.DTOs.Accounting;
+using Platform.Application.Services;
 using Platform.Domain.Entities.Legal;
 using Platform.Persistence;
 using System;
@@ -16,39 +18,30 @@ namespace Platform.API.Controllers
     public class ReportsController : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext;
+        private readonly IFinancialReportService _reportService;
+        private readonly IJournalService _journalService;
 
-        public ReportsController(ApplicationDbContext dbContext)
+        public ReportsController(
+            ApplicationDbContext dbContext,
+            IFinancialReportService reportService,
+            IJournalService journalService)
         {
             _dbContext = dbContext;
+            _reportService = reportService;
+            _journalService = journalService;
         }
 
         [HttpGet("revenue-by-month")]
-        public async Task<IActionResult> GetRevenueByMonth()
+        public async Task<ActionResult<List<RevenueByMonthDto>>> GetRevenueByMonth()
         {
-            var sixMonthsAgo = DateTime.UtcNow.AddMonths(-6);
-            
-            var payments = await _dbContext.Payments
-                .Where(p => p.PaymentDate >= sixMonthsAgo)
-                .ToListAsync();
-
-            var monthlyData = payments
-                .GroupBy(p => new { p.PaymentDate.Year, p.PaymentDate.Month })
-                .Select(g => new
-                {
-                    Month = $"{g.Key.Year}-{g.Key.Month:D2}",
-                    Amount = g.Sum(p => p.Amount)
-                })
-                .OrderBy(x => x.Month)
-                .ToList();
-
-            return Ok(monthlyData);
+            return Ok(await _reportService.GetRevenueByMonthAsync());
         }
 
         [HttpGet("case-stats")]
         public async Task<IActionResult> GetCaseStats()
         {
             var cases = await _dbContext.LegalCases.ToListAsync();
-            
+
             var stats = new
             {
                 Total = cases.Count,
@@ -79,44 +72,26 @@ namespace Platform.API.Controllers
         }
 
         [HttpGet("projections")]
-        public async Task<IActionResult> GetFinancialProjections()
+        public async Task<ActionResult<FinancialProjectionDto>> GetFinancialProjections()
         {
-            var outstandingAmount = await _dbContext.Invoices
-                .SumAsync(i => i.TotalAmount - i.PaidAmount);
-
-            var trustFunds = await _dbContext.TrustTransactions
-                .SumAsync(t => t.Type == TrustTransactionType.Deposit ? t.Amount : -t.Amount);
-
-            // Simple projection: 70% of outstanding is collectable in 30 days
-            var projectedCollections = outstandingAmount * 0.70m;
-
-            return Ok(new
-            {
-                CurrentReceivables = outstandingAmount,
-                TotalTrustFunds = trustFunds,
-                ProjectedCollections30Days = projectedCollections,
-                TotalLiquidity = projectedCollections + trustFunds
-            });
+            return Ok(await _reportService.GetFinancialProjectionsAsync());
         }
+
         [HttpGet("dashboard-summary")]
         public async Task<IActionResult> GetDashboardSummary()
         {
             var today = DateTime.UtcNow.Date;
             var startOfMonth = new DateTime(today.Year, today.Month, 1);
 
-            var totalCases = await _dbContext.LegalCases.CountAsync();
-            var activeCases = await _dbContext.LegalCases.CountAsync(c => c.Status == CaseStatus.Active);
-            
-            var monthlyRevenue = await _dbContext.Payments
-                .Where(p => p.PaymentDate >= startOfMonth)
-                .SumAsync(p => p.Amount);
+            var summary = await _reportService.GetDashboardSummaryAsync();
 
             var upcomingSessions = await _dbContext.CourtSessions
                 .Include(s => s.LegalCase)
                 .Where(s => s.SessionDate >= DateTime.UtcNow && s.Status == SessionStatus.Scheduled)
                 .OrderBy(s => s.SessionDate)
                 .Take(5)
-                .Select(s => new {
+                .Select(s => new
+                {
                     s.Id,
                     s.SessionDate,
                     s.CourtName,
@@ -127,7 +102,6 @@ namespace Platform.API.Controllers
                 })
                 .ToListAsync();
 
-            // Aggregating Recent Activities
             var recentDocs = await _dbContext.CaseDocuments
                 .OrderByDescending(d => d.CreatedOn)
                 .Take(5)
@@ -139,11 +113,12 @@ namespace Platform.API.Controllers
                 .ThenInclude(i => i.LegalCase)
                 .OrderByDescending(p => p.PaymentDate)
                 .Take(5)
-                .Select(p => new { 
-                    Type = "Payment", 
-                    Title = "دفعة مستلمة", 
-                    Description = $"تم استلام {p.Amount:C} لـ {(p.Invoice.LegalCase != null ? p.Invoice.LegalCase.ClientName : "موكل")}", 
-                    Date = p.PaymentDate 
+                .Select(p => new
+                {
+                    Type = "Payment",
+                    Title = "دفعة مستلمة",
+                    Description = $"تم استلام {p.Amount} لـ {(p.Invoice.LegalCase != null ? p.Invoice.LegalCase.ClientName : "موكل")}",
+                    Date = p.PaymentDate
                 })
                 .ToListAsync();
 
@@ -151,14 +126,14 @@ namespace Platform.API.Controllers
                 .Where(t => t.IsCompleted)
                 .OrderByDescending(t => t.LastModifiedOn)
                 .Take(5)
-                .Select(t => new { 
-                    Type = "Task", 
-                    Title = "إكمال مهمة", 
-                    Description = $"تم إنجاز: {t.Title}", 
-                    Date = t.LastModifiedOn ?? t.CreatedOn 
+                .Select(t => new
+                {
+                    Type = "Task",
+                    Title = "إكمال مهمة",
+                    Description = $"تم إنجاز: {t.Title}",
+                    Date = t.LastModifiedOn ?? t.CreatedOn
                 })
                 .ToListAsync();
-
 
             var activities = recentDocs
                 .Concat(recentPayments)
@@ -169,15 +144,59 @@ namespace Platform.API.Controllers
 
             return Ok(new
             {
-                TotalCases = totalCases,
-                ActiveCases = activeCases,
-                MonthlyRevenue = monthlyRevenue,
-                RevenueTrend = "+15% عن الشهر الماضي", // Mock trend for now
-                CasesTrend = "+5 قضايا جديدة",
+                TotalCases = summary.TotalCases,
+                ActiveCases = summary.ActiveCases,
+                MonthlyRevenue = summary.MonthlyRevenue,
+                RevenueTrend = summary.RevenueTrend,
+                CasesTrend = summary.CasesTrend,
                 UpcomingSessions = upcomingSessions,
                 RecentActivities = activities
             });
         }
+
+        // ── Double-Entry Accounting Reports ──────────────────────────────
+
+        [HttpGet("trial-balance")]
+        public async Task<ActionResult<List<TrialBalanceDto>>> GetTrialBalance([FromQuery] DateTime? asOf)
+        {
+            return Ok(await _journalService.GetTrialBalanceAsync(asOf));
+        }
+
+        [HttpGet("balance-sheet")]
+        public async Task<ActionResult<BalanceSheetDto>> GetBalanceSheet([FromQuery] DateTime? asOf)
+        {
+            return Ok(await _journalService.GetBalanceSheetAsync(asOf));
+        }
+
+        [HttpGet("income-statement")]
+        public async Task<ActionResult<IncomeStatementDto>> GetIncomeStatement(
+            [FromQuery] DateTime? from, [FromQuery] DateTime? to)
+        {
+            var fromDate = from ?? DateTime.UtcNow.AddMonths(-1);
+            var toDate = to ?? DateTime.UtcNow;
+            return Ok(await _journalService.GetIncomeStatementAsync(fromDate, toDate));
+        }
+
+        [HttpGet("ar-aging")]
+        public async Task<ActionResult<List<AccountsReceivableAgingDto>>> GetAccountsReceivableAging([FromQuery] DateTime? asOf)
+        {
+            return Ok(await _journalService.GetAccountsReceivableAgingAsync(asOf));
+        }
+
+        [HttpGet("general-ledger/{accountId}")]
+        public async Task<ActionResult<List<GeneralLedgerEntryDto>>> GetGeneralLedger(
+            Guid accountId,
+            [FromQuery] DateTime? from, [FromQuery] DateTime? to)
+        {
+            return Ok(await _journalService.GetGeneralLedgerAsync(accountId, from, to));
+        }
+
+        [HttpGet("journal-entries")]
+        public async Task<ActionResult<List<JournalEntryDto>>> GetJournalEntries(
+            [FromQuery] DateTime? from, [FromQuery] DateTime? to,
+            [FromQuery] string? referenceType, [FromQuery] Guid? referenceId)
+        {
+            return Ok(await _journalService.GetEntriesAsync(from, to, referenceType, referenceId));
+        }
     }
 }
-

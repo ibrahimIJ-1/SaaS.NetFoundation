@@ -22,5 +22,17 @@ namespace Platform.Domain.Entities.Legal
         
         [JsonIgnore]
         public virtual ICollection<TransactionStepInstance> TransactionStepInstances { get; set; } = new List<TransactionStepInstance>();
+
+        [JsonIgnore]
+        public virtual ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
+
+        [JsonIgnore]
+        public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
+
+        [JsonIgnore]
+        public virtual ICollection<Expense> Expenses { get; set; } = new List<Expense>();
+
+        [JsonIgnore]
+        public virtual ICollection<TrustTransaction> TrustTransactions { get; set; } = new List<TrustTransaction>();
     }
 }

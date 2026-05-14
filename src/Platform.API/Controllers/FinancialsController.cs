@@ -1,10 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Platform.Domain.Entities.Legal;
-using Platform.Persistence;
+using Platform.Application.DTOs.Accounting;
+using Platform.Application.Services;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Platform.API.Controllers
@@ -14,81 +12,37 @@ namespace Platform.API.Controllers
     [Route("api/financials")]
     public class FinancialsController : ControllerBase
     {
-        private readonly ApplicationDbContext _dbContext;
+        private readonly ITrustService _trustService;
+        private readonly IFinancialReportService _reportService;
 
-        public FinancialsController(ApplicationDbContext dbContext)
+        public FinancialsController(ITrustService trustService, IFinancialReportService reportService)
         {
-            _dbContext = dbContext;
+            _trustService = trustService;
+            _reportService = reportService;
         }
 
         [HttpGet("dashboard-stats")]
-        public async Task<IActionResult> GetDashboardStats()
+        public async Task<ActionResult<DashboardStatsDto>> GetDashboardStats()
         {
-            var totalRevenue = await _dbContext.Payments.SumAsync(p => p.Amount);
-            var totalOutstanding = await _dbContext.Invoices
-                .Where(i => i.Status != InvoiceStatus.Paid && i.Status != InvoiceStatus.Cancelled)
-                .SumAsync(i => i.TotalAmount - i.PaidAmount);
-
-            var trustBalance = await _dbContext.TrustTransactions
-                .SumAsync(t => t.Type == TrustTransactionType.Deposit ? t.Amount : -t.Amount);
-
-            var monthlyRevenue = await _dbContext.Payments
-                .Where(p => p.PaymentDate >= DateTime.UtcNow.AddMonths(-1))
-                .SumAsync(p => p.Amount);
-
-            return Ok(new
-            {
-                TotalRevenue = totalRevenue,
-                TotalOutstanding = totalOutstanding,
-                TrustBalance = trustBalance,
-                MonthlyRevenue = monthlyRevenue
-            });
+            return Ok(await _reportService.GetDashboardStatsAsync());
         }
 
         [HttpGet("trust/case/{caseId}")]
-        public async Task<IActionResult> GetTrustTransactions(Guid caseId)
+        public async Task<ActionResult<TrustTransactionsResponseDto>> GetTrustTransactions(Guid caseId)
         {
-            var transactions = await _dbContext.TrustTransactions
-                .Where(t => t.LegalCaseId == caseId)
-                .OrderByDescending(t => t.TransactionDate)
-                .ToListAsync();
-
-            var balance = transactions.Sum(t => t.Type == TrustTransactionType.Deposit ? t.Amount : -t.Amount);
-
-            return Ok(new
-            {
-                Transactions = transactions,
-                Balance = balance
-            });
+            return Ok(await _trustService.GetByCaseAsync(caseId));
         }
 
         [HttpPost("trust")]
-        public async Task<IActionResult> RecordTrustTransaction([FromBody] RecordTrustRequest request)
+        public async Task<ActionResult<TrustTransactionDto>> RecordTrustTransaction([FromBody] RecordTrustRequestDto request)
         {
-            var transaction = new TrustTransaction
-            {
-                LegalCaseId = request.LegalCaseId,
-                Amount = request.Amount,
-                Type = request.Type,
-                TransactionDate = request.TransactionDate,
-                Description = request.Description,
-                ReferenceNumber = request.ReferenceNumber
-            };
-
-            _dbContext.TrustTransactions.Add(transaction);
-            await _dbContext.SaveChangesAsync();
-
-            return Ok(transaction);
+            return Ok(await _trustService.RecordTransactionAsync(request));
         }
-    }
 
-    public class RecordTrustRequest
-    {
-        public Guid LegalCaseId { get; set; }
-        public decimal Amount { get; set; }
-        public TrustTransactionType Type { get; set; }
-        public DateTime TransactionDate { get; set; }
-        public string Description { get; set; } = default!;
-        public string? ReferenceNumber { get; set; }
+        [HttpGet("trust")]
+        public async Task<ActionResult<List<TrustTransactionDto>>> GetAllTrustTransactions()
+        {
+            return Ok(await _trustService.GetAllAsync());
+        }
     }
 }
