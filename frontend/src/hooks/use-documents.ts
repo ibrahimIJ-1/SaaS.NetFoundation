@@ -178,3 +178,27 @@ export function useDeleteVideoAnnotation() {
     }
   });
 }
+
+export function useCreateFromImages() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ caseId, files, order }: { caseId: string; files: File[]; order: string[] }) =>
+      documentService.createFromImages(caseId, files, order),
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ['documents', 'case', data.legalCaseId] });
+      toast.success("تم إنشاء المستند بنجاح");
+    }
+  });
+}
+
+export function useRunOcr() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (documentId: string) => documentService.runOcr(documentId),
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ['documents'] });
+      queryClient.invalidateQueries({ queryKey: ['documents', data.originalId] });
+      toast.success("تم استخراج النص بواسطة OCR");
+    }
+  });
+}

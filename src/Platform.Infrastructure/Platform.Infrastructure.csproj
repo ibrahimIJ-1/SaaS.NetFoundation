@@ -21,6 +21,7 @@
 	  <PackageReference Include="AWSSDK.Textract" Version="4.0.3.27" />
 	  <PackageReference Include="Hangfire.Core" Version="1.8.23" />
 	  <PackageReference Include="RabbitMQ.Client" Version="7.2.1" />
+	  <PackageReference Include="PDFsharp" Version="6.1.1" />
 	</ItemGroup>
 
 </Project>

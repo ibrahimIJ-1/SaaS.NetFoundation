@@ -92,5 +92,21 @@ export const documentService = {
 
   deleteVideoAnnotation: async (annotationId: string): Promise<void> => {
     await apiClient.delete(`/documents/video-annotations/${annotationId}`);
+  },
+
+  createFromImages: async (caseId: string, files: File[], order: string[]): Promise<CaseDocument> => {
+    const formData = new FormData();
+    formData.append('caseId', caseId);
+    files.forEach((f) => formData.append('files', f));
+    formData.append('order', order.join(','));
+    const response = await apiClient.post('/documents/create-from-images', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
+
+  runOcr: async (documentId: string): Promise<{ originalId: string; ocrDocument: CaseDocument }> => {
+    const response = await apiClient.post(`/documents/${documentId}/ocr`);
+    return response.data;
   }
 };

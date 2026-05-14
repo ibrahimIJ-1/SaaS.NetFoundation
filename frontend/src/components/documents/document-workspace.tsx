@@ -9,6 +9,7 @@ import {
   useToggleSharing,
   useSaveVideoAnnotation,
   useDeleteVideoAnnotation,
+  useRunOcr,
 } from "@/hooks/use-documents";
 import { Button } from "@/components/ui/button";
 import { RichEditor } from "@/components/ui/rich-editor";
@@ -22,6 +23,7 @@ import {
   X,
   Check,
   Search,
+  ScanSearch,
   FileText,
   Navigation2,
   Edit2,
@@ -69,6 +71,7 @@ export function DocumentWorkspace({
   const toggleSharing = useToggleSharing();
   const saveVideoAnnotation = useSaveVideoAnnotation();
   const deleteVideoAnnotation = useDeleteVideoAnnotation();
+  const runOcr = useRunOcr();
 
   const [selectedColor, setSelectedColor] = useState(COLORS[0].value);
   const [selectionText, setSelectionText] = useState("");
@@ -417,6 +420,18 @@ export function DocumentWorkspace({
           </div>
         </div>
         <div className="flex items-center gap-3">
+          {(isPdf || isImage) && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => runOcr.mutate(doc.id)}
+              disabled={runOcr.isPending}
+              className="gap-2"
+            >
+              <ScanSearch className="w-4 h-4" />
+              {runOcr.isPending ? "جارٍ OCR..." : "OCR"}
+            </Button>
+          )}
           <Button
             variant="outline"
             size="sm"

@@ -18,6 +18,8 @@ namespace Platform.Infrastructure
             services.AddScoped<IAIService, GeminiAIService>();
             services.AddScoped<IOCRService, AWSTextractService>();
             services.AddScoped<IDocumentConversionService, DocumentConversionService>();
+            services.AddScoped<IDocumentOcrService, TesseractOcrService>();
+            services.AddScoped<IDocumentCreatorService, PdfCreatorService>();
 
             return services;
         }

@@ -23,17 +23,23 @@ namespace Platform.API.Controllers
         private readonly IStorageService _storageService;
         private readonly IOCRService _ocrService;
         private readonly IDocumentConversionService _conversionService;
+        private readonly IDocumentOcrService _documentOcrService;
+        private readonly IDocumentCreatorService _documentCreatorService;
 
         public DocumentsController(
             ApplicationDbContext dbContext,
             IStorageService storageService,
             IOCRService ocrService,
-            IDocumentConversionService conversionService)
+            IDocumentConversionService conversionService,
+            IDocumentOcrService documentOcrService,
+            IDocumentCreatorService documentCreatorService)
         {
             _dbContext = dbContext;
             _storageService = storageService;
             _ocrService = ocrService;
             _conversionService = conversionService;
+            _documentOcrService = documentOcrService;
+            _documentCreatorService = documentCreatorService;
         }
 
         [HttpGet("shared")]
@@ -356,6 +362,155 @@ namespace Platform.API.Controllers
             await _dbContext.SaveChangesAsync();
 
             return Ok(document);
+        }
+
+        // --- Document Creator: create PDF from images ---
+
+        [HttpPost("create-from-images")]
+        public async Task<IActionResult> CreateFromImages(
+            [FromForm] Guid caseId,
+            [FromForm] List<IFormFile> files,
+            [FromForm] string order) // comma-separated filenames in desired order
+        {
+            if (files == null || files.Count == 0)
+                return BadRequest("No files uploaded");
+
+            var orderedFilenames = (order ?? "")
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .ToList();
+
+            var imageSources = new List<ImageSource>();
+            foreach (var file in orderedFilenames)
+            {
+                var match = files.FirstOrDefault(f =>
+                    string.Equals(f.FileName, file, StringComparison.OrdinalIgnoreCase));
+                if (match == null) continue;
+
+                var ms = new MemoryStream();
+                await match.CopyToAsync(ms);
+                ms.Position = 0;
+
+                imageSources.Add(new ImageSource
+                {
+                    Stream = ms,
+                    FileName = match.FileName,
+                    Order = imageSources.Count
+                });
+            }
+
+            // Fallback: use upload order if no order string
+            if (imageSources.Count == 0)
+            {
+                foreach (var file in files)
+                {
+                    var ms = new MemoryStream();
+                    await file.CopyToAsync(ms);
+                    ms.Position = 0;
+
+                    imageSources.Add(new ImageSource
+                    {
+                        Stream = ms,
+                        FileName = file.FileName,
+                        Order = imageSources.Count
+                    });
+                }
+            }
+
+            try
+            {
+                using var pdfStream = await _documentCreatorService.CreatePdfFromImagesAsync(imageSources);
+
+                var pdfFileName = $"{caseId}/{Guid.NewGuid()}_created_document.pdf";
+                var pdfUrl = await _storageService.UploadFileAsync(pdfStream, pdfFileName, "application/pdf");
+
+                var document = new CaseDocument
+                {
+                    LegalCaseId = caseId,
+                    FileName = "مستند من الصور.pdf",
+                    FileUrl = pdfUrl,
+                    ContentType = "application/pdf",
+                    UploadDate = DateTime.UtcNow,
+                    UploadedBy = User.Identity?.Name ?? "Unknown",
+                    Version = 1
+                };
+
+                _dbContext.CaseDocuments.Add(document);
+                await _dbContext.SaveChangesAsync();
+
+                return Ok(document);
+            }
+            finally
+            {
+                foreach (var src in imageSources)
+                    src.Stream.Dispose();
+            }
+        }
+
+        // --- OCR: run OCR on an existing document ---
+
+        [HttpPost("{id}/ocr")]
+        public async Task<IActionResult> RunOcr(Guid id)
+        {
+            var document = await _dbContext.CaseDocuments.FindAsync(id);
+            if (document == null) return NotFound();
+
+            if (!_documentOcrService.CanOcr(document.ContentType, document.FileName))
+                return BadRequest("OCR is not supported for this file type.");
+
+            // Stream the original file from storage (simplified — uses fileUrl as key)
+            var fileKey = document.FileUrl.Contains(".amazonaws.com/")
+                ? document.FileUrl.Split(".amazonaws.com/")[1]
+                : document.FileUrl;
+
+            // We need a way to download from S3. For now, we'll use the upload pattern:
+            // Download original to memory, process with OCR, upload result.
+
+            // Since IStorageService doesn't have a download method, we'll signal the limitation.
+            // In production, add IStorageService.GetFileAsync() or use HttpClient on the public URL.
+            // For this implementation, we'll require the document to be re-uploaded for OCR,
+            // OR we use an HttpClient to fetch the file from its public URL.
+
+            try
+            {
+                using var httpClient = new HttpClient { Timeout = TimeSpan.FromMinutes(5) };
+                using var originalStream = await httpClient.GetStreamAsync(document.FileUrl);
+
+                using var ocrPdfStream = await _documentOcrService.OcrToSearchablePdfAsync(
+                    originalStream, document.FileName);
+
+                var ocrFileName = $"{document.LegalCaseId}/{Guid.NewGuid()}_ocr_{document.FileName}.pdf";
+                var ocrPdfUrl = await _storageService.UploadFileAsync(ocrPdfStream, ocrFileName, "application/pdf");
+
+                // Save as a new version linked to the original document
+                var latestVersion = await _dbContext.CaseDocuments
+                    .Where(d => d.ParentDocumentId == document.Id || d.Id == document.Id)
+                    .MaxAsync(d => (int?)d.Version) ?? 1;
+
+                var rootId = document.ParentDocumentId ?? document.Id;
+
+                var ocrDocument = new CaseDocument
+                {
+                    LegalCaseId = document.LegalCaseId,
+                    FileName = Path.GetFileNameWithoutExtension(document.FileName) + "_OCR.pdf",
+                    FileUrl = ocrPdfUrl,
+                    ContentType = "application/pdf",
+                    UploadDate = DateTime.UtcNow,
+                    UploadedBy = User.Identity?.Name ?? "OCR",
+                    Version = latestVersion + 1,
+                    ParentDocumentId = rootId
+                };
+
+                _dbContext.CaseDocuments.Add(ocrDocument);
+                await _dbContext.SaveChangesAsync();
+
+                return Ok(new { originalId = id, ocrDocument });
+            }
+            catch (HttpRequestException ex)
+            {
+                return BadRequest(
+                    "Cannot access the document file for OCR. Ensure the document URL is publicly accessible, " +
+                    "or upload the file directly for OCR. Details: " + ex.Message);
+            }
         }
 
         [HttpPost("{id}/sign")]
