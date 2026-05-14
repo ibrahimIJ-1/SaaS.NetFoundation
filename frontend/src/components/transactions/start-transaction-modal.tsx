@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Plus, X, Loader2 } from 'lucide-react';
@@ -39,7 +39,7 @@ export function StartTransactionModal({ open, onClose, onSuccess }: StartTransac
   const { mutate: create, isPending } = useCreateTransaction();
   
   const form = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema) as Resolver<FormData>,
     defaultValues: { workflowDefinitionId: '', contactId: '', clientName: '', actualPrice: 0, currencyId: '', notes: '' },
   });
 
@@ -67,7 +67,6 @@ export function StartTransactionModal({ open, onClose, onSuccess }: StartTransac
       {
         onSuccess: (result) => {
           form.reset();
-          setSelectedWorkflow(null);
           onClose();
           onSuccess?.(result.id);
         },
@@ -86,7 +85,7 @@ export function StartTransactionModal({ open, onClose, onSuccess }: StartTransac
           {/* Workflow */}
           <div className="space-y-1">
             <Label>نوع الإجراء *</Label>
-            <Select onValueChange={handleWorkflowChange} disabled={loadingWorkflows}>
+            <Select onValueChange={(value: string | null) => handleWorkflowChange(value ?? '')} disabled={loadingWorkflows}>
               <SelectTrigger>
                 <SelectValue placeholder={loadingWorkflows ? 'جاري التحميل...' : 'اختر الإجراء'} />
               </SelectTrigger>
@@ -122,7 +121,7 @@ export function StartTransactionModal({ open, onClose, onSuccess }: StartTransac
           {/* Client */}
           <div className="space-y-1">
             <Label>الموكل</Label>
-            <Select onValueChange={handleContactChange}>
+            <Select onValueChange={(value: string | null) => handleContactChange(value ?? '')}>
               <SelectTrigger>
                 <SelectValue placeholder="اختر الموكل (اختياري)" />
               </SelectTrigger>
@@ -153,7 +152,7 @@ export function StartTransactionModal({ open, onClose, onSuccess }: StartTransac
             <Label>العملة *</Label>
             <Select 
               value={form.watch('currencyId')} 
-              onValueChange={(v) => form.setValue('currencyId', v)}
+              onValueChange={(v: string | null) => form.setValue('currencyId', v ?? '')}
             >
               <SelectTrigger>
                 <SelectValue placeholder="اختر العملة" />

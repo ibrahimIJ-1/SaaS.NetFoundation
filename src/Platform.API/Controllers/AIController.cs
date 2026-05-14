@@ -51,14 +51,14 @@ namespace Platform.API.Controllers
         }
 
         [HttpPost("analyze-text")]
-        public async Task<IActionResult> AnalyzeText([FromBody] string text)
+        public async Task<IActionResult> AnalyzeText([FromBody] AnalyzeTextRequest request)
         {
-            var analysis = await _aiService.AnalyzeDocument(text);
+            var analysis = await _aiService.AnalyzeDocument(request.Text);
             return Ok(new { Analysis = analysis });
         }
 
         [HttpPost("transcribe")]
-        public async Task<IActionResult> Transcribe(Microsoft.AspNetCore.Http.IFormFile file)
+        public async Task<IActionResult> Transcribe([FromForm] Microsoft.AspNetCore.Http.IFormFile file)
         {
             if (file == null || file.Length == 0) return BadRequest("No audio file provided.");
 
@@ -73,5 +73,10 @@ namespace Platform.API.Controllers
     {
         public string Prompt { get; set; } = default!;
         public string? Context { get; set; }
+    }
+
+    public class AnalyzeTextRequest
+    {
+        public string Text { get; set; } = default!;
     }
 }

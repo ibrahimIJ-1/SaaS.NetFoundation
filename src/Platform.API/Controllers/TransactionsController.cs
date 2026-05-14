@@ -238,7 +238,7 @@ namespace Platform.API.Controllers
 
         // ── POST /api/transactions/{id}/steps/{stepId}/files ────────────────
         [HttpPost("{id:guid}/steps/{stepId:guid}/files")]
-        public async Task<IActionResult> UploadFile(Guid id, Guid stepId, IFormFile file)
+        public async Task<IActionResult> UploadFile(Guid id, Guid stepId, [FromForm] IFormFile file)
         {
             var transaction = await _db.LegalTransactions.Include(t => t.Steps).FirstOrDefaultAsync(t => t.Id == id);
             if (transaction == null) return NotFound();

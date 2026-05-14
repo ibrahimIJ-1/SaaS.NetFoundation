@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -186,7 +187,7 @@ namespace Platform.API.Controllers
         }
 
         [HttpPost("{id}/documents")]
-        public async Task<IActionResult> UploadDocument(Guid id, IFormFile file, [FromQuery] Guid? parentId = null)
+        public async Task<IActionResult> UploadDocument(Guid id, [FromForm] IFormFile file, [FromQuery] Guid? parentId = null)
         {
             var legalCase = await _dbContext.LegalCases.FindAsync(id);
             if (legalCase == null) return NotFound();
@@ -407,23 +408,23 @@ namespace Platform.API.Controllers
 
     public class CreateCaseRequest
     {
-        public string CaseNumber { get; set; } = default!;
-        public string Title { get; set; } = default!;
-        public string ClientId { get; set; } = default!;
-        public string ClientName { get; set; } = default!;
-        public string CaseType { get; set; } = default!;
+        [Required] public string CaseNumber { get; set; } = default!;
+        [Required] public string Title { get; set; } = default!;
+        [Required] public string ClientId { get; set; } = default!;
+        [Required] public string ClientName { get; set; } = default!;
+        [Required] public string CaseType { get; set; } = default!;
         public CaseStatus Status { get; set; }
         public Priority Priority { get; set; }
-        public string CourtInfo { get; set; } = default!;
-        public string AssignedLawyerId { get; set; } = default!;
-        public string AssignedLawyerName { get; set; } = default!;
+        [Required] public string CourtInfo { get; set; } = default!;
+        [Required] public string AssignedLawyerId { get; set; } = default!;
+        [Required] public string AssignedLawyerName { get; set; } = default!;
         public string? Description { get; set; }
         public List<string>? Tags { get; set; }
     }
 
     public class UpdateCaseRequest
     {
-        public string Title { get; set; } = default!;
+        [Required] public string Title { get; set; } = default!;
         public CaseStatus Status { get; set; }
         public Priority Priority { get; set; }
         public string? Description { get; set; }

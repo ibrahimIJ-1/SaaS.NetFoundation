@@ -158,7 +158,7 @@ export default function TransactionsPage() {
             className="pr-9"
           />
         </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
+        <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value ?? '')}>
           <SelectTrigger className="w-full sm:w-44">
             <SelectValue placeholder="الحالة" />
           </SelectTrigger>

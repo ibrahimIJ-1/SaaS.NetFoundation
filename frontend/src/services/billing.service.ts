@@ -44,7 +44,7 @@ export const billingService = {
   },
 
   bulkGenerateInvoices: async (caseIds: string[]): Promise<any> => {
-    const response = await apiClient.post('/invoices/bulk-generate', caseIds);
+    const response = await apiClient.post('/invoices/bulk-generate', { caseIds });
     return response.data;
   },
 

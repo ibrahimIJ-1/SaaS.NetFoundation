@@ -12,6 +12,7 @@ using Platform.Application.Multitenancy.Roles.Queries.GetRoleById;
 namespace Platform.API.Controllers
 {
     [Authorize]
+    [ApiController]
     [Route("api/tenant/roles")]
     public class TenantRolesController : Controller
     {
@@ -77,16 +78,21 @@ namespace Platform.API.Controllers
         }
 
         [HttpPost("{roleId}/permissions")]
-        public async Task<IActionResult> AssignPermissions(string roleId, [FromBody] List<Guid> permissionIds)
+        public async Task<IActionResult> AssignPermissions(string roleId, [FromBody] AssignPermissionsRequest request)
         {
             var result = await _mediator.Send(new AssignPermissionsToRoleCommand
             {
                 RoleId = roleId,
-                PermissionIds = permissionIds
+                PermissionIds = request.PermissionIds
             });
 
             if (!result.IsSuccess) return BadRequest(result.Errors);
             return Ok();
+        }
+
+        public class AssignPermissionsRequest
+        {
+            public List<Guid> PermissionIds { get; set; } = new();
         }
     }
 }

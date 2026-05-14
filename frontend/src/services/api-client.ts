@@ -28,11 +28,16 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      Cookies.remove('token');
-      // Redirect to login handled by AuthProvider or middleware
-      if (typeof window !== 'undefined') {
-        window.location.href = '/login';
+    if (error.response) {
+      const { status, data, config } = error.response;
+      if (status >= 400 && status < 500) {
+        console.error(`API 4xx [${config.method?.toUpperCase()} ${config.url}]:`, data);
+      }
+      if (status === 401) {
+        Cookies.remove('token');
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
       }
     }
     return Promise.reject(error);

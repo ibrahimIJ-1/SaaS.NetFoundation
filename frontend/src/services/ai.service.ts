@@ -12,9 +12,7 @@ export const aiService = {
   },
 
   analyzeText: async (text: string): Promise<{ analysis: string }> => {
-    const response = await apiClient.post('/ai/analyze-text', text, {
-      headers: { 'Content-Type': 'application/json' }
-    });
+    const response = await apiClient.post('/ai/analyze-text', { text });
     return response.data;
   },
 

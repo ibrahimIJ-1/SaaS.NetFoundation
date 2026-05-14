@@ -55,7 +55,15 @@ export function EditSessionModal({
       courtName: session.courtName,
       roomNumber: session.roomNumber || "",
       judgeName: session.judgeName || "",
-      sessionDate: new Date(session.sessionDate).toISOString().slice(0, 16),
+      sessionDate: (() => {
+        const d = new Date(session.sessionDate);
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, "0");
+        const day = String(d.getDate()).padStart(2, "0");
+        const h = String(d.getHours()).padStart(2, "0");
+        const min = String(d.getMinutes()).padStart(2, "0");
+        return `${y}-${m}-${day}T${h}:${min}`;
+      })(),
     },
   });
 

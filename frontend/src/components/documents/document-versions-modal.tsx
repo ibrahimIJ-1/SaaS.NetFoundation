@@ -212,11 +212,9 @@ export function DocumentVersionsModal({
                     variant="ghost" 
                     size="icon" 
                     className="h-9 w-9 text-muted-foreground hover:text-legal-gold hover:bg-legal-gold/10"
-                    asChild
+                    onClick={() => window.open(v.fileUrl, '_blank')}
                   >
-                    <a href={v.fileUrl} target="_blank" rel="noopener noreferrer" download>
-                      <Download className="w-4 h-4" />
-                    </a>
+                    <Download className="w-4 h-4" />
                   </Button>
                 </div>
               </div>

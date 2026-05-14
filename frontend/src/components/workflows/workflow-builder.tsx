@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray, Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Plus, Trash2, GripVertical, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
@@ -47,7 +47,7 @@ export function WorkflowBuilder({ defaultValues, onSubmit, isSubmitting }: Workf
   const [fileInput, setFileInput] = useState<Record<number, string>>({});
 
   const form = useForm<WorkflowFormData>({
-    resolver: zodResolver(workflowSchema),
+    resolver: zodResolver(workflowSchema) as Resolver<WorkflowFormData>,
     defaultValues: defaultValues
       ? {
           name: defaultValues.name,
@@ -164,7 +164,7 @@ export function WorkflowBuilder({ defaultValues, onSubmit, isSubmitting }: Workf
             <Label>العملة الافتراضية</Label>
             <Select 
               value={form.watch('currencyId')} 
-              onValueChange={(val) => form.setValue('currencyId', val)}
+              onValueChange={(val: string | null) => form.setValue('currencyId', val ?? undefined)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="اختر العملة" />
@@ -303,7 +303,7 @@ export function WorkflowBuilder({ defaultValues, onSubmit, isSubmitting }: Workf
                       <Label>العملة (اختياري)</Label>
                       <Select 
                         value={form.watch(`steps.${idx}.currencyId` as const)} 
-                        onValueChange={(val) => form.setValue(`steps.${idx}.currencyId` as const, val)}
+                        onValueChange={(val: string | null) => form.setValue(`steps.${idx}.currencyId` as const, val ?? undefined)}
                       >
                         <SelectTrigger className="h-10">
                           <SelectValue placeholder="نفس عملة القالب" />

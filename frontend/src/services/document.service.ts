@@ -71,7 +71,7 @@ export const documentService = {
   },
 
   toggleSharing: async (id: string, isShared: boolean): Promise<CaseDocument> => {
-    const response = await apiClient.patch(`/documents/${id}/share`, isShared);
+    const response = await apiClient.patch(`/documents/${id}/share`, { isShared });
     return response.data;
   },
 

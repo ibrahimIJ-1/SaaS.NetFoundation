@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
@@ -95,7 +95,7 @@ function StepPanel({
   const { mutate: deleteFile } = useDeleteTransactionFile(transactionId);
 
   const form = useForm<StepUpdateForm>({
-    resolver: zodResolver(stepUpdateSchema),
+    resolver: zodResolver(stepUpdateSchema) as Resolver<StepUpdateForm>,
     defaultValues: {
       actualPrice: step.actualPrice,
       actualExpense: step.actualExpense,
@@ -327,7 +327,7 @@ function StepPanel({
                 <Label className="text-xs">العملة</Label>
                 <Select
                   value={form.watch("currencyId")}
-                  onValueChange={(v) => form.setValue("currencyId", v)}
+                  onValueChange={(v: string | null) => form.setValue("currencyId", v ?? undefined)}
                   disabled={!isEditing}
                 >
                   <SelectTrigger className="h-10 text-xs">

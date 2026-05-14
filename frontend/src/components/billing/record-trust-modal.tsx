@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useRecordTrust } from "@/hooks/use-billing";
@@ -52,7 +52,7 @@ export function RecordTrustModal({
   const recordTrust = useRecordTrust();
 
   const form = useForm<z.infer<typeof trustSchema>>({
-    resolver: zodResolver(trustSchema),
+    resolver: zodResolver(trustSchema) as Resolver<z.infer<typeof trustSchema>>,
     defaultValues: {
       amount: 0,
       type: "Deposit",

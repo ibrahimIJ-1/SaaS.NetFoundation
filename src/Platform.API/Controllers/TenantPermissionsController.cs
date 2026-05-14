@@ -1,9 +1,11 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Platform.Application.Multitenancy.Permissions.Queries.GetAllPermissions;
 
 namespace Platform.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/tenant/permissions")]
     public class TenantPermissionsController : Controller

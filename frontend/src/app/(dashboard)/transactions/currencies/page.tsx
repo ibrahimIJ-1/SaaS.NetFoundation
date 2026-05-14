@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useCurrencies, useCreateCurrency, useUpdateCurrency } from '@/hooks/use-currencies';
 import { Currency } from '@/types/currency';
-import { useForm } from 'react-hook-form';
+import { useForm, Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
@@ -22,7 +22,7 @@ const currencySchema = z.object({
   name: z.string().min(2, 'الاسم مطلوب'),
   symbol: z.string().min(1, 'الرمز مطلوب'),
   exchangeRate: z.coerce.number().min(0, 'يجب أن يكون أكبر من أو يساوي صفر'),
-  isBase: z.boolean().default(false),
+  isBase: z.boolean(),
 });
 
 type CurrencyFormData = z.infer<typeof currencySchema>;
@@ -36,7 +36,7 @@ export default function CurrenciesPage() {
   const [editTarget, setEditTarget] = useState<Currency | null>(null);
 
   const form = useForm<CurrencyFormData>({
-    resolver: zodResolver(currencySchema),
+    resolver: zodResolver(currencySchema) as Resolver<CurrencyFormData>,
     defaultValues: {
       code: '',
       name: '',

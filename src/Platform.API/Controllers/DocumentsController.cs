@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -112,7 +113,7 @@ namespace Platform.API.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task<IActionResult> Upload([FromForm] Guid caseId, IFormFile file, [FromQuery] Guid? parentId = null)
+        public async Task<IActionResult> Upload([FromForm] Guid caseId, [FromForm] IFormFile file, [FromQuery] Guid? parentId = null)
         {
             if (file == null || file.Length == 0) return BadRequest("No file uploaded");
 
@@ -358,12 +359,12 @@ namespace Platform.API.Controllers
         }
 
         [HttpPatch("{id}/share")]
-        public async Task<IActionResult> ToggleSharing(Guid id, [FromBody] bool isShared)
+        public async Task<IActionResult> ToggleSharing(Guid id, [FromBody] ToggleSharingRequest request)
         {
             var document = await _dbContext.CaseDocuments.FindAsync(id);
             if (document == null) return NotFound();
 
-            document.IsSharedWithClient = isShared;
+            document.IsSharedWithClient = request.IsShared;
             await _dbContext.SaveChangesAsync();
 
             return Ok(document);
@@ -556,7 +557,12 @@ namespace Platform.API.Controllers
 
     public class SignDocumentRequest
     {
-        public string SignerName { get; set; } = default!;
-        public string SignatureImage { get; set; } = default!;
+        [Required] public string SignerName { get; set; } = default!;
+        [Required] public string SignatureImage { get; set; } = default!;
+    }
+
+    public class ToggleSharingRequest
+    {
+        public bool IsShared { get; set; }
     }
 }

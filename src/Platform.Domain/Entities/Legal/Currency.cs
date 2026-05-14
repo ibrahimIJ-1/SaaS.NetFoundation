@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Platform.Domain.Common;
 using System;
 using System.Collections.Generic;
@@ -7,9 +8,9 @@ namespace Platform.Domain.Entities.Legal
 {
     public class Currency : BaseEntity
     {
-        public string Code { get; set; } // USD, IQD, etc.
-        public string Name { get; set; }
-        public string Symbol { get; set; }
+        [Required] public string Code { get; set; } = default!;
+        [Required] public string Name { get; set; } = default!;
+        [Required] public string Symbol { get; set; } = default!;
         public decimal ExchangeRate { get; set; } // Rate relative to base currency
         public bool IsBase { get; set; }
 

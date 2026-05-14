@@ -160,10 +160,10 @@ namespace Platform.API.Controllers
                 .ToListAsync();
 
 
-            var activities = recentDocs.Cast<object>()
-                .Concat(recentPayments.Cast<object>())
-                .Concat(recentTasks.Cast<object>())
-                .OrderByDescending(a => ((dynamic)a).Date)
+            var activities = recentDocs
+                .Concat(recentPayments)
+                .Concat(recentTasks)
+                .OrderByDescending(a => a.Date)
                 .Take(10)
                 .ToList();
 

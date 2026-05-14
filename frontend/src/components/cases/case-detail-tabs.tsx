@@ -51,7 +51,6 @@ import {
   getPriorityLabel,
   getCaseTypeLabel,
 } from "@/lib/case-localization";
-import { StatusBadge } from "@/components/ui/status-badge";
 import { RichEditor } from "../ui/rich-editor";
 
 interface CaseDetailTabsProps {
@@ -230,9 +229,15 @@ export function CaseDetailTabs({ caseData }: CaseDetailTabsProps) {
                       الأولوية
                     </span>
                     <span className="col-span-2 text-foreground font-medium">
-                      <StatusBadge status={caseData.priority}>
+                      <span className={cn(
+                        "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border",
+                        caseData.priority === 'Urgent' && "bg-red-500/10 text-red-400 border-red-500/20",
+                        caseData.priority === 'High' && "bg-orange-500/10 text-orange-400 border-orange-500/20",
+                        caseData.priority === 'Medium' && "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
+                        caseData.priority === 'Low' && "bg-blue-500/10 text-blue-400 border-blue-500/20",
+                      )}>
                         {getPriorityLabel(caseData.priority.toString())}
-                      </StatusBadge>
+                      </span>
                     </span>
                   </div>
                 </div>
