@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { documentService } from '@/services/document.service';
-import { DocumentHighlight, DocumentAnnotation } from '@/types/document';
+import { DocumentHighlight, DocumentAnnotation, DocumentVideoAnnotation } from '@/types/document';
 import { toast } from 'sonner';
 
 export function useCaseDocuments(caseId: string) {
@@ -143,6 +143,38 @@ export function useToggleSharing() {
       queryClient.invalidateQueries({ queryKey: ['documents'] });
       queryClient.invalidateQueries({ queryKey: ['documents', 'case', data.legalCaseId] });
       toast.success(data.isSharedWithClient ? "تم مشاركة المستند مع الموكل" : "تم إلغاء مشاركة المستند");
+    }
+  });
+}
+
+export function useSaveVideoAnnotation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ documentId, annotation }: { documentId: string; annotation: Omit<DocumentVideoAnnotation, 'id' | 'createdAt'> }) =>
+      documentService.saveVideoAnnotation(documentId, annotation),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['documents', data.documentId] });
+    }
+  });
+}
+
+export function useUpdateVideoAnnotation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ annotationId, annotation }: { annotationId: string; annotation: Partial<DocumentVideoAnnotation> }) =>
+      documentService.updateVideoAnnotation(annotationId, annotation),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['documents'] });
+    }
+  });
+}
+
+export function useDeleteVideoAnnotation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (annotationId: string) => documentService.deleteVideoAnnotation(annotationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['documents'] });
     }
   });
 }

@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback, createElement } from "react";
 import {
   useDocument,
   useSaveHighlight,
   useUpdateHighlight,
   useDeleteHighlight,
   useToggleSharing,
+  useSaveVideoAnnotation,
+  useDeleteVideoAnnotation,
 } from "@/hooks/use-documents";
 import { Button } from "@/components/ui/button";
 import { RichEditor } from "@/components/ui/rich-editor";
@@ -24,6 +26,8 @@ import {
   Navigation2,
   Edit2,
   Save,
+  Image,
+  Video,
 } from "lucide-react";
 import { Viewer, Worker, SpecialZoomLevel } from "@react-pdf-viewer/core";
 import {
@@ -38,6 +42,9 @@ import { cn } from "@/lib/utils";
 import { SignaturePad } from "../portal/signature-pad";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { ImageViewer } from "./image-viewer";
+import { VideoViewer } from "./video-viewer";
+import { DocumentHighlight, DocumentVideoAnnotation } from "@/types/document";
 
 interface DocumentWorkspaceProps {
   documentId: string;
@@ -60,22 +67,41 @@ export function DocumentWorkspace({
   const updateHighlight = useUpdateHighlight();
   const deleteHighlight = useDeleteHighlight();
   const toggleSharing = useToggleSharing();
+  const saveVideoAnnotation = useSaveVideoAnnotation();
+  const deleteVideoAnnotation = useDeleteVideoAnnotation();
 
   const [selectedColor, setSelectedColor] = useState(COLORS[0].value);
   const [selectionText, setSelectionText] = useState("");
   const [annotationInput, setAnnotationInput] = useState("");
   const [pendingRegion, setPendingRegion] = useState<any>(null);
   const [showSignPad, setShowSignPad] = useState(false);
+  const [activeHighlightId, setActiveHighlightId] = useState<string | null>(null);
 
-  const [editingHighlightId, setEditingHighlightId] = useState<string | null>(
-    null,
-  );
+  const [editingHighlightId, setEditingHighlightId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
+
+
+  const [pendingVideoAnnotation, setPendingVideoAnnotation] = useState<{
+    timeStart: number;
+    timeEnd: number;
+    color: string;
+  } | null>(null);
 
   const pageNavigationPluginInstance = pageNavigationPlugin();
   const { jumpToPage } = pageNavigationPluginInstance;
 
+  // --- Determine content type ---
+  const contentType = doc?.contentType || "";
+  const isPdf =
+    contentType === "application/pdf" || (!contentType && doc?.fileUrl?.endsWith(".pdf"));
+  const isImage = contentType.startsWith("image/") || /\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(doc?.fileName || "");
+  const isVideo = contentType.startsWith("video/") || /\.(mp4|webm|mov|avi)$/i.test(doc?.fileName || "");
+  const isOffice = !isPdf && !isImage && !isVideo;
+  const effectiveFileUrl = (isOffice && doc?.convertedPdfUrl) || doc?.fileUrl || "";
+
+  // --- PDF highlight logic ---
   const lastCapturedRef = useRef<string>("");
+
   const SelectionCollector = ({ props }: { props: any }) => {
     useEffect(() => {
       const region = props.selectionRegion;
@@ -117,24 +143,18 @@ export function DocumentWorkspace({
         }
 
         setSelectionText(props.selectedText);
-        console.log(props);
-
         setPendingRegion({
           ...region,
           rects,
           pageIndex: props.selectionData.startPageIndex,
         });
       }
-    }, [
-      props.selectedText,
-      props.selectionRegion,
-      props.selectionData.startPageIndex,
-    ]);
+    }, [props.selectedText, props.selectionRegion, props.selectionData.startPageIndex]);
 
     return null;
   };
 
-  const renderHighlightTarget = (props: RenderHighlightTargetProps) => (
+  const renderHighlightTarget = useCallback((props: RenderHighlightTargetProps) => (
     <div
       style={{
         background: "#fff",
@@ -156,13 +176,13 @@ export function DocumentWorkspace({
         <span className="text-xs font-bold">إضافة ملاحظة</span>
       </Button>
     </div>
-  );
+  ), []);
 
-  const renderHighlightContent = (props: any) => (
+  const renderHighlightContent = useCallback((props: any) => (
     <SelectionCollector props={props} />
-  );
+  ), []);
 
-  const renderHighlights = (props: any) => (
+  const renderHighlights = useCallback((props: any) => (
     <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-10">
       {doc?.highlights
         ?.filter((h: any) => h.pageNumber === props.pageIndex + 1)
@@ -200,50 +220,143 @@ export function DocumentWorkspace({
           );
         })}
     </div>
-  );
+  ), [doc?.highlights]);
 
-  const highlightPluginInstance = highlightPlugin({
+  const pdfHighlightPlugin = highlightPlugin({
     renderHighlightTarget,
     renderHighlightContent,
     renderHighlights,
   });
 
-  const handleSaveHighlight = () => {
-    if (!selectionText || !doc || !pendingRegion) return;
-    saveHighlight.mutate(
-      {
-        documentId: doc.id,
-        highlight: {
-          color: selectedColor,
-          textContent: selectionText,
-          pageNumber: pendingRegion.pageIndex + 1,
-          x1: pendingRegion.left,
-          y1: pendingRegion.top,
-          x2: pendingRegion.left + pendingRegion.width,
-          y2: pendingRegion.top + pendingRegion.height,
-          rectsJson: JSON.stringify(
-            pendingRegion.rects.map((r: any) => ({
-              left: r.left,
-              top: r.top,
-              width: r.width,
-              height: r.height,
-            })),
-          ),
-          label: COLORS.find((c) => c.value === selectedColor)?.label,
-          comment: annotationInput.trim() || undefined,
-        } as any,
-      },
-      {
-        onSuccess: () => {
-          toast.success("تم حفظ التمييز والملاحظة");
-          setPendingRegion(null);
-          setAnnotationInput("");
-          setSelectionText("");
+  // --- Save PDF highlight ---
+  // --- Save Image highlight ---
+  const handleImageSelection = useCallback(
+    (selection: { x1: number; y1: number; x2: number; y2: number; pageNumber: number }) => {
+      setPendingRegion({
+        left: selection.x1,
+        top: selection.y1,
+        width: selection.x2 - selection.x1,
+        height: selection.y2 - selection.y1,
+        pageIndex: 0,
+        rects: [],
+      });
+      setSelectionText("");
+    },
+    [],
+  );
+
+  // --- Commit image/video annotation ---
+  const commitPendingAnnotation = () => {
+    if (!doc || !pendingRegion) return;
+
+    if (isPdf || isOffice) {
+      if (!selectionText) return;
+      saveHighlight.mutate(
+        {
+          documentId: doc.id,
+          highlight: {
+            color: selectedColor,
+            textContent: selectionText,
+            pageNumber: pendingRegion.pageIndex + 1,
+            x1: pendingRegion.left,
+            y1: pendingRegion.top,
+            x2: pendingRegion.left + pendingRegion.width,
+            y2: pendingRegion.top + pendingRegion.height,
+            rectsJson: JSON.stringify(
+              (pendingRegion.rects || []).map((r: any) => ({
+                left: r.left,
+                top: r.top,
+                width: r.width,
+                height: r.height,
+              })),
+            ),
+            label: COLORS.find((c) => c.value === selectedColor)?.label,
+            comment: annotationInput.trim() || undefined,
+          } as any,
         },
-      },
-    );
+        {
+          onSuccess: () => {
+            toast.success("تم حفظ التمييز والملاحظة");
+            setPendingRegion(null);
+            setAnnotationInput("");
+            setSelectionText("");
+          },
+        },
+      );
+    } else if (isImage) {
+      saveHighlight.mutate(
+        {
+          documentId: doc.id,
+          highlight: {
+            color: selectedColor,
+            textContent: "",
+            pageNumber: 1,
+            x1: pendingRegion.left,
+            y1: pendingRegion.top,
+            x2: pendingRegion.left + pendingRegion.width,
+            y2: pendingRegion.top + pendingRegion.height,
+            label: COLORS.find((c) => c.value === selectedColor)?.label,
+            comment: annotationInput.trim() || undefined,
+          } as any,
+        },
+        {
+          onSuccess: () => {
+            toast.success("تم حفظ التمييز");
+            setPendingRegion(null);
+            setAnnotationInput("");
+          },
+        },
+      );
+    } else if (pendingVideoAnnotation) {
+      saveVideoAnnotation.mutate(
+        {
+          documentId: doc.id,
+          annotation: {
+            timeStart: pendingVideoAnnotation.timeStart,
+            timeEnd: pendingVideoAnnotation.timeEnd,
+            comment: annotationInput.trim() || "",
+            color: selectedColor,
+            label: COLORS.find((c) => c.value === selectedColor)?.label,
+          } as any,
+        },
+        {
+          onSuccess: () => {
+            toast.success("تم حفظ التعليق");
+            setPendingRegion(null);
+            setPendingVideoAnnotation(null);
+            setAnnotationInput("");
+          },
+        },
+      );
+    }
   };
 
+  // --- Video annotation handlers ---
+  const handleAddVideoAnnotation = useCallback(
+    (a: { timeStart: number; timeEnd: number; comment: string; color: string }) => {
+      setPendingVideoAnnotation({ timeStart: a.timeStart, timeEnd: a.timeEnd, color: a.color });
+      setSelectedColor(a.color);
+      setPendingRegion({ left: 0, top: 0, width: 0, height: 0, pageIndex: 0, rects: [] });
+      setAnnotationInput(a.comment);
+    },
+    [],
+  );
+
+  const handleDeleteVideoAnnotation = useCallback(
+    (id: string) => {
+      if (confirm("حذف التعليق؟")) deleteVideoAnnotation.mutate(id);
+    },
+    [deleteVideoAnnotation],
+  );
+
+  const handleVideoAnnotationClick = useCallback(
+    (a: DocumentVideoAnnotation) => {
+      setActiveHighlightId(a.id);
+    },
+    [],
+  );
+
+  // --- Shared ---
   const handleToggleSharing = () => {
     if (!doc) return;
     toggleSharing.mutate({
@@ -257,6 +370,14 @@ export function DocumentWorkspace({
     toast.info(`انتقال إلى الصفحة ${highlight.pageNumber}`);
   };
 
+  const handleDownload = () => {
+    if (!doc?.fileUrl) return;
+    const a = document.createElement("a");
+    a.href = doc.fileUrl;
+    a.download = doc.fileName;
+    a.click();
+  };
+
   if (isLoading)
     return (
       <div className="flex items-center justify-center h-full font-bold">
@@ -267,6 +388,9 @@ export function DocumentWorkspace({
     return (
       <div className="p-20 text-center text-red-500">Document not found</div>
     );
+
+  const typeIcon = isPdf || isOffice ? FileText : isImage ? Image : Video;
+  const typeLabel = isPdf ? "PDF" : isImage ? "صورة" : isVideo ? "فيديو" : "مستند";
 
   return (
     <div
@@ -280,13 +404,16 @@ export function DocumentWorkspace({
             <ChevronRight className="rotate-180" />
           </Button>
           <div className="p-2 bg-primary/10 rounded-lg">
-            <FileText className="w-6 h-6 text-primary" />
+            {createElement(typeIcon, { className: "w-6 h-6 text-primary" })}
           </div>
           <div>
             <h1 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">
               {doc.fileName}
             </h1>
-            <p className="text-xs text-slate-500">مساحة عمل الوثائق</p>
+            <p className="text-xs text-slate-500 flex items-center gap-2">
+              <Badge variant="outline" className="text-[10px]">{typeLabel}</Badge>
+              مساحة عمل الوثائق
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -305,27 +432,66 @@ export function DocumentWorkspace({
           >
             {doc.isSharedWithClient ? "مشترك" : "مشاركة"}
           </Button>
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" onClick={handleDownload}>
             <Download className="w-4 h-4" />
           </Button>
         </div>
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* PDF Viewer */}
+        {/* Viewer area */}
         <div className="w-4/6 relative overflow-hidden flex flex-col p-4">
           <div className="h-full bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden">
-            <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
-              <Viewer
+            {isPdf || (isOffice && doc.convertedPdfUrl) ? (
+              <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
+                <Viewer
+                  fileUrl={effectiveFileUrl}
+                  plugins={[
+                    pdfHighlightPlugin,
+                    pageNavigationPluginInstance,
+                  ]}
+                  theme="light"
+                  defaultScale={SpecialZoomLevel.PageFit}
+                />
+              </Worker>
+            ) : isImage ? (
+              <ImageViewer
                 fileUrl={doc.fileUrl}
-                plugins={[
-                  highlightPluginInstance,
-                  pageNavigationPluginInstance,
-                ]}
-                theme="light"
-                defaultScale={SpecialZoomLevel.PageFit}
+                highlights={doc.highlights || []}
+                onSelectionComplete={handleImageSelection}
+                onHighlightClick={(h) => setActiveHighlightId(h.id)}
+                activeHighlightId={activeHighlightId}
               />
-            </Worker>
+            ) : isVideo ? (
+              <VideoViewer
+                fileUrl={doc.fileUrl}
+                annotations={doc.videoAnnotations || []}
+                onAddAnnotation={handleAddVideoAnnotation}
+                onDeleteAnnotation={handleDeleteVideoAnnotation}
+                onAnnotationClick={handleVideoAnnotationClick}
+                selectedAnnotationId={activeHighlightId}
+                annotationColors={COLORS}
+              />
+            ) : isOffice ? (
+              <div className="flex flex-col h-full">
+                <div className="flex items-center gap-3 p-4 bg-amber-50 dark:bg-amber-950/20 border-b border-amber-200">
+                  <FileText className="w-5 h-5 text-amber-600" />
+                  <p className="text-sm text-amber-700 dark:text-amber-300">
+                    لا يمكن معاينة هذا المستند — يرجى تنزيله لفتحه بالبرنامج المناسب
+                  </p>
+                </div>
+                <iframe
+                  src={doc.fileUrl}
+                  className="w-full flex-1"
+                  title={doc.fileName}
+                />
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full text-slate-400 p-8">
+                <FileText className="w-16 h-16 mb-4 opacity-40" />
+                <p className="text-sm font-medium">نوع الملف غير مدعوم للمعاينة</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -336,7 +502,7 @@ export function DocumentWorkspace({
               <MessageSquare className="w-5 h-5 text-primary" />
               التعليقات والتمييز
               <Badge variant="secondary" className="mr-2">
-                {doc.highlights?.length || 0}
+                {(doc.highlights?.length || 0) + (doc.videoAnnotations?.length || 0)}
               </Badge>
             </h2>
             <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -345,7 +511,7 @@ export function DocumentWorkspace({
           </div>
 
           <div className="flex-1 overflow-y-auto p-5 space-y-6">
-            {/* New Highlight Card */}
+            {/* New annotation card */}
             {pendingRegion && (
               <div className="bg-primary/5 border-2 border-primary/20 rounded-2xl p-5 shadow-inner">
                 <div className="flex justify-between items-center mb-4">
@@ -356,16 +522,30 @@ export function DocumentWorkspace({
                     variant="ghost"
                     size="icon"
                     className="h-7 w-7 rounded-full"
-                    onClick={() => setPendingRegion(null)}
+                    onClick={() => {
+                      setPendingRegion(null);
+                      setPendingVideoAnnotation(null);
+                    }}
                   >
                     <X className="w-4 h-4" />
                   </Button>
                 </div>
 
-                <div className="bg-white rounded-xl p-4 border border-primary/10 mb-4 italic text-sm text-slate-600 line-clamp-4 relative pr-3">
-                  <div className="absolute right-0 top-0 bottom-0 w-1 bg-primary/40 rounded-r-xl" />
-                  "{selectionText}"
-                </div>
+                {selectionText && (
+                  <div className="bg-white rounded-xl p-4 border border-primary/10 mb-4 italic text-sm text-slate-600 line-clamp-4 relative pr-3">
+                    <div className="absolute right-0 top-0 bottom-0 w-1 bg-primary/40 rounded-r-xl" />
+                    "{selectionText}"
+                  </div>
+                )}
+
+                {pendingVideoAnnotation && (
+                  <div className="bg-white rounded-xl p-4 border border-primary/10 mb-4 text-sm text-slate-600 relative pr-3">
+                    <div className="absolute right-0 top-0 bottom-0 w-1 bg-primary/40 rounded-r-xl" />
+                    تعليق فيديو عند{" "}
+                    {Math.floor(pendingVideoAnnotation.timeStart / 60)}
+                    :{(pendingVideoAnnotation.timeStart % 60).toFixed(0).padStart(2, "0")}
+                  </div>
+                )}
 
                 <div className="space-y-4">
                   <div className="flex gap-2.5">
@@ -392,7 +572,7 @@ export function DocumentWorkspace({
 
                   <Button
                     className="w-full h-11 font-bold"
-                    onClick={handleSaveHighlight}
+                    onClick={commitPendingAnnotation}
                   >
                     <Check className="w-4 h-4 ml-2" /> حفظ التمييز
                   </Button>
@@ -400,15 +580,25 @@ export function DocumentWorkspace({
               </div>
             )}
 
-            {/* List of saved highlights */}
+            {/* List of saved highlights (PDF + Image) */}
             <div className="space-y-4 text-right">
-              {!doc.highlights?.length && !pendingRegion && (
-                <div className="flex flex-col items-center justify-center py-20 opacity-40">
-                  <FileText className="w-12 h-12 mb-4" />
-                  <p className="text-sm font-medium">لا توجد ملاحظات بعد</p>
-                </div>
-              )}
+              {!doc.highlights?.length &&
+                !doc.videoAnnotations?.length &&
+                !pendingRegion && (
+                  <div className="flex flex-col items-center justify-center py-20 opacity-40">
+                    <MessageSquare className="w-12 h-12 mb-4" />
+                    <p className="text-sm font-medium">لا توجد ملاحظات بعد</p>
+                    <p className="text-xs mt-2">
+                      {isImage
+                        ? "اسحب على الصورة لتحديد منطقة"
+                        : isVideo
+                          ? "انقر على شريط الوقت لإضافة تعليق"
+                          : "حدد نصاً في المستند لإضافة ملاحظة"}
+                    </p>
+                  </div>
+                )}
 
+              {/* PDF/Image highlights */}
               {doc.highlights?.map((h: any) => (
                 <div
                   key={h.id}
@@ -416,9 +606,16 @@ export function DocumentWorkspace({
                     "group bg-white border border-slate-200 rounded-2xl p-5 transition-all relative overflow-hidden",
                     editingHighlightId === h.id
                       ? "ring-2 ring-primary border-transparent"
-                      : "hover:border-primary/30 hover:shadow-xl cursor-pointer",
+                      : activeHighlightId === h.id
+                        ? "ring-2 ring-primary/40 border-primary/30"
+                        : "hover:border-primary/30 hover:shadow-xl cursor-pointer",
                   )}
-                  onClick={() => editingHighlightId !== h.id && handleJump(h)}
+                  onClick={() => {
+                    if (editingHighlightId !== h.id) {
+                      setActiveHighlightId(h.id);
+                      if (isPdf || isOffice) handleJump(h);
+                    }
+                  }}
                 >
                   <div
                     className="absolute right-0 top-0 bottom-0 w-1.5"
@@ -427,13 +624,15 @@ export function DocumentWorkspace({
 
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <Badge
-                        variant="outline"
-                        className="text-[10px] font-black"
-                        style={{ color: h.color, borderColor: h.color + "33" }}
-                      >
-                        صفحة {h.pageNumber}
-                      </Badge>
+                      {!isImage && (
+                        <Badge
+                          variant="outline"
+                          className="text-[10px] font-black"
+                          style={{ color: h.color, borderColor: h.color + "33" }}
+                        >
+                          صفحة {h.pageNumber}
+                        </Badge>
+                      )}
                       <span className="text-[10px] font-bold text-slate-400">
                         {h.label}
                       </span>
@@ -482,9 +681,11 @@ export function DocumentWorkspace({
                     </div>
                   </div>
 
-                  <p className="text-xs text-slate-500 italic mb-4 line-clamp-3 leading-relaxed border-r-2 border-slate-100 pr-3 text-right">
-                    "{h.textContent}"
-                  </p>
+                  {h.textContent && (
+                    <p className="text-xs text-slate-500 italic mb-4 line-clamp-3 leading-relaxed border-r-2 border-slate-100 pr-3 text-right">
+                      "{h.textContent}"
+                    </p>
+                  )}
 
                   {editingHighlightId === h.id ? (
                     <div
@@ -524,7 +725,7 @@ export function DocumentWorkspace({
                     </div>
                   ) : null}
 
-                  {editingHighlightId !== h.id && (
+                  {editingHighlightId !== h.id && !isImage && (
                     <div className="mt-4 pt-3 border-t border-slate-50 flex items-center justify-between text-[10px] text-slate-400 font-bold">
                       <span className="flex items-center gap-1">
                         <Navigation2 className="w-3 h-3 rotate-180" /> انقر
@@ -536,6 +737,51 @@ export function DocumentWorkspace({
                         )}
                       </span>
                     </div>
+                  )}
+                </div>
+              ))}
+
+              {/* Video annotations */}
+              {doc.videoAnnotations?.map((a: any) => (
+                <div
+                  key={a.id}
+                  className={cn(
+                    "group bg-white border border-slate-200 rounded-2xl p-5 transition-all relative overflow-hidden cursor-pointer",
+                    activeHighlightId === a.id && "ring-2 ring-primary/40 border-primary/30",
+                  )}
+                  onClick={() => setActiveHighlightId(a.id)}
+                >
+                  <div
+                    className="absolute right-0 top-0 bottom-0 w-1.5"
+                    style={{ backgroundColor: a.color }}
+                  />
+                  <div className="flex items-start justify-between mb-3">
+                    <Badge
+                      variant="outline"
+                      className="text-[10px] font-black font-mono"
+                      style={{ color: a.color, borderColor: a.color + "33" }}
+                    >
+                      {Math.floor(a.timeStart / 60)}:
+                      {(a.timeStart % 60).toFixed(0).padStart(2, "0")}
+                    </Badge>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-red-400 hover:text-red-500 opacity-0 group-hover:opacity-100"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (confirm("حذف التعليق؟"))
+                          deleteVideoAnnotation.mutate(a.id);
+                      }}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  {a.comment && (
+                    <div
+                      className="text-sm text-slate-800 leading-normal font-medium rich-text-preview"
+                      dangerouslySetInnerHTML={{ __html: a.comment }}
+                    />
                   )}
                 </div>
               ))}
@@ -571,6 +817,7 @@ export function DocumentWorkspace({
           </div>
         </div>
       )}
+
       <style jsx global>{`
         .rich-text-preview {
           color: #000000;
@@ -581,7 +828,6 @@ export function DocumentWorkspace({
           margin: 8px 0;
         }
       `}</style>
-
     </div>
   );
 }

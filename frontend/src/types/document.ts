@@ -11,6 +11,7 @@ export interface DocumentHighlight {
   rectsJson?: string;
   label?: string;
   comment?: string;
+  createdAt?: string;
 }
 
 export interface DocumentAnnotation {
@@ -25,6 +26,17 @@ export interface DocumentAnnotation {
   createdAt: string;
 }
 
+export interface DocumentVideoAnnotation {
+  id: string;
+  documentId: string;
+  timeStart: number;
+  timeEnd: number;
+  comment: string;
+  color: string;
+  label?: string;
+  createdAt?: string;
+}
+
 export interface CaseDocument {
   id: string;
   legalCaseId: string;
@@ -33,6 +45,8 @@ export interface CaseDocument {
   };
   fileName: string;
   fileUrl: string;
+  contentType: string;
+  convertedPdfUrl?: string;
   uploadDate: string;
   uploadedBy: string;
   isSharedWithClient: boolean;
@@ -41,4 +55,5 @@ export interface CaseDocument {
   extractedText?: string;
   highlights?: DocumentHighlight[];
   annotations?: DocumentAnnotation[];
+  videoAnnotations?: DocumentVideoAnnotation[];
 }

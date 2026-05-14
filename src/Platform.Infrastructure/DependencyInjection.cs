@@ -17,6 +17,7 @@ namespace Platform.Infrastructure
             services.AddScoped<IStorageService, Platform.Infrastructure.Storage.S3StorageService>();
             services.AddScoped<IAIService, GeminiAIService>();
             services.AddScoped<IOCRService, AWSTextractService>();
+            services.AddScoped<IDocumentConversionService, DocumentConversionService>();
 
             return services;
         }

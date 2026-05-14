@@ -1,5 +1,5 @@
 import { apiClient } from './api-client';
-import { CaseDocument, DocumentHighlight, DocumentAnnotation } from '@/types/document';
+import { CaseDocument, DocumentHighlight, DocumentAnnotation, DocumentVideoAnnotation } from '@/types/document';
 
 export const documentService = {
   getDocumentsByCase: async (caseId: string): Promise<CaseDocument[]> => {
@@ -78,5 +78,19 @@ export const documentService = {
   signDocument: async (id: string, signerName: string, signatureImage: string): Promise<any> => {
     const response = await apiClient.post(`/documents/${id}/sign`, { signerName, signatureImage });
     return response.data;
+  },
+
+  saveVideoAnnotation: async (documentId: string, annotation: Omit<DocumentVideoAnnotation, 'id' | 'createdAt'>): Promise<DocumentVideoAnnotation> => {
+    const response = await apiClient.post(`/documents/${documentId}/video-annotations`, annotation);
+    return response.data;
+  },
+
+  updateVideoAnnotation: async (annotationId: string, annotation: Partial<DocumentVideoAnnotation>): Promise<DocumentVideoAnnotation> => {
+    const response = await apiClient.patch(`/documents/video-annotations/${annotationId}`, annotation);
+    return response.data;
+  },
+
+  deleteVideoAnnotation: async (annotationId: string): Promise<void> => {
+    await apiClient.delete(`/documents/video-annotations/${annotationId}`);
   }
 };

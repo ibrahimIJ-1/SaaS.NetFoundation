@@ -34,6 +34,7 @@ namespace Platform.Persistence
         public DbSet<LegalTemplate> LegalTemplates => Set<LegalTemplate>();
         public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
         public DbSet<DocumentSignature> DocumentSignatures => Set<DocumentSignature>();
+        public DbSet<DocumentVideoAnnotation> DocumentVideoAnnotations => Set<DocumentVideoAnnotation>();
 
         // Workflow & Transactions
         public DbSet<WorkflowDefinition> WorkflowDefinitions => Set<WorkflowDefinition>();
@@ -144,6 +145,12 @@ namespace Platform.Persistence
                 .HasMany(d => d.Annotations)
                 .WithOne(a => a.Document)
                 .HasForeignKey(a => a.DocumentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CaseDocument>()
+                .HasMany(d => d.VideoAnnotations)
+                .WithOne(v => v.Document)
+                .HasForeignKey(v => v.DocumentId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<LegalCase>()

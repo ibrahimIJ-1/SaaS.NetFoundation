@@ -22,6 +22,19 @@ namespace Platform.API.Controllers
         private readonly ApplicationDbContext _dbContext;
         private readonly IStorageService _storageService;
         private readonly IOCRService _ocrService;
+        private readonly IDocumentConversionService _conversionService;
+
+        public DocumentsController(
+            ApplicationDbContext dbContext,
+            IStorageService storageService,
+            IOCRService ocrService,
+            IDocumentConversionService conversionService)
+        {
+            _dbContext = dbContext;
+            _storageService = storageService;
+            _ocrService = ocrService;
+            _conversionService = conversionService;
+        }
 
         [HttpGet("shared")]
         public async Task<IActionResult> GetSharedDocuments()
@@ -48,13 +61,6 @@ namespace Platform.API.Controllers
                 .ToListAsync();
 
             return Ok(documents);
-        }
-
-        public DocumentsController(ApplicationDbContext dbContext, IStorageService storageService, IOCRService ocrService)
-        {
-            _dbContext = dbContext;
-            _storageService = storageService;
-            _ocrService = ocrService;
         }
 
         [HttpGet("case/{caseId}")]
@@ -87,6 +93,7 @@ namespace Platform.API.Controllers
             var document = await _dbContext.CaseDocuments
                 .Include(d => d.Highlights)
                 .Include(d => d.Annotations)
+                .Include(d => d.VideoAnnotations)
                 .FirstOrDefaultAsync(d => d.Id == id);
 
             if (document == null) return NotFound();
@@ -104,7 +111,6 @@ namespace Platform.API.Controllers
 
             if (finalParentId == null)
             {
-                // Check if a document with the same name already exists in this case
                 var existingDoc = await _dbContext.CaseDocuments
                     .Where(d => d.LegalCaseId == caseId && d.FileName == file.FileName && d.ParentDocumentId == null)
                     .OrderByDescending(d => d.Version)
@@ -126,26 +132,82 @@ namespace Platform.API.Controllers
                         .OrderByDescending(d => d.Version)
                         .Select(d => d.Version)
                         .FirstOrDefaultAsync();
-                    
+
                     version = Math.Max(parent.Version, latestVersion) + 1;
                 }
             }
 
-            using var memoryStream = new MemoryStream();
-            await file.CopyToAsync(memoryStream);
-            memoryStream.Position = 0;
+            var contentType = file.ContentType;
+            if (string.IsNullOrEmpty(contentType) || contentType == "application/octet-stream")
+            {
+                var ext = Path.GetExtension(file.FileName)?.ToLowerInvariant();
+                contentType = ext switch
+                {
+                    ".pdf" => "application/pdf",
+                    ".doc" => "application/msword",
+                    ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    ".xls" => "application/vnd.ms-excel",
+                    ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    ".ppt" => "application/vnd.ms-powerpoint",
+                    ".pptx" => "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                    ".jpg" or ".jpeg" => "image/jpeg",
+                    ".png" => "image/png",
+                    ".gif" => "image/gif",
+                    ".webp" => "image/webp",
+                    ".bmp" => "image/bmp",
+                    ".mp4" => "video/mp4",
+                    ".webm" => "video/webm",
+                    ".mov" => "video/quicktime",
+                    ".avi" => "video/x-msvideo",
+                    ".rtf" => "application/rtf",
+                    ".txt" => "text/plain",
+                    _ => contentType
+                };
+            }
 
-            var fileName = $"{caseId}/{Guid.NewGuid()}_{file.FileName}";
-            var url = await _storageService.UploadFileAsync(memoryStream, fileName, file.ContentType);
+            using var uploadStream = new MemoryStream();
+            await file.CopyToAsync(uploadStream);
+            uploadStream.Position = 0;
 
-            memoryStream.Position = 0;
-            var extractedText = await _ocrService.ExtractTextAsync(memoryStream, file.FileName);
+            var storageFileName = $"{caseId}/{Guid.NewGuid()}_{file.FileName}";
+            var originalUrl = await _storageService.UploadFileAsync(uploadStream, storageFileName, contentType);
+
+            string? convertedPdfUrl = null;
+
+            // Auto-convert Office documents to PDF
+            if (_conversionService.CanConvert(contentType))
+            {
+                try
+                {
+                    uploadStream.Position = 0;
+                    using var pdfStream = await _conversionService.ConvertToPdfAsync(uploadStream, file.FileName);
+                    var pdfFileName = $"{caseId}/{Guid.NewGuid()}_{Path.GetFileNameWithoutExtension(file.FileName)}.pdf";
+                    convertedPdfUrl = await _storageService.UploadFileAsync(pdfStream, pdfFileName, "application/pdf");
+                }
+                catch (Exception ex)
+                {
+                    // Log but don't fail — PDF viewing will be unavailable for this file
+                    var logger = HttpContext.RequestServices.GetRequiredService<ILogger<DocumentsController>>();
+                    logger.LogWarning(ex, "Failed to convert document to PDF: {FileName}", file.FileName);
+                }
+            }
+
+            // OCR text extraction
+            uploadStream.Position = 0;
+            string? extractedText = null;
+            try
+            {
+                extractedText = await _ocrService.ExtractTextAsync(uploadStream, file.FileName);
+            }
+            catch { /* OCR failure is non-critical */ }
 
             var document = new CaseDocument
             {
                 LegalCaseId = caseId,
                 FileName = file.FileName,
-                FileUrl = url,
+                FileUrl = originalUrl,
+                ContentType = contentType,
+                ConvertedPdfUrl = convertedPdfUrl,
                 UploadDate = DateTime.UtcNow,
                 UploadedBy = User.Identity?.Name ?? "Unknown",
                 ExtractedText = extractedText,
@@ -318,6 +380,47 @@ namespace Platform.API.Controllers
             await _dbContext.SaveChangesAsync();
 
             return Ok(signature);
+        }
+
+        // --- Video Annotations ---
+
+        [HttpPost("{id}/video-annotations")]
+        public async Task<IActionResult> SaveVideoAnnotation(Guid id, [FromBody] DocumentVideoAnnotation request)
+        {
+            request.DocumentId = id;
+
+            _dbContext.DocumentVideoAnnotations.Add(request);
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(request);
+        }
+
+        [HttpPatch("video-annotations/{annotationId}")]
+        public async Task<IActionResult> UpdateVideoAnnotation(Guid annotationId, [FromBody] DocumentVideoAnnotation request)
+        {
+            var annotation = await _dbContext.DocumentVideoAnnotations.FindAsync(annotationId);
+            if (annotation == null) return NotFound();
+
+            annotation.Comment = request.Comment;
+            annotation.Color = request.Color;
+            annotation.Label = request.Label;
+            annotation.TimeStart = request.TimeStart;
+            annotation.TimeEnd = request.TimeEnd;
+
+            await _dbContext.SaveChangesAsync();
+            return Ok(annotation);
+        }
+
+        [HttpDelete("video-annotations/{annotationId}")]
+        public async Task<IActionResult> DeleteVideoAnnotation(Guid annotationId)
+        {
+            var annotation = await _dbContext.DocumentVideoAnnotations.FindAsync(annotationId);
+            if (annotation == null) return NotFound();
+
+            _dbContext.DocumentVideoAnnotations.Remove(annotation);
+            await _dbContext.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 

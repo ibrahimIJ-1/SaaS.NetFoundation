@@ -8,6 +8,8 @@ namespace Platform.Domain.Entities.Legal
         public Guid LegalCaseId { get; set; }
         public string FileName { get; set; } = default!;
         public string FileUrl { get; set; } = default!;
+        public string ContentType { get; set; } = "application/octet-stream";
+        public string? ConvertedPdfUrl { get; set; }
         public DateTime UploadDate { get; set; } = DateTime.UtcNow;
         public string UploadedBy { get; set; } = default!;
         public string? ExtractedText { get; set; }
@@ -22,5 +24,6 @@ namespace Platform.Domain.Entities.Legal
 
         public virtual ICollection<DocumentHighlight> Highlights { get; set; } = new List<DocumentHighlight>();
         public virtual ICollection<DocumentAnnotation> Annotations { get; set; } = new List<DocumentAnnotation>();
+        public virtual ICollection<DocumentVideoAnnotation> VideoAnnotations { get; set; } = new List<DocumentVideoAnnotation>();
     }
 }
