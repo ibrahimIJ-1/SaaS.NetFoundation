@@ -12,6 +12,7 @@ namespace Platform.Application.Multitenancy.Users.Queries.GetAllUsers
     {
         public string Id { get; set; } = default!;
         public string Email { get; set; } = default!;
+        public string? FullName { get; set; }
         public List<string> Roles { get; set; } = new();
     }
 }

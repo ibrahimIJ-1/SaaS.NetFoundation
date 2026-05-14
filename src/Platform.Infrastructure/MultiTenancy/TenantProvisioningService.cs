@@ -28,13 +28,123 @@ namespace Platform.Infrastructure.MultiTenancy
 
         public async Task RegisterTenantAsync(RegisterTenantRequest request)
         {
-            // 1️⃣ Build connection string
-            var baseConnection = _configuration.GetConnectionString("TenantTemplate");
+            var tenantConnectionString = await SaveTenantAsync(request);
+            await using var tenantDb = CreateTenantDb(tenantConnectionString);
 
+            // 4️⃣ Create database + apply migrations
+            await tenantDb.Database.MigrateAsync();
+
+            // 5️⃣ Seed permissions + roles + admin user
+            await SeedTenantAsync(tenantDb, tenantConnectionString, request.AdminEmail, request.AdminPassword);
+        }
+
+        public async Task EnsureTenantSeedsAsync(string connectionString)
+        {
+            await using var tenantDb = CreateTenantDb(connectionString);
+
+            // Ensure permissions exist
+            var existingPermissionNames = await tenantDb.Permissions
+                .Select(p => p.Name)
+                .ToListAsync();
+
+            var missingPermissions = PermissionDefinitions.All
+                .Where(p => !existingPermissionNames.Contains(p))
+                .Select(p => new Permission { Id = Guid.NewGuid(), Name = p })
+                .ToList();
+
+            if (missingPermissions.Count > 0)
+            {
+                await tenantDb.Permissions.AddRangeAsync(missingPermissions);
+                await tenantDb.SaveChangesAsync();
+            }
+
+            // Ensure default roles exist
+            var roleStore = new RoleStore<IdentityRole>(tenantDb);
+            var roleManager = new RoleManager<IdentityRole>(roleStore, null, null, null, null);
+
+            foreach (var roleName in PermissionDefinitions.DefaultRolePermissions.Keys.Append("Admin").Append("User"))
+            {
+                if (!await roleManager.RoleExistsAsync(roleName))
+                    await roleManager.CreateAsync(new IdentityRole(roleName));
+            }
+
+            // Ensure Admin role has all permissions
+            var adminRole = await roleManager.FindByNameAsync("Admin");
+            var allPermissions = await tenantDb.Permissions.ToListAsync();
+            var existingAdminPermissions = await tenantDb.RolePermissions
+                .Where(rp => rp.RoleId == adminRole.Id)
+                .Select(rp => rp.PermissionId)
+                .ToListAsync();
+
+            foreach (var permission in allPermissions)
+            {
+                if (!existingAdminPermissions.Contains(permission.Id))
+                {
+                    tenantDb.RolePermissions.Add(new RolePermission
+                    {
+                        RoleId = adminRole.Id,
+                        PermissionId = permission.Id,
+                    });
+                }
+            }
+
+            // Ensure default roles have their assigned permissions
+            var permissionDict = await tenantDb.Permissions.ToDictionaryAsync(p => p.Name, p => p.Id);
+
+            foreach (var (roleName, permNames) in PermissionDefinitions.DefaultRolePermissions)
+            {
+                var role = await roleManager.FindByNameAsync(roleName);
+                if (role == null) continue;
+
+                var existingRolePermissions = await tenantDb.RolePermissions
+                    .Where(rp => rp.RoleId == role.Id)
+                    .Select(rp => rp.PermissionId)
+                    .ToHashSetAsync();
+
+                foreach (var permName in permNames)
+                {
+                    if (permissionDict.TryGetValue(permName, out var permId) && !existingRolePermissions.Contains(permId))
+                    {
+                        tenantDb.RolePermissions.Add(new RolePermission
+                        {
+                            RoleId = role.Id,
+                            PermissionId = permId,
+                        });
+                    }
+                }
+            }
+
+            await tenantDb.SaveChangesAsync();
+
+            // Ensure feature flags exist
+            var appOptions = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseSqlServer(connectionString)
+                .Options;
+
+            await using var appDb = new ApplicationDbContext(appOptions);
+            var existingFeatures = await appDb.TenantFeatures.Select(f => f.FeatureKey).ToListAsync();
+            var missingFeatures = FeatureFlags.All
+                .Where(f => !existingFeatures.Contains(f))
+                .Select(f => new TenantFeature
+                {
+                    FeatureKey = f,
+                    IsEnabled = true,
+                    Description = $"Enable/disable the {f} module"
+                }).ToList();
+
+            if (missingFeatures.Count > 0)
+            {
+                await appDb.TenantFeatures.AddRangeAsync(missingFeatures);
+                await appDb.SaveChangesAsync();
+            }
+        }
+
+        private async Task<string> SaveTenantAsync(RegisterTenantRequest request)
+        {
+            var baseConnection = _configuration.GetConnectionString("TenantTemplate");
             var tenantDbName = $"Tenant_{request.Identifier}";
             var tenantConnectionString = baseConnection.Replace("{DB_NAME}", tenantDbName);
 
-            // 2️⃣ Save tenant in master DB
             var tenant = new Tenant
             {
                 Name = request.Name,
@@ -45,42 +155,39 @@ namespace Platform.Infrastructure.MultiTenancy
 
             _registryContext.Tenants.Add(tenant);
             await _registryContext.SaveChangesAsync();
+            return tenantConnectionString;
+        }
 
-            // 3️⃣ Create tenant DB context dynamically
+        private TenantIdentityDbContext CreateTenantDb(string connectionString)
+        {
             var optionsBuilder = new DbContextOptionsBuilder<TenantIdentityDbContext>();
-            optionsBuilder.UseSqlServer(tenantConnectionString);
+            optionsBuilder.UseSqlServer(connectionString);
+            return new TenantIdentityDbContext(optionsBuilder.Options);
+        }
 
-            using var tenantDb = new TenantIdentityDbContext(optionsBuilder.Options);
-
-            // 4️⃣ Create database + apply migrations
-            await tenantDb.Database.MigrateAsync();
-
-            // 5️⃣ Seed roles
+        private async Task SeedTenantAsync(TenantIdentityDbContext tenantDb, string tenantConnectionString, string adminEmail, string adminPassword)
+        {
             var roleStore = new RoleStore<IdentityRole>(tenantDb);
-            var roleManager = new RoleManager<IdentityRole>(
-                roleStore,
-                null,
-                null,
-                null,
-                null);
+            var roleManager = new RoleManager<IdentityRole>(roleStore, null, null, null, null);
 
+            // Seed roles
             await roleManager.CreateAsync(new IdentityRole("Admin"));
             await roleManager.CreateAsync(new IdentityRole("User"));
+            foreach (var roleName in PermissionDefinitions.DefaultRolePermissions.Keys)
+                await roleManager.CreateAsync(new IdentityRole(roleName));
 
-            // 6️⃣ Seed permissions
+            // Seed permissions
             var permissions = PermissionDefinitions.All
-                .Select(p => new Permission
-                {
-                    Id = Guid.NewGuid(),
-                    Name = p
-                }).ToList();
+                .Select(p => new Permission { Id = Guid.NewGuid(), Name = p })
+                .ToList();
 
             await tenantDb.Permissions.AddRangeAsync(permissions);
             await tenantDb.SaveChangesAsync();
 
-            // 7️⃣ Assign all permissions to Admin role
-            var adminRole = await roleManager.FindByNameAsync("Admin");
+            var permissionDict = permissions.ToDictionary(p => p.Name, p => p.Id);
 
+            // Assign all permissions to Admin role
+            var adminRole = await roleManager.FindByNameAsync("Admin");
             foreach (var permission in permissions)
             {
                 tenantDb.RolePermissions.Add(new RolePermission
@@ -90,15 +197,34 @@ namespace Platform.Infrastructure.MultiTenancy
                 });
             }
 
+            // Assign role-specific permissions
+            foreach (var (roleName, permNames) in PermissionDefinitions.DefaultRolePermissions)
+            {
+                var role = await roleManager.FindByNameAsync(roleName);
+                if (role == null) continue;
+
+                foreach (var permName in permNames)
+                {
+                    if (permissionDict.TryGetValue(permName, out var permId))
+                    {
+                        tenantDb.RolePermissions.Add(new RolePermission
+                        {
+                            RoleId = role.Id,
+                            PermissionId = permId,
+                        });
+                    }
+                }
+            }
+
             await tenantDb.SaveChangesAsync();
 
-            // 8️⃣ Seed feature flags (using AppDb)
+            // Seed feature flags
             var appOptions = new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseSqlServer(tenantConnectionString)
                 .Options;
 
-            using var appDb = new ApplicationDbContext(appOptions);
-            await appDb.Database.MigrateAsync(); // Ensure business tables are created
+            await using var appDb = new ApplicationDbContext(appOptions);
+            await appDb.Database.MigrateAsync();
 
             var features = FeatureFlags.All
                 .Select(f => new TenantFeature
@@ -111,7 +237,7 @@ namespace Platform.Infrastructure.MultiTenancy
             await appDb.TenantFeatures.AddRangeAsync(features);
             await appDb.SaveChangesAsync();
 
-            // 9️⃣ Create admin user
+            // Create admin user
             var userStore = new UserStore<ApplicationUser>(tenantDb);
             var userManager = new UserManager<ApplicationUser>(
                 userStore, null, new PasswordHasher<ApplicationUser>(),
@@ -119,13 +245,13 @@ namespace Platform.Infrastructure.MultiTenancy
 
             var admin = new ApplicationUser
             {
-                UserName = request.AdminEmail,
-                Email = request.AdminEmail,
+                UserName = adminEmail,
+                Email = adminEmail,
                 FullName = "System Administrator",
                 IsActive = true,
             };
 
-            await userManager.CreateAsync(admin, request.AdminPassword);
+            await userManager.CreateAsync(admin, adminPassword);
             await userManager.AddToRoleAsync(admin, "Admin");
         }
     }

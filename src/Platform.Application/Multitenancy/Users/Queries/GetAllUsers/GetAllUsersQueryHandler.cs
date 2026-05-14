@@ -28,6 +28,7 @@ namespace Platform.Application.Multitenancy.Users.Queries.GetAllUsers
                 {
                     Id = user.Id,
                     Email = user.Email!,
+                    FullName = user.FullName,
                     Roles = roles.ToList()
                 });
             }

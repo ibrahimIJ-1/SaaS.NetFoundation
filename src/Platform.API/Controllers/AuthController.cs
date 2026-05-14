@@ -115,6 +115,53 @@ namespace Platform.API.Controllers
         }
 
         [Authorize]
+        [HttpPut("profile")]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequest request)
+        {
+            var userId = User.FindFirstValue(JwtRegisteredClaimNames.Sub)
+                         ?? User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var user = await _dbContext.Users
+                .OfType<ApplicationUser>()
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null) return NotFound("User not found");
+
+            if (!string.IsNullOrWhiteSpace(request.FullName))
+                user.FullName = request.FullName;
+            if (!string.IsNullOrWhiteSpace(request.JobTitle))
+                user.JobTitle = request.JobTitle;
+            if (!string.IsNullOrWhiteSpace(request.PreferredLanguage))
+                user.PreferredLanguage = request.PreferredLanguage;
+            if (!string.IsNullOrWhiteSpace(request.AvatarUrl))
+                user.AvatarUrl = request.AvatarUrl;
+
+            if (!string.IsNullOrWhiteSpace(request.CurrentPassword) && !string.IsNullOrWhiteSpace(request.NewPassword))
+            {
+                var userManager = new UserManager<ApplicationUser>(
+                    new UserStore<ApplicationUser>(_dbContext),
+                    null,
+                    new PasswordHasher<ApplicationUser>(),
+                    new List<IUserValidator<ApplicationUser>>(),
+                    new List<IPasswordValidator<ApplicationUser>>(),
+                    new UpperInvariantLookupNormalizer(),
+                    new IdentityErrorDescriber(),
+                    null, null);
+
+                var changeResult = await userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
+                if (!changeResult.Succeeded)
+                    return BadRequest(changeResult.Errors.Select(e => e.Description));
+            }
+
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(new { message = "Profile updated successfully" });
+        }
+
+        [Authorize]
         [HttpGet("me")]
         public async Task<IActionResult> GetMe()
         {
@@ -201,5 +248,15 @@ namespace Platform.API.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+    }
+
+    public class UpdateProfileRequest
+    {
+        public string? FullName { get; set; }
+        public string? JobTitle { get; set; }
+        public string? PreferredLanguage { get; set; }
+        public string? AvatarUrl { get; set; }
+        public string? CurrentPassword { get; set; }
+        public string? NewPassword { get; set; }
     }
 }

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { rolesService, permissionsService } from "@/services/admin.service";
-import { RoleDto } from "@/types/admin";
+import { RoleDto, CreateRoleDto } from "@/types/admin";
 import {
   Card,
   CardContent,
@@ -20,7 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Plus, MoreHorizontal, Edit, Trash, ShieldCheck, AlertTriangle } from "lucide-react";
+import { Plus, MoreHorizontal, Edit, Trash, ShieldCheck, AlertTriangle, ArrowLeft } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,9 +39,69 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { Can } from "@/components/auth/can";
+import { useRouter } from "next/navigation";
+
+const PERMISSION_ARABIC: Record<string, string> = {
+  "Users.View": "عرض المستخدمين",
+  "Users.Create": "إنشاء مستخدم",
+  "Users.Update": "تعديل مستخدم",
+  "Users.Delete": "حذف مستخدم",
+  "Roles.View": "عرض الأدوار",
+  "Roles.Create": "إنشاء دور",
+  "Roles.Update": "تعديل دور",
+  "Roles.Delete": "حذف دور",
+  "Cases.View": "عرض القضايا",
+  "Cases.Create": "إنشاء قضية",
+  "Cases.Update": "تعديل قضية",
+  "Cases.Delete": "حذف قضية",
+  "Cases.Assign": "تعيين قضية",
+  "Cases.Close": "إغلاق قضية",
+  "Documents.View": "عرض المستندات",
+  "Documents.Create": "إنشاء مستند",
+  "Documents.Update": "تعديل مستند",
+  "Documents.Delete": "حذف مستند",
+  "Documents.Upload": "رفع مستند",
+  "Documents.Sign": "توقيع مستند",
+  "Clients.View": "عرض الموكلين",
+  "Clients.Create": "إنشاء موكل",
+  "Clients.Update": "تعديل موكل",
+  "Clients.Delete": "حذف موكل",
+  "Clients.Communicate": "التواصل مع الموكل",
+  "Calendar.View": "عرض التقويم",
+  "Calendar.Create": "إنشاء حدث",
+  "Calendar.Update": "تعديل حدث",
+  "Calendar.Delete": "حذف حدث",
+  "Tasks.View": "عرض المهام",
+  "Tasks.Create": "إنشاء مهمة",
+  "Tasks.Update": "تعديل مهمة",
+  "Tasks.Delete": "حذف مهمة",
+  "Tasks.Assign": "تعيين مهمة",
+  "Billing.ViewInvoices": "عرض الفواتير",
+  "Billing.CreateInvoices": "إنشاء فاتورة",
+  "Billing.EditInvoices": "تعديل فاتورة",
+  "Billing.DeleteInvoices": "حذف فاتورة",
+  "Billing.RecordPayments": "تسجيل دفعة",
+  "Billing.ViewReports": "عرض التقارير المالية",
+  "Billing.ManageTrust": "إدارة الأمانات",
+  "Communication.View": "عرض المراسلات",
+  "Communication.Send": "إرسال مراسلة",
+  "Reports.ViewOperational": "تقارير تشغيلية",
+  "Reports.ViewFinancial": "تقارير مالية",
+  "Reports.ViewClinical": "تقارير سريرية",
+  "Reports.ViewAdministrative": "تقارير إدارية",
+  "Reports.Export": "تصدير التقارير",
+  "Settings.View": "عرض الإعدادات",
+  "Settings.Update": "تعديل الإعدادات",
+  "Settings.ManageFeatures": "إدارة الميزات",
+  "Audit.View": "عرض سجل التدقيق",
+  "Notifications.View": "عرض الإشعارات",
+  "Notifications.Manage": "إدارة الإشعارات",
+};
 
 export default function RolesPage() {
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -62,27 +122,26 @@ export default function RolesPage() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (name: string) => rolesService.create(name),
+    mutationFn: (data: CreateRoleDto) => rolesService.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
-      toast.success("Role created successfully");
+      toast.success("تم إنشاء الدور بنجاح");
       setIsCreateOpen(false);
       setNewRoleName("");
     },
-    onError: () => toast.error("Failed to create role"),
+    onError: () => toast.error("فشل إنشاء الدور"),
   });
 
   const deleteMutation = useMutation({
     mutationFn: () => rolesService.delete(selectedRole!.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
-      toast.success("Role deleted successfully");
+      toast.success("تم حذف الدور بنجاح");
       setIsDeleteOpen(false);
     },
-    onError: () => toast.error("Failed to delete role"),
+    onError: () => toast.error("فشل حذف الدور"),
   });
 
-  // To fetch role's current permissions when editing
   const fetchRolePermissionsMutation = useMutation({
     mutationFn: (roleId: string) => rolesService.getById(roleId),
     onSuccess: (data) => {
@@ -93,15 +152,15 @@ export default function RolesPage() {
   const assignPermissionsMutation = useMutation({
     mutationFn: () => rolesService.assignPermissions(selectedRole!.id, selectedPermissionIds),
     onSuccess: () => {
-      toast.success("Permissions updated successfully");
+      toast.success("تم تحديث الصلاحيات بنجاح");
       setIsPermissionsOpen(false);
     },
-    onError: () => toast.error("Failed to update permissions"),
+    onError: () => toast.error("فشل تحديث الصلاحيات"),
   });
 
   const openDelete = (role: RoleDto) => {
     if (role.name === "Admin") {
-      toast.error("The Admin role cannot be deleted.");
+      toast.error("لا يمكن حذف دور المشرف");
       return;
     }
     setSelectedRole(role);
@@ -110,7 +169,7 @@ export default function RolesPage() {
 
   const openPermissions = (role: RoleDto) => {
     if (role.name === "Admin") {
-      toast.error("The Admin role has all permissions by default.");
+      toast.error("دور المشرف لديه جميع الصلاحيات بشكل افتراضي");
       return;
     }
     setSelectedRole(role);
@@ -119,28 +178,51 @@ export default function RolesPage() {
   };
 
   const togglePermission = (permissionId: string) => {
-    setSelectedPermissionIds(prev => 
+    setSelectedPermissionIds(prev =>
       prev.includes(permissionId) ? prev.filter(p => p !== permissionId) : [...prev, permissionId]
     );
+  };
+
+  const handleCreate = () => {
+    if (!newRoleName.trim()) {
+      toast.error("يرجى إدخال اسم الدور");
+      return;
+    }
+    createMutation.mutate({ name: newRoleName.trim(), permissionIds: [] });
   };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-50">Roles & Permissions</h1>
-          <p className="text-slate-400 mt-1">Define access levels for different staff groups.</p>
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            className="text-slate-400 hover:text-slate-200 hover:bg-slate-800 p-2"
+            onClick={() => router.push("/users")}
+          >
+            <ArrowLeft className ="w-5 h-5" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-50">
+              الأدوار والصلاحيات
+            </h1>
+            <p className="text-slate-400 mt-1">
+              تحديد مستويات الوصول لمجموعات الموظفين المختلفة
+            </p>
+          </div>
         </div>
-        <Button onClick={() => setIsCreateOpen(true)} className="bg-teal-600 hover:bg-teal-500 text-white">
-          <Plus className="w-4 h-4 mr-2" />
-          Create Role
-        </Button>
+        <Can permission="Roles.Create">
+          <Button onClick={() => setIsCreateOpen(true)} className="bg-teal-600 hover:bg-teal-500 text-white">
+            <Plus className="w-4 h-4 mr-2" />
+            إنشاء دور
+          </Button>
+        </Can>
       </div>
 
       <Card className="bg-slate-900 border-slate-800">
         <CardHeader>
-          <CardTitle className="text-slate-50">Role Definitions</CardTitle>
-          <CardDescription className="text-slate-400">Manage roles and their associated permissions.</CardDescription>
+          <CardTitle className="text-slate-50">تعريفات الأدوار</CardTitle>
+          <CardDescription className="text-slate-400">إدارة الأدوار والصلاحيات المرتبطة بها</CardDescription>
         </CardHeader>
         <CardContent>
           {rolesLoading ? (
@@ -151,9 +233,9 @@ export default function RolesPage() {
             <Table>
               <TableHeader className="bg-slate-950/50">
                 <TableRow className="border-slate-800 hover:bg-transparent">
-                  <TableHead className="text-slate-400">Role Name</TableHead>
-                  <TableHead className="text-slate-400">Role ID</TableHead>
-                  <TableHead className="text-right text-slate-400">Actions</TableHead>
+                  <TableHead className="text-slate-400">اسم الدور</TableHead>
+                  <TableHead className="text-slate-400">المعرف</TableHead>
+                  <TableHead className="text-right text-slate-400">الإجراءات</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -177,16 +259,18 @@ export default function RolesPage() {
                           {role.name !== 'Admin' ? (
                             <>
                               <DropdownMenuItem className="focus:bg-slate-800 focus:text-slate-200 cursor-pointer" onClick={() => openPermissions(role)}>
-                                <Edit className="w-4 h-4 mr-2" /> Edit Permissions
+                                <Edit className="w-4 h-4 mr-2" /> تعديل الصلاحيات
                               </DropdownMenuItem>
-                              <DropdownMenuSeparator className="bg-slate-800" />
-                              <DropdownMenuItem className="focus:bg-red-500/20 focus:text-red-400 text-red-400 cursor-pointer" onClick={() => openDelete(role)}>
-                                <Trash className="w-4 h-4 mr-2" /> Delete
-                              </DropdownMenuItem>
+                              <Can permission="Roles.Delete">
+                                <DropdownMenuSeparator className="bg-slate-800" />
+                                <DropdownMenuItem className="focus:bg-red-500/20 focus:text-red-400 text-red-400 cursor-pointer" onClick={() => openDelete(role)}>
+                                  <Trash className="w-4 h-4 mr-2" /> حذف
+                                </DropdownMenuItem>
+                              </Can>
                             </>
                           ) : (
                             <DropdownMenuItem disabled className="text-slate-500">
-                              System Role (Protected)
+                              دور النظام (محمي)
                             </DropdownMenuItem>
                           )}
                         </DropdownMenuContent>
@@ -204,16 +288,16 @@ export default function RolesPage() {
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogContent className="sm:max-w-[425px] bg-slate-900 border-slate-800 text-slate-50">
           <DialogHeader>
-            <DialogTitle>Create New Role</DialogTitle>
+            <DialogTitle>إنشاء دور جديد</DialogTitle>
           </DialogHeader>
-          <form onSubmit={(e) => { e.preventDefault(); createMutation.mutate(newRoleName); }}>
+          <form onSubmit={(e) => { e.preventDefault(); handleCreate(); }}>
             <div className="grid gap-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="roleName" className="text-slate-300">Role Name *</Label>
+                <Label htmlFor="roleName" className="text-slate-300">اسم الدور *</Label>
                 <Input
                   id="roleName"
                   required
-                  placeholder="e.g. Receptionist, Doctor"
+                  placeholder="مثال: محامٍ، سكرتير، محاسب"
                   value={newRoleName}
                   onChange={(e) => setNewRoleName(e.target.value)}
                   className="bg-slate-950 border-slate-800 focus-visible:ring-teal-500"
@@ -222,7 +306,7 @@ export default function RolesPage() {
             </div>
             <DialogFooter>
               <Button type="submit" disabled={createMutation.isPending} className="bg-teal-600 hover:bg-teal-500 text-white">
-                {createMutation.isPending ? "Saving..." : "Create Role"}
+                {createMutation.isPending ? "جارٍ الحفظ..." : "إنشاء دور"}
               </Button>
             </DialogFooter>
           </form>
@@ -235,18 +319,18 @@ export default function RolesPage() {
           <DialogHeader>
             <DialogTitle className="text-red-400 flex items-center">
               <AlertTriangle className="w-5 h-5 mr-2" />
-              Confirm Deletion
+              تأكيد الحذف
             </DialogTitle>
             <DialogDescription className="text-slate-400">
-              Are you sure you want to delete the <strong>{selectedRole?.name}</strong> role? Users with this role will lose associated permissions.
+              هل أنت متأكد من حذف دور <strong>{selectedRole?.name}</strong>؟ المستخدمون المرتبطون بهذا الدور سيفقدون الصلاحيات المرتبطة.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="mt-4">
             <Button variant="outline" onClick={() => setIsDeleteOpen(false)} className="border-slate-700 bg-transparent text-slate-300 hover:bg-slate-800">
-              Cancel
+              إلغاء
             </Button>
             <Button onClick={() => deleteMutation.mutate()} disabled={deleteMutation.isPending} className="bg-red-600 hover:bg-red-500 text-white">
-              {deleteMutation.isPending ? "Deleting..." : "Yes, Delete"}
+              {deleteMutation.isPending ? "جارٍ الحذف..." : "نعم، احذف"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -256,9 +340,9 @@ export default function RolesPage() {
       <Dialog open={isPermissionsOpen} onOpenChange={setIsPermissionsOpen}>
         <DialogContent className="sm:max-w-[600px] bg-slate-900 border-slate-800 text-slate-50">
           <DialogHeader>
-            <DialogTitle>Edit Permissions</DialogTitle>
+            <DialogTitle>تعديل الصلاحيات</DialogTitle>
             <DialogDescription className="text-slate-400">
-              Select access rights for the <strong>{selectedRole?.name}</strong> role.
+              اختر صلاحيات الوصول لدور <strong>{selectedRole?.name}</strong>
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-3 py-4 max-h-[60vh] overflow-y-auto pr-2">
@@ -268,30 +352,33 @@ export default function RolesPage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {allPermissions?.map((permission) => (
-                  <div key={permission.id} className="flex items-start space-x-3 p-3 rounded-md bg-slate-950 border border-slate-800">
-                    <input 
-                      type="checkbox" 
-                      id={`perm-${permission.id}`}
-                      checked={selectedPermissionIds.includes(permission.id)}
-                      onChange={() => togglePermission(permission.id)}
-                      className="mt-1 rounded border-slate-700 bg-slate-900 text-teal-600 focus:ring-teal-500 w-4 h-4"
-                    />
-                    <Label htmlFor={`perm-${permission.id}`} className="text-sm text-slate-300 cursor-pointer">
-                      <div className="font-medium text-slate-200">{permission.name.split('.')[1] || permission.name}</div>
-                      <div className="text-xs text-slate-500">{permission.name}</div>
-                    </Label>
-                  </div>
-                ))}
+                {allPermissions?.map((permission) => {
+                  const permLabel = PERMISSION_ARABIC[permission.name] || permission.name.split('.')[1] || permission.name;
+                  return (
+                    <div key={permission.id} className="flex items-start gap-3 p-3 rounded-md bg-slate-950 border border-slate-800">
+                      <input
+                        type="checkbox"
+                        id={`perm-${permission.id}`}
+                        checked={selectedPermissionIds.includes(permission.id)}
+                        onChange={() => togglePermission(permission.id)}
+                        className="mt-1 rounded border-slate-700 bg-slate-900 text-teal-600 focus:ring-teal-500 w-4 h-4"
+                      />
+                      <Label htmlFor={`perm-${permission.id}`} className="text-sm text-slate-300 cursor-pointer flex-1">
+                        <div className="font-medium text-slate-200">{permLabel}</div>
+                        <div className="text-xs text-slate-500">{permission.name}</div>
+                      </Label>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsPermissionsOpen(false)} className="border-slate-700 bg-transparent text-slate-300 hover:bg-slate-800">
-              Cancel
+              إلغاء
             </Button>
             <Button onClick={() => assignPermissionsMutation.mutate()} disabled={assignPermissionsMutation.isPending || fetchRolePermissionsMutation.isPending} className="bg-teal-600 hover:bg-teal-500 text-white">
-              {assignPermissionsMutation.isPending ? "Saving..." : "Save Permissions"}
+              {assignPermissionsMutation.isPending ? "جارٍ الحفظ..." : "حفظ الصلاحيات"}
             </Button>
           </DialogFooter>
         </DialogContent>

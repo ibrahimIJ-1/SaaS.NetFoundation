@@ -41,6 +41,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { Can } from "@/components/auth/can";
 import { useRouter } from "next/navigation";
 
 export default function UsersPage() {
@@ -53,9 +54,9 @@ export default function UsersPage() {
   const [isRolesOpen, setIsRolesOpen] = useState(false);
 
   const [selectedUser, setSelectedUser] = useState<UserDto | null>(null);
-  
+
   const [createData, setCreateData] = useState<CreateUserDto>({ email: "", fullName: "", password: "", role: "User" });
-  const [editData, setEditData] = useState<UpdateUserDto>({ email: "", fullName: "", jobTitle: "", isActive: true });
+  const [editData, setEditData] = useState<UpdateUserDto>({ email: "", fullName: "" });
   const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>([]);
 
   const { data: users, isLoading: usersLoading } = useQuery({
@@ -72,49 +73,48 @@ export default function UsersPage() {
     mutationFn: usersService.create,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      toast.success("User created successfully");
+      toast.success("تم إنشاء المستخدم بنجاح");
       setIsCreateOpen(false);
       setCreateData({ email: "", fullName: "", password: "", role: "User" });
     },
-    onError: () => toast.error("Failed to create user"),
+    onError: () => toast.error("فشل إنشاء المستخدم"),
   });
 
   const updateMutation = useMutation({
     mutationFn: (data: UpdateUserDto) => usersService.update(selectedUser!.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      toast.success("User updated successfully");
+      toast.success("تم تحديث المستخدم بنجاح");
       setIsEditOpen(false);
     },
-    onError: () => toast.error("Failed to update user"),
+    onError: () => toast.error("فشل تحديث المستخدم"),
   });
 
   const deleteMutation = useMutation({
     mutationFn: () => usersService.delete(selectedUser!.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      toast.success("User deleted successfully");
+      toast.success("تم حذف المستخدم بنجاح");
       setIsDeleteOpen(false);
     },
-    onError: () => toast.error("Failed to delete user"),
+    onError: () => toast.error("فشل حذف المستخدم"),
   });
 
   const assignRolesMutation = useMutation({
     mutationFn: () => usersService.assignRoles(selectedUser!.id, selectedRoleIds),
     onSuccess: () => {
-      toast.success("Roles assigned successfully");
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast.success("تم تعيين الأدوار بنجاح");
       setIsRolesOpen(false);
     },
-    onError: () => toast.error("Failed to assign roles"),
+    onError: () => toast.error("فشل تعيين الأدوار"),
   });
 
   const openEdit = (user: UserDto) => {
     setSelectedUser(user);
     setEditData({
       email: user.email,
-      fullName: user.fullName,
-      jobTitle: user.jobTitle || "",
-      isActive: user.isActive,
+      fullName: user.fullName || "",
     });
     setIsEditOpen(true);
   };
@@ -126,15 +126,13 @@ export default function UsersPage() {
 
   const openRoles = (user: UserDto) => {
     setSelectedUser(user);
-    // Ideally we would fetch the user's current roles here and preset selectedRoleIds
-    // For now, we start empty
     setSelectedRoleIds([]);
     setIsRolesOpen(true);
   };
 
-  const toggleRole = (roleName: string) => {
-    setSelectedRoleIds(prev => 
-      prev.includes(roleName) ? prev.filter(r => r !== roleName) : [...prev, roleName]
+  const toggleRole = (roleId: string) => {
+    setSelectedRoleIds(prev =>
+      prev.includes(roleId) ? prev.filter(r => r !== roleId) : [...prev, roleId]
     );
   };
 
@@ -143,10 +141,10 @@ export default function UsersPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-slate-50">
-            Users & Roles
+            المستخدمون
           </h1>
           <p className="text-slate-400 mt-1">
-            Manage clinic staff access and permissions.
+            إدارة المستخدمين والصلاحيات
           </p>
         </div>
         <div className="flex gap-3">
@@ -156,23 +154,25 @@ export default function UsersPage() {
             onClick={() => router.push("/roles")}
           >
             <Shield className="w-4 h-4 mr-2" />
-            Manage Roles
+            إدارة الأدوار
           </Button>
-          <Button 
-            className="bg-teal-600 hover:bg-teal-500 text-white"
-            onClick={() => setIsCreateOpen(true)}
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add User
-          </Button>
+          <Can permission="Users.Create">
+            <Button 
+              className="bg-teal-600 hover:bg-teal-500 text-white"
+              onClick={() => setIsCreateOpen(true)}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              إضافة مستخدم
+            </Button>
+          </Can>
         </div>
       </div>
 
       <Card className="bg-slate-900 border-slate-800">
         <CardHeader>
-          <CardTitle className="text-slate-50">Staff Directory</CardTitle>
+          <CardTitle className="text-slate-50">قائمة المستخدمين</CardTitle>
           <CardDescription className="text-slate-400">
-            All registered users in this clinic.
+            جميع المستخدمين المسجلين في النظام
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -184,12 +184,11 @@ export default function UsersPage() {
             <Table>
               <TableHeader className="bg-slate-950/50">
                 <TableRow className="border-slate-800 hover:bg-transparent">
-                  <TableHead className="text-slate-400">User</TableHead>
-                  <TableHead className="text-slate-400">Contact</TableHead>
-                  <TableHead className="text-slate-400">Job Title</TableHead>
-                  <TableHead className="text-slate-400">Status</TableHead>
+                  <TableHead className="text-slate-400">المستخدم</TableHead>
+                  <TableHead className="text-slate-400">البريد الإلكتروني</TableHead>
+                  <TableHead className="text-slate-400">الأدوار</TableHead>
                   <TableHead className="text-right text-slate-400">
-                    Actions
+                    الإجراءات
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -202,20 +201,11 @@ export default function UsersPage() {
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 font-bold overflow-hidden">
-                          {user.avatarUrl ? (
-                            <img
-                              src={user.avatarUrl}
-                              alt={user.fullName}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            user.fullName?.charAt(0) ||
-                            user.email.charAt(0).toUpperCase()
-                          )}
+                          {user.fullName?.charAt(0) || user.email.charAt(0).toUpperCase()}
                         </div>
                         <div>
                           <div className="font-medium text-slate-200">
-                            {user.fullName || "No Name"}
+                            {user.fullName || "بدون اسم"}
                           </div>
                           <div className="text-xs text-slate-500 font-mono">
                             {user.id.substring(0, 8)}...
@@ -227,19 +217,16 @@ export default function UsersPage() {
                       {user.email}
                     </TableCell>
                     <TableCell className="text-slate-400">
-                      {user.jobTitle || "-"}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant="outline"
-                        className={
-                          user.isActive
-                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                            : "bg-red-500/10 text-red-400 border-red-500/20"
-                        }
-                      >
-                        {user.isActive ? "Active" : "Disabled"}
-                      </Badge>
+                      <div className="flex flex-wrap gap-1">
+                        {user.roles?.map(role => (
+                          <Badge key={role} variant="outline" className="bg-teal-500/10 text-teal-400 border-teal-500/20 text-xs">
+                            {role}
+                          </Badge>
+                        ))}
+                        {(!user.roles || user.roles.length === 0) && (
+                          <span className="text-xs text-slate-500">لا يوجد</span>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
@@ -250,17 +237,19 @@ export default function UsersPage() {
                           align="end"
                           className="bg-slate-900 border-slate-800 text-slate-300"
                         >
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuLabel>الإجراءات</DropdownMenuLabel>
                           <DropdownMenuItem className="focus:bg-slate-800 focus:text-slate-200 cursor-pointer" onClick={() => openEdit(user)}>
-                            <Edit className="w-4 h-4 mr-2" /> Edit
+                            <Edit className="w-4 h-4 mr-2" /> تعديل
                           </DropdownMenuItem>
                           <DropdownMenuItem className="focus:bg-slate-800 focus:text-slate-200 cursor-pointer" onClick={() => openRoles(user)}>
-                            <Shield className="w-4 h-4 mr-2" /> Assign Roles
+                            <Shield className="w-4 h-4 mr-2" /> تعيين الأدوار
                           </DropdownMenuItem>
-                          <DropdownMenuSeparator className="bg-slate-800" />
-                          <DropdownMenuItem className="focus:bg-red-500/20 focus:text-red-400 text-red-400 cursor-pointer" onClick={() => openDelete(user)}>
-                            <Trash className="w-4 h-4 mr-2" /> Delete
-                          </DropdownMenuItem>
+                          <Can permission="Users.Delete">
+                            <DropdownMenuSeparator className="bg-slate-800" />
+                            <DropdownMenuItem className="focus:bg-red-500/20 focus:text-red-400 text-red-400 cursor-pointer" onClick={() => openDelete(user)}>
+                              <Trash className="w-4 h-4 mr-2" /> حذف
+                            </DropdownMenuItem>
+                          </Can>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -269,10 +258,10 @@ export default function UsersPage() {
                 {users?.length === 0 && (
                   <TableRow>
                     <TableCell
-                      colSpan={5}
+                      colSpan={4}
                       className="text-center py-8 text-slate-500"
                     >
-                      No users found.
+                      لا يوجد مستخدمون
                     </TableCell>
                   </TableRow>
                 )}
@@ -286,12 +275,12 @@ export default function UsersPage() {
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogContent className="sm:max-w-[425px] bg-slate-900 border-slate-800 text-slate-50">
           <DialogHeader>
-            <DialogTitle>Add New User</DialogTitle>
+            <DialogTitle>إضافة مستخدم جديد</DialogTitle>
           </DialogHeader>
           <form onSubmit={(e) => { e.preventDefault(); createMutation.mutate(createData); }}>
             <div className="grid gap-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="fullName" className="text-slate-300">Full Name *</Label>
+                <Label htmlFor="fullName" className="text-slate-300">الاسم الكامل *</Label>
                 <Input
                   id="fullName"
                   required
@@ -301,7 +290,7 @@ export default function UsersPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-slate-300">Email *</Label>
+                <Label htmlFor="email" className="text-slate-300">البريد الإلكتروني *</Label>
                 <Input
                   id="email"
                   type="email"
@@ -312,7 +301,7 @@ export default function UsersPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-slate-300">Temporary Password *</Label>
+                <Label htmlFor="password" className="text-slate-300">كلمة المرور المؤقتة *</Label>
                 <Input
                   id="password"
                   required
@@ -322,7 +311,7 @@ export default function UsersPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="role" className="text-slate-300">Initial Role</Label>
+                <Label htmlFor="role" className="text-slate-300">الدور الأولي</Label>
                 <select
                   id="role"
                   value={createData.role}
@@ -338,7 +327,7 @@ export default function UsersPage() {
             </div>
             <DialogFooter>
               <Button type="submit" disabled={createMutation.isPending} className="bg-teal-600 hover:bg-teal-500 text-white">
-                {createMutation.isPending ? "Saving..." : "Create User"}
+                {createMutation.isPending ? "جارٍ الحفظ..." : "إنشاء مستخدم"}
               </Button>
             </DialogFooter>
           </form>
@@ -349,12 +338,12 @@ export default function UsersPage() {
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
         <DialogContent className="sm:max-w-[425px] bg-slate-900 border-slate-800 text-slate-50">
           <DialogHeader>
-            <DialogTitle>Edit User</DialogTitle>
+            <DialogTitle>تعديل المستخدم</DialogTitle>
           </DialogHeader>
           <form onSubmit={(e) => { e.preventDefault(); updateMutation.mutate(editData); }}>
             <div className="grid gap-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="editFullName" className="text-slate-300">Full Name *</Label>
+                <Label htmlFor="editFullName" className="text-slate-300">الاسم الكامل *</Label>
                 <Input
                   id="editFullName"
                   required
@@ -364,7 +353,7 @@ export default function UsersPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="editEmail" className="text-slate-300">Email *</Label>
+                <Label htmlFor="editEmail" className="text-slate-300">البريد الإلكتروني *</Label>
                 <Input
                   id="editEmail"
                   type="email"
@@ -374,29 +363,10 @@ export default function UsersPage() {
                   className="bg-slate-950 border-slate-800 focus-visible:ring-teal-500"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="editJobTitle" className="text-slate-300">Job Title</Label>
-                <Input
-                  id="editJobTitle"
-                  value={editData.jobTitle}
-                  onChange={(e) => setEditData({ ...editData, jobTitle: e.target.value })}
-                  className="bg-slate-950 border-slate-800 focus-visible:ring-teal-500"
-                />
-              </div>
-              <div className="flex items-center space-x-2 mt-2">
-                <input 
-                  type="checkbox" 
-                  id="isActive" 
-                  checked={editData.isActive} 
-                  onChange={(e) => setEditData({ ...editData, isActive: e.target.checked })}
-                  className="rounded border-slate-800 bg-slate-950 text-teal-600 focus:ring-teal-500"
-                />
-                <Label htmlFor="isActive" className="text-slate-300">Account is Active</Label>
-              </div>
             </div>
             <DialogFooter>
               <Button type="submit" disabled={updateMutation.isPending} className="bg-teal-600 hover:bg-teal-500 text-white">
-                {updateMutation.isPending ? "Saving..." : "Save Changes"}
+                {updateMutation.isPending ? "جارٍ الحفظ..." : "حفظ التغييرات"}
               </Button>
             </DialogFooter>
           </form>
@@ -409,18 +379,18 @@ export default function UsersPage() {
           <DialogHeader>
             <DialogTitle className="text-red-400 flex items-center">
               <AlertTriangle className="w-5 h-5 mr-2" />
-              Confirm Deletion
+              تأكيد الحذف
             </DialogTitle>
             <DialogDescription className="text-slate-400">
-              Are you sure you want to delete <strong>{selectedUser?.fullName}</strong>? This action cannot be undone.
+              هل أنت متأكد من حذف <strong>{selectedUser?.fullName}</strong>؟ هذا الإجراء لا يمكن التراجع عنه.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="mt-4">
             <Button variant="outline" onClick={() => setIsDeleteOpen(false)} className="border-slate-700 bg-transparent text-slate-300 hover:bg-slate-800">
-              Cancel
+              إلغاء
             </Button>
             <Button onClick={() => deleteMutation.mutate()} disabled={deleteMutation.isPending} className="bg-red-600 hover:bg-red-500 text-white">
-              {deleteMutation.isPending ? "Deleting..." : "Yes, Delete"}
+              {deleteMutation.isPending ? "جارٍ الحذف..." : "نعم، احذف"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -430,19 +400,19 @@ export default function UsersPage() {
       <Dialog open={isRolesOpen} onOpenChange={setIsRolesOpen}>
         <DialogContent className="sm:max-w-[425px] bg-slate-900 border-slate-800 text-slate-50">
           <DialogHeader>
-            <DialogTitle>Assign Roles</DialogTitle>
+            <DialogTitle>تعيين الأدوار</DialogTitle>
             <DialogDescription className="text-slate-400">
-              Select roles for <strong>{selectedUser?.fullName}</strong>
+              اختر الأدوار لـ <strong>{selectedUser?.fullName}</strong>
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-3 py-4 max-h-[50vh] overflow-y-auto">
             {roles?.map((role) => (
-              <div key={role.id} className="flex items-center space-x-3 p-2 rounded-md hover:bg-slate-800/50">
-                <input 
-                  type="checkbox" 
+              <div key={role.id} className="flex items-center gap-3 p-2 rounded-md hover:bg-slate-800/50">
+                <input
+                  type="checkbox"
                   id={`role-${role.id}`}
-                  checked={selectedRoleIds.includes(role.name)}
-                  onChange={() => toggleRole(role.name)}
+                  checked={selectedRoleIds.includes(role.id)}
+                  onChange={() => toggleRole(role.id)}
                   className="rounded border-slate-800 bg-slate-950 text-teal-600 focus:ring-teal-500 w-4 h-4"
                 />
                 <Label htmlFor={`role-${role.id}`} className="text-slate-200 cursor-pointer flex-1">
@@ -453,10 +423,10 @@ export default function UsersPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsRolesOpen(false)} className="border-slate-700 bg-transparent text-slate-300 hover:bg-slate-800">
-              Cancel
+              إلغاء
             </Button>
             <Button onClick={() => assignRolesMutation.mutate()} disabled={assignRolesMutation.isPending} className="bg-teal-600 hover:bg-teal-500 text-white">
-              {assignRolesMutation.isPending ? "Saving..." : "Save Roles"}
+              {assignRolesMutation.isPending ? "جارٍ الحفظ..." : "حفظ الأدوار"}
             </Button>
           </DialogFooter>
         </DialogContent>

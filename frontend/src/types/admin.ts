@@ -1,16 +1,13 @@
 export interface UserDto {
   id: string;
   email: string;
-  fullName: string;
-  jobTitle?: string;
-  avatarUrl?: string;
-  isActive: boolean;
-  preferredLanguage: string;
+  fullName?: string;
+  roles: string[];
 }
 
 export interface CreateUserDto {
   email: string;
-  password?: string;
+  password: string;
   fullName: string;
   role: string;
 }
@@ -18,8 +15,8 @@ export interface CreateUserDto {
 export interface UpdateUserDto {
   email: string;
   fullName: string;
-  jobTitle?: string;
-  isActive?: boolean;
+  password?: string;
+  role?: string;
 }
 
 export interface PermissionDto {
@@ -34,4 +31,16 @@ export interface RoleDto {
 
 export interface RoleWithPermissionsDto extends RoleDto {
   permissions: PermissionDto[];
+}
+
+export interface CreateRoleDto {
+  name: string;
+  permissionIds: string[];
+}
+
+export interface UserPermissionMatrixDto {
+  userId: string;
+  email: string;
+  roles: string[];
+  permissions: string[];
 }

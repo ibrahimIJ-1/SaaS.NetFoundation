@@ -155,6 +155,27 @@ using (var scope = app.Services.CreateScope())
     await MasterDbSeeder.SeedAsync(context);
 }
 
+// Ensure existing tenants have all permissions, roles, and feature flags
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var registry = services.GetRequiredService<TenantRegistryDbContext>();
+    var provisioning = services.GetRequiredService<ITenantProvisioningService>();
+
+    foreach (var tenant in await registry.Tenants.ToListAsync())
+    {
+        try
+        {
+            await provisioning.EnsureTenantSeedsAsync(tenant.ConnectionString);
+        }
+        catch (Exception ex)
+        {
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.LogWarning(ex, "Failed to ensure seeds for tenant {Tenant}", tenant.Identifier);
+        }
+    }
+}
+
 // Middleware pipeline
 app.UseCors("AllowAll");
 app.UseHttpsRedirection();
