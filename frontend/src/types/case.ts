@@ -94,6 +94,22 @@ export interface AddSessionRequest {
   notes?: string;
 }
 
+export type TranscriptionStatus = 'Pending' | 'Processing' | 'Completed' | 'Failed';
+
+export interface VoiceRecording {
+  id: string;
+  legalCaseId: string;
+  courtSessionId?: string;
+  fileUrl: string;
+  fileName: string;
+  fileSizeBytes: number;
+  durationSeconds: number;
+  transcriptionStatus: TranscriptionStatus;
+  transcriptionText?: string;
+  errorMessage?: string;
+  recordedAt: string;
+}
+
 export interface AddPartyRequest {
   name: string;
   lawyerName?: string;

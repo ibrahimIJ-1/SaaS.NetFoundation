@@ -69,8 +69,12 @@ namespace Platform.API.Controllers
                 .Include(c => c.Opponents)
                 .Include(c => c.Stages)
                 .Include(c => c.Sessions)
+                    .ThenInclude(s => s.SessionNotes)
+                .Include(c => c.Sessions)
+                    .ThenInclude(s => s.VoiceRecordings)
                 .Include(c => c.Notes)
                 .Include(c => c.Documents)
+                .Include(c => c.VoiceRecordings)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
             if (legalCase == null)
@@ -138,6 +142,7 @@ namespace Platform.API.Controllers
             var legalCase = await _dbContext.LegalCases
                 .Include(c => c.Stages)
                 .Include(c => c.Sessions)
+                    .ThenInclude(s => s.SessionNotes)
                 .Include(c => c.Notes)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
@@ -172,9 +177,16 @@ namespace Platform.API.Controllers
             var legalCase = await _dbContext.LegalCases.FindAsync(id);
             if (legalCase == null) return NotFound();
 
+            if (request.CourtSessionId.HasValue)
+            {
+                var session = await _dbContext.CourtSessions.FindAsync(request.CourtSessionId.Value);
+                if (session == null) return NotFound("Session not found.");
+            }
+
             var note = new CaseNote
             {
                 LegalCaseId = id,
+                CourtSessionId = request.CourtSessionId,
                 NoteText = request.NoteText,
                 AuthorName = User.Identity?.Name ?? "Unknown",
                 Date = DateTime.UtcNow
@@ -383,6 +395,41 @@ namespace Platform.API.Controllers
             return NoContent();
         }
 
+        [HttpGet("sessions/{sessionId}/notes")]
+        public async Task<IActionResult> GetSessionNotes(Guid sessionId)
+        {
+            var session = await _dbContext.CourtSessions.FindAsync(sessionId);
+            if (session == null) return NotFound();
+
+            var notes = await _dbContext.CaseNotes
+                .Where(n => n.CourtSessionId == sessionId)
+                .OrderByDescending(n => n.Date)
+                .ToListAsync();
+
+            return Ok(notes);
+        }
+
+        [HttpPost("sessions/{sessionId}/notes")]
+        public async Task<IActionResult> AddSessionNote(Guid sessionId, [FromBody] AddNoteRequest request)
+        {
+            var session = await _dbContext.CourtSessions.Include(s => s.LegalCase).FirstOrDefaultAsync(s => s.Id == sessionId);
+            if (session == null) return NotFound();
+
+            var note = new CaseNote
+            {
+                LegalCaseId = session.LegalCaseId,
+                CourtSessionId = sessionId,
+                NoteText = request.NoteText,
+                AuthorName = User.Identity?.Name ?? "Unknown",
+                Date = DateTime.UtcNow
+            };
+
+            _dbContext.CaseNotes.Add(note);
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(note);
+        }
+
         [HttpGet("lookup/courts")]
         public async Task<IActionResult> GetCourts()
         {
@@ -434,6 +481,7 @@ namespace Platform.API.Controllers
     public class AddNoteRequest
     {
         public string NoteText { get; set; } = default!;
+        public Guid? CourtSessionId { get; set; }
     }
 
     public class AddStageRequest

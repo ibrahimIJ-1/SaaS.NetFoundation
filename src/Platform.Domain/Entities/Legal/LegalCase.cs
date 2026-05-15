@@ -34,6 +34,7 @@ namespace Platform.Domain.Entities.Legal
         public ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
         public ICollection<TrustTransaction> TrustTransactions { get; set; } = new List<TrustTransaction>();
         public ICollection<Expense> Expenses { get; set; } = new List<Expense>();
+        public ICollection<VoiceRecording> VoiceRecordings { get; set; } = new List<VoiceRecording>();
         public List<string> Tags { get; set; } = new List<string>();
     }
 }

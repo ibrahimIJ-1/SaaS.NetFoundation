@@ -1,5 +1,5 @@
 using Platform.Domain.Common;
-using System;
+using System.Collections.Generic;
 
 namespace Platform.Domain.Entities.Legal
 {
@@ -14,6 +14,9 @@ namespace Platform.Domain.Entities.Legal
         public string? Notes { get; set; }
         public string? Decision { get; set; }
         public SessionStatus Status { get; set; } = SessionStatus.Scheduled;
+
+        public ICollection<CaseNote> SessionNotes { get; set; } = new List<CaseNote>();
+        public ICollection<VoiceRecording> VoiceRecordings { get; set; } = new List<VoiceRecording>();
     }
 
     public enum SessionStatus

@@ -81,6 +81,16 @@ export const caseService = {
   getDocumentVersions: async (documentId: string): Promise<any[]> => {
     const response = await apiClient.get(`/cases/documents/${documentId}/versions`);
     return response.data;
+  },
+
+  getSessionNotes: async (sessionId: string): Promise<CaseNote[]> => {
+    const response = await apiClient.get(`/cases/sessions/${sessionId}/notes`);
+    return response.data;
+  },
+
+  addSessionNote: async (sessionId: string, noteText: string): Promise<CaseNote> => {
+    const response = await apiClient.post(`/cases/sessions/${sessionId}/notes`, { noteText });
+    return response.data;
   }
 };
 

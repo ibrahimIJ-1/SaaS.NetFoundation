@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Platform.Application.Abstractions;
+using Platform.Infrastructure.Jobs.Handlers;
 using Platform.Infrastructure.MultiTenancy;
 using Platform.Application.Common.Interfaces;
 using Platform.Infrastructure.Services;
@@ -20,6 +21,9 @@ namespace Platform.Infrastructure
             services.AddScoped<IDocumentConversionService, DocumentConversionService>();
             services.AddScoped<IDocumentOcrService, TesseractOcrService>();
             services.AddScoped<IDocumentCreatorService, PdfCreatorService>();
+
+            // Hangfire jobs
+            services.AddScoped<TranscriptionJob>();
 
             return services;
         }

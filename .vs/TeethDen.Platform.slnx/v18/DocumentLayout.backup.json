@@ -3,16 +3,52 @@
   "WorkspaceRootPath": "F:\\projects\\TeethDen.Platform\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|f:\\projects\\teethden.platform\\src\\platform.persistence\\migrations\\applicationdb\\20260511222710_addcommenttohighlight.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|solutionrelative:src\\platform.persistence\\migrations\\applicationdb\\20260511222710_addcommenttohighlight.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{6CA9EDB2-3C10-9B0A-3262-8112643A659A}|src\\Platform.API\\Platform.API.csproj|f:\\projects\\teethden.platform\\src\\platform.api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6CA9EDB2-3C10-9B0A-3262-8112643A659A}|src\\Platform.API\\Platform.API.csproj|solutionrelative:src\\platform.api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|f:\\projects\\teethden.platform\\src\\platform.persistence\\migrations\\applicationdb\\20260511222710_addcommenttohighlight.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|solutionrelative:src\\platform.persistence\\migrations\\applicationdb\\20260511222710_addcommenttohighlight.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{3BF75894-B29F-0CAE-9886-7E7B8E0B172E}|src\\Platform.Infrastructure\\Platform.Infrastructure.csproj|f:\\projects\\teethden.platform\\src\\platform.infrastructure\\multitenancy\\tenantprovisioningservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3BF75894-B29F-0CAE-9886-7E7B8E0B172E}|src\\Platform.Infrastructure\\Platform.Infrastructure.csproj|solutionrelative:src\\platform.infrastructure\\multitenancy\\tenantprovisioningservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|f:\\projects\\teethden.platform\\src\\platform.persistence\\migrations\\applicationdb\\applicationdbcontextmodelsnapshot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|solutionrelative:src\\platform.persistence\\migrations\\applicationdb\\applicationdbcontextmodelsnapshot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|f:\\projects\\teethden.platform\\src\\platform.persistence\\migrations\\applicationdb\\20260515071600_initialapplication.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|solutionrelative:src\\platform.persistence\\migrations\\applicationdb\\20260515071600_initialapplication.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|f:\\projects\\teethden.platform\\src\\platform.persistence\\identity\\tenantmigrationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|solutionrelative:src\\platform.persistence\\identity\\tenantmigrationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|f:\\projects\\teethden.platform\\src\\platform.persistence\\migrations\\tenantidentitydb\\tenantidentitydbcontextmodelsnapshot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|solutionrelative:src\\platform.persistence\\migrations\\tenantidentitydb\\tenantidentitydbcontextmodelsnapshot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|f:\\projects\\teethden.platform\\src\\platform.persistence\\migrations\\tenantregistrydbcontextmodelsnapshot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|solutionrelative:src\\platform.persistence\\migrations\\tenantregistrydbcontextmodelsnapshot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|f:\\projects\\teethden.platform\\src\\platform.persistence\\migrations\\tenantidentitydb\\20260515070134_nameyourmigration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|solutionrelative:src\\platform.persistence\\migrations\\tenantidentitydb\\20260515070134_nameyourmigration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|f:\\projects\\teethden.platform\\src\\platform.persistence\\migrations\\tenantidentitydb\\20260510223252_addusercontactlink.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|solutionrelative:src\\platform.persistence\\migrations\\tenantidentitydb\\20260510223252_addusercontactlink.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{641FA427-5E63-B0A6-45F5-7F14508415D7}|src\\Platform.Domain\\Platform.Domain.csproj|f:\\projects\\teethden.platform\\src\\platform.domain\\entities\\legal\\casedocument.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{641FA427-5E63-B0A6-45F5-7F14508415D7}|src\\Platform.Domain\\Platform.Domain.csproj|solutionrelative:src\\platform.domain\\entities\\legal\\casedocument.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6CA9EDB2-3C10-9B0A-3262-8112643A659A}|src\\Platform.API\\Platform.API.csproj|f:\\projects\\teethden.platform\\src\\platform.api\\controllers\\transactionscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6CA9EDB2-3C10-9B0A-3262-8112643A659A}|src\\Platform.API\\Platform.API.csproj|solutionrelative:src\\platform.api\\controllers\\transactionscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|f:\\projects\\teethden.platform\\src\\platform.persistence\\migrations\\20260223165742_initialmaster.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|solutionrelative:src\\platform.persistence\\migrations\\20260223165742_initialmaster.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|f:\\projects\\teethden.platform\\src\\platform.persistence\\tenantregistrydbcontextfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -27,32 +63,12 @@
       "RelativeMoniker": "D:0:0:{EA5DE702-444D-F935-D025-457104279F61}|src\\TenantMigrator\\TenantMigrator.csproj|solutionrelative:src\\tenantmigrator\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6CA9EDB2-3C10-9B0A-3262-8112643A659A}|src\\Platform.API\\Platform.API.csproj|f:\\projects\\teethden.platform\\src\\platform.api\\controllers\\transactionscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6CA9EDB2-3C10-9B0A-3262-8112643A659A}|src\\Platform.API\\Platform.API.csproj|solutionrelative:src\\platform.api\\controllers\\transactionscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|f:\\projects\\teethden.platform\\src\\platform.persistence\\migrations\\applicationdb\\20260513105131_addworkflowandtransactions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|solutionrelative:src\\platform.persistence\\migrations\\applicationdb\\20260513105131_addworkflowandtransactions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|f:\\projects\\teethden.platform\\src\\platform.persistence\\migrations\\applicationdb\\applicationdbcontextmodelsnapshot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|solutionrelative:src\\platform.persistence\\migrations\\applicationdb\\applicationdbcontextmodelsnapshot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{641FA427-5E63-B0A6-45F5-7F14508415D7}|src\\Platform.Domain\\Platform.Domain.csproj|f:\\projects\\teethden.platform\\src\\platform.domain\\entities\\legal\\casedocument.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{641FA427-5E63-B0A6-45F5-7F14508415D7}|src\\Platform.Domain\\Platform.Domain.csproj|solutionrelative:src\\platform.domain\\entities\\legal\\casedocument.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{641FA427-5E63-B0A6-45F5-7F14508415D7}|src\\Platform.Domain\\Platform.Domain.csproj|f:\\projects\\teethden.platform\\src\\platform.domain\\entities\\legal\\documenthighlight.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{641FA427-5E63-B0A6-45F5-7F14508415D7}|src\\Platform.Domain\\Platform.Domain.csproj|solutionrelative:src\\platform.domain\\entities\\legal\\documenthighlight.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{6CA9EDB2-3C10-9B0A-3262-8112643A659A}|src\\Platform.API\\Platform.API.csproj|f:\\projects\\teethden.platform\\src\\platform.api\\controllers\\documentscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{6CA9EDB2-3C10-9B0A-3262-8112643A659A}|src\\Platform.API\\Platform.API.csproj|solutionrelative:src\\platform.api\\controllers\\documentscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6CA9EDB2-3C10-9B0A-3262-8112643A659A}|src\\Platform.API\\Platform.API.csproj|f:\\projects\\teethden.platform\\src\\platform.api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6CA9EDB2-3C10-9B0A-3262-8112643A659A}|src\\Platform.API\\Platform.API.csproj|solutionrelative:src\\platform.api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{641FA427-5E63-B0A6-45F5-7F14508415D7}|src\\Platform.Domain\\Platform.Domain.csproj|f:\\projects\\teethden.platform\\src\\platform.domain\\entities\\legal\\legalcase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -67,18 +83,6 @@
       "RelativeMoniker": "D:0:0:{6CA9EDB2-3C10-9B0A-3262-8112643A659A}|src\\Platform.API\\Platform.API.csproj|solutionrelative:src\\platform.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|f:\\projects\\teethden.platform\\src\\platform.persistence\\migrations\\applicationdb\\20260510104913_addlegalentities.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|solutionrelative:src\\platform.persistence\\migrations\\applicationdb\\20260510104913_addlegalentities.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|f:\\projects\\teethden.platform\\src\\platform.persistence\\migrations\\applicationdb\\20260506200011_initialappdb.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|solutionrelative:src\\platform.persistence\\migrations\\applicationdb\\20260506200011_initialappdb.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|f:\\projects\\teethden.platform\\src\\platform.persistence\\migrations\\20260223165742_initialmaster.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|solutionrelative:src\\platform.persistence\\migrations\\20260223165742_initialmaster.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|f:\\projects\\teethden.platform\\src\\platform.persistence\\migrations\\tenantidentitydb\\20260506195947_updateapplicationuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|solutionrelative:src\\platform.persistence\\migrations\\tenantidentitydb\\20260506195947_updateapplicationuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -89,18 +93,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|f:\\projects\\teethden.platform\\src\\platform.persistence\\tenants\\tenantregistrydbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|solutionrelative:src\\platform.persistence\\tenants\\tenantregistrydbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|f:\\projects\\teethden.platform\\src\\platform.persistence\\migrations\\tenantregistrydbcontextmodelsnapshot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|solutionrelative:src\\platform.persistence\\migrations\\tenantregistrydbcontextmodelsnapshot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|f:\\projects\\teethden.platform\\src\\platform.persistence\\migrations\\tenantidentitydb\\tenantidentitydbcontextmodelsnapshot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4C9074B4-19EE-E2BF-5EF3-9B6B99B2327F}|src\\Platform.Persistence\\Platform.Persistence.csproj|solutionrelative:src\\platform.persistence\\migrations\\tenantidentitydb\\tenantidentitydbcontextmodelsnapshot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{3BF75894-B29F-0CAE-9886-7E7B8E0B172E}|src\\Platform.Infrastructure\\Platform.Infrastructure.csproj|f:\\projects\\teethden.platform\\src\\platform.infrastructure\\multitenancy\\tenantprovisioningservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{3BF75894-B29F-0CAE-9886-7E7B8E0B172E}|src\\Platform.Infrastructure\\Platform.Infrastructure.csproj|solutionrelative:src\\platform.infrastructure\\multitenancy\\tenantprovisioningservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{4ED1536E-B615-C2A0-D31B-F30BF0539F51}|src\\Platform.Shared\\Platform.Shared.csproj|f:\\projects\\teethden.platform\\src\\platform.shared\\permissiondefinitions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -150,118 +142,56 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 13,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "20260511222710_AddCommentToHighlight.cs",
-              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\ApplicationDb\\20260511222710_AddCommentToHighlight.cs",
-              "RelativeDocumentMoniker": "src\\Platform.Persistence\\Migrations\\ApplicationDb\\20260511222710_AddCommentToHighlight.cs",
-              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\ApplicationDb\\20260511222710_AddCommentToHighlight.cs",
-              "RelativeToolTip": "src\\Platform.Persistence\\Migrations\\ApplicationDb\\20260511222710_AddCommentToHighlight.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-14T19:07:44.205Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "20260511222710_AddCommentToHighlight.Designer.cs",
-              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\ApplicationDb\\20260511222710_AddCommentToHighlight.Designer.cs",
-              "RelativeDocumentMoniker": "src\\Platform.Persistence\\Migrations\\ApplicationDb\\20260511222710_AddCommentToHighlight.Designer.cs",
-              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\ApplicationDb\\20260511222710_AddCommentToHighlight.Designer.cs",
-              "RelativeToolTip": "src\\Platform.Persistence\\Migrations\\ApplicationDb\\20260511222710_AddCommentToHighlight.Designer.cs",
+              "DocumentIndex": 7,
+              "Title": "20260515070134_NameYourMigration.cs",
+              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\TenantIdentityDb\\20260515070134_NameYourMigration.cs",
+              "RelativeDocumentMoniker": "src\\Platform.Persistence\\Migrations\\TenantIdentityDb\\20260515070134_NameYourMigration.cs",
+              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\TenantIdentityDb\\20260515070134_NameYourMigration.cs",
+              "RelativeToolTip": "src\\Platform.Persistence\\Migrations\\TenantIdentityDb\\20260515070134_NameYourMigration.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-14T19:07:44.081Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-15T07:01:45.911Z",
+              "IsPinned": true
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "DocumentHighlight.cs",
-              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Domain\\Entities\\Legal\\DocumentHighlight.cs",
-              "RelativeDocumentMoniker": "src\\Platform.Domain\\Entities\\Legal\\DocumentHighlight.cs",
-              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.Domain\\Entities\\Legal\\DocumentHighlight.cs",
-              "RelativeToolTip": "src\\Platform.Domain\\Entities\\Legal\\DocumentHighlight.cs",
-              "ViewState": "AgIAAA8AAAAAAAAAAAAAABsAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 8,
+              "Title": "20260510223252_AddUserContactLink.cs",
+              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\TenantIdentityDb\\20260510223252_AddUserContactLink.cs",
+              "RelativeDocumentMoniker": "src\\Platform.Persistence\\Migrations\\TenantIdentityDb\\20260510223252_AddUserContactLink.cs",
+              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\TenantIdentityDb\\20260510223252_AddUserContactLink.cs",
+              "RelativeToolTip": "src\\Platform.Persistence\\Migrations\\TenantIdentityDb\\20260510223252_AddUserContactLink.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-11T22:18:35.933Z"
+              "WhenOpened": "2026-05-15T07:01:48.904Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "LegalCase.cs",
-              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Domain\\Entities\\Legal\\LegalCase.cs",
-              "RelativeDocumentMoniker": "src\\Platform.Domain\\Entities\\Legal\\LegalCase.cs",
-              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.Domain\\Entities\\Legal\\LegalCase.cs",
-              "RelativeToolTip": "src\\Platform.Domain\\Entities\\Legal\\LegalCase.cs",
-              "ViewState": "AgIAABsAAAAAAAAAAAAAwCEAAABRAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-11T18:37:09.309Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "AuthController.cs",
-              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.API\\Controllers\\AuthController.cs",
-              "RelativeDocumentMoniker": "src\\Platform.API\\Controllers\\AuthController.cs",
-              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.API\\Controllers\\AuthController.cs",
-              "RelativeToolTip": "src\\Platform.API\\Controllers\\AuthController.cs",
-              "ViewState": "AgIAACAAAAAAAAAAAAAuwC0AAAAMAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-11T15:02:21.88Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "DocumentsController.cs",
-              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.API\\Controllers\\DocumentsController.cs",
-              "RelativeDocumentMoniker": "src\\Platform.API\\Controllers\\DocumentsController.cs",
-              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.API\\Controllers\\DocumentsController.cs",
-              "RelativeToolTip": "src\\Platform.API\\Controllers\\DocumentsController.cs",
-              "ViewState": "AgIAAEYAAAAAAAAAAAAiwFYAAAAMAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-10T23:39:11.778Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "TenantRegistryDbContextFactory.cs",
-              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\TenantRegistryDbContextFactory.cs",
-              "RelativeDocumentMoniker": "src\\Platform.Persistence\\TenantRegistryDbContextFactory.cs",
-              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\TenantRegistryDbContextFactory.cs",
-              "RelativeToolTip": "src\\Platform.Persistence\\TenantRegistryDbContextFactory.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-06T20:11:59.697Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "TransactionsController.cs",
-              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.API\\Controllers\\TransactionsController.cs",
-              "RelativeDocumentMoniker": "src\\Platform.API\\Controllers\\TransactionsController.cs",
-              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.API\\Controllers\\TransactionsController.cs",
-              "RelativeToolTip": "src\\Platform.API\\Controllers\\TransactionsController.cs",
-              "ViewState": "AgIAAKoAAAAAAAAAAAAQwLwAAABrAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-13T11:27:27.437Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "TenantMigrationService.cs",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Identity\\TenantMigrationService.cs",
               "RelativeDocumentMoniker": "src\\Platform.Persistence\\Identity\\TenantMigrationService.cs",
               "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Identity\\TenantMigrationService.cs",
               "RelativeToolTip": "src\\Platform.Persistence\\Identity\\TenantMigrationService.cs",
-              "ViewState": "AgIAABsAAAAAAAAAAAAcwCUAAAAdAAAAAAAAAA==",
+              "ViewState": "AgIAACIAAAAAAAAAAAAcwDsAAAA4AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-10T09:28:01.773Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-10T09:28:01.773Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "TransactionsController.cs",
+              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.API\\Controllers\\TransactionsController.cs",
+              "RelativeDocumentMoniker": "src\\Platform.API\\Controllers\\TransactionsController.cs",
+              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.API\\Controllers\\TransactionsController.cs",
+              "RelativeToolTip": "src\\Platform.API\\Controllers\\TransactionsController.cs",
+              "ViewState": "AgIAAKoAAAAAAAAAAAAQwLwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-13T11:27:27.437Z"
             },
             {
               "$type": "Document",
@@ -277,19 +207,141 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "20260513105131_AddWorkflowAndTransactions.cs",
-              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\ApplicationDb\\20260513105131_AddWorkflowAndTransactions.cs",
-              "RelativeDocumentMoniker": "src\\Platform.Persistence\\Migrations\\ApplicationDb\\20260513105131_AddWorkflowAndTransactions.cs",
-              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\ApplicationDb\\20260513105131_AddWorkflowAndTransactions.cs",
-              "RelativeToolTip": "src\\Platform.Persistence\\Migrations\\ApplicationDb\\20260513105131_AddWorkflowAndTransactions.cs",
-              "ViewState": "AgIAAFgAAAAAAAAAAIAwwGkAAAAfAAAAAAAAAA==",
+              "DocumentIndex": 1,
+              "Title": "TenantProvisioningService.cs",
+              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Infrastructure\\MultiTenancy\\TenantProvisioningService.cs",
+              "RelativeDocumentMoniker": "src\\Platform.Infrastructure\\MultiTenancy\\TenantProvisioningService.cs",
+              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.Infrastructure\\MultiTenancy\\TenantProvisioningService.cs",
+              "RelativeToolTip": "src\\Platform.Infrastructure\\MultiTenancy\\TenantProvisioningService.cs",
+              "ViewState": "AgIAABQAAAAAAAAAAIA2wCkAAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-13T10:59:27.718Z"
+              "WhenOpened": "2026-05-10T09:19:41.211Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 2,
+              "Title": "ApplicationDbContextModelSnapshot.cs",
+              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\ApplicationDb\\ApplicationDbContextModelSnapshot.cs",
+              "RelativeDocumentMoniker": "src\\Platform.Persistence\\Migrations\\ApplicationDb\\ApplicationDbContextModelSnapshot.cs",
+              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\ApplicationDb\\ApplicationDbContextModelSnapshot.cs",
+              "RelativeToolTip": "src\\Platform.Persistence\\Migrations\\ApplicationDb\\ApplicationDbContextModelSnapshot.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-15T07:17:04.873Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "20260223165742_InitialMaster.cs",
+              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\20260223165742_InitialMaster.cs",
+              "RelativeDocumentMoniker": "src\\Platform.Persistence\\Migrations\\20260223165742_InitialMaster.cs",
+              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\20260223165742_InitialMaster.cs",
+              "RelativeToolTip": "src\\Platform.Persistence\\Migrations\\20260223165742_InitialMaster.cs",
+              "ViewState": "AgIAABMAAAAAAAAAAAAgwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-10T10:27:48.796Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "TenantRegistryDbContextModelSnapshot.cs",
+              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\TenantRegistryDbContextModelSnapshot.cs",
+              "RelativeDocumentMoniker": "src\\Platform.Persistence\\Migrations\\TenantRegistryDbContextModelSnapshot.cs",
+              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\TenantRegistryDbContextModelSnapshot.cs",
+              "RelativeToolTip": "src\\Platform.Persistence\\Migrations\\TenantRegistryDbContextModelSnapshot.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAwwBYAAABNAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-06T19:59:16.974Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "TenantIdentityDbContextModelSnapshot.cs",
+              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\TenantIdentityDb\\TenantIdentityDbContextModelSnapshot.cs",
+              "RelativeDocumentMoniker": "src\\Platform.Persistence\\Migrations\\TenantIdentityDb\\TenantIdentityDbContextModelSnapshot.cs",
+              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\TenantIdentityDb\\TenantIdentityDbContextModelSnapshot.cs",
+              "RelativeToolTip": "src\\Platform.Persistence\\Migrations\\TenantIdentityDb\\TenantIdentityDbContextModelSnapshot.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-06T20:12:34.514Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "TenantRegistryDbContextFactory.cs",
+              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\TenantRegistryDbContextFactory.cs",
+              "RelativeDocumentMoniker": "src\\Platform.Persistence\\TenantRegistryDbContextFactory.cs",
+              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\TenantRegistryDbContextFactory.cs",
+              "RelativeToolTip": "src\\Platform.Persistence\\TenantRegistryDbContextFactory.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-06T20:11:59.697Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "DocumentHighlight.cs",
+              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Domain\\Entities\\Legal\\DocumentHighlight.cs",
+              "RelativeDocumentMoniker": "src\\Platform.Domain\\Entities\\Legal\\DocumentHighlight.cs",
+              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.Domain\\Entities\\Legal\\DocumentHighlight.cs",
+              "RelativeToolTip": "src\\Platform.Domain\\Entities\\Legal\\DocumentHighlight.cs",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAABsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-11T22:18:35.933Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "DocumentsController.cs",
+              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.API\\Controllers\\DocumentsController.cs",
+              "RelativeDocumentMoniker": "src\\Platform.API\\Controllers\\DocumentsController.cs",
+              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.API\\Controllers\\DocumentsController.cs",
+              "RelativeToolTip": "src\\Platform.API\\Controllers\\DocumentsController.cs",
+              "ViewState": "AgIAAEYAAAAAAAAAAAAiwFYAAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-10T23:39:11.778Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.API\\Controllers\\AuthController.cs",
+              "RelativeDocumentMoniker": "src\\Platform.API\\Controllers\\AuthController.cs",
+              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.API\\Controllers\\AuthController.cs",
+              "RelativeToolTip": "src\\Platform.API\\Controllers\\AuthController.cs",
+              "ViewState": "AgIAAB0AAAAAAAAAAAA3wDAAAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-11T15:02:21.88Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "20260515071600_InitialApplication.cs",
+              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\ApplicationDb\\20260515071600_InitialApplication.cs",
+              "RelativeDocumentMoniker": "src\\Platform.Persistence\\Migrations\\ApplicationDb\\20260515071600_InitialApplication.cs",
+              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\ApplicationDb\\20260515071600_InitialApplication.cs",
+              "RelativeToolTip": "src\\Platform.Persistence\\Migrations\\ApplicationDb\\20260515071600_InitialApplication.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-15T07:17:02.427Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "LegalCase.cs",
+              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Domain\\Entities\\Legal\\LegalCase.cs",
+              "RelativeDocumentMoniker": "src\\Platform.Domain\\Entities\\Legal\\LegalCase.cs",
+              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.Domain\\Entities\\Legal\\LegalCase.cs",
+              "RelativeToolTip": "src\\Platform.Domain\\Entities\\Legal\\LegalCase.cs",
+              "ViewState": "AgIAABsAAAAAAAAAAAAAwCEAAABRAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-11T18:37:09.309Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
               "Title": "CurrenciesController.cs",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.API\\Controllers\\CurrenciesController.cs",
               "RelativeDocumentMoniker": "src\\Platform.API\\Controllers\\CurrenciesController.cs",
@@ -301,7 +353,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 18,
               "Title": "S3StorageService.cs",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Infrastructure\\Storage\\S3StorageService.cs",
               "RelativeDocumentMoniker": "src\\Platform.Infrastructure\\Storage\\S3StorageService.cs",
@@ -313,19 +365,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "ApplicationDbContextModelSnapshot.cs",
-              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\ApplicationDb\\ApplicationDbContextModelSnapshot.cs",
-              "RelativeDocumentMoniker": "src\\Platform.Persistence\\Migrations\\ApplicationDb\\ApplicationDbContextModelSnapshot.cs",
-              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\ApplicationDb\\ApplicationDbContextModelSnapshot.cs",
-              "RelativeToolTip": "src\\Platform.Persistence\\Migrations\\ApplicationDb\\ApplicationDbContextModelSnapshot.cs",
-              "ViewState": "AgIAAIMCAAAAAAAAAIAwwJQCAAAmAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-10T10:48:36.78Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 21,
               "Title": "TenantDatabaseInitializer.cs",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Infrastructure\\MultiTenancy\\TenantDatabaseInitializer.cs",
               "RelativeDocumentMoniker": "src\\Platform.Infrastructure\\MultiTenancy\\TenantDatabaseInitializer.cs",
@@ -337,19 +377,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
-              "Title": "20260223165742_InitialMaster.cs",
-              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\20260223165742_InitialMaster.cs",
-              "RelativeDocumentMoniker": "src\\Platform.Persistence\\Migrations\\20260223165742_InitialMaster.cs",
-              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\20260223165742_InitialMaster.cs",
-              "RelativeToolTip": "src\\Platform.Persistence\\Migrations\\20260223165742_InitialMaster.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-10T10:27:48.796Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 20,
               "Title": "20260506195947_UpdateApplicationUser.cs",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\TenantIdentityDb\\20260506195947_UpdateApplicationUser.cs",
               "RelativeDocumentMoniker": "src\\Platform.Persistence\\Migrations\\TenantIdentityDb\\20260506195947_UpdateApplicationUser.cs",
@@ -361,19 +389,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
-              "Title": "20260506200011_InitialAppDb.cs",
-              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\ApplicationDb\\20260506200011_InitialAppDb.cs",
-              "RelativeDocumentMoniker": "src\\Platform.Persistence\\Migrations\\ApplicationDb\\20260506200011_InitialAppDb.cs",
-              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\ApplicationDb\\20260506200011_InitialAppDb.cs",
-              "RelativeToolTip": "src\\Platform.Persistence\\Migrations\\ApplicationDb\\20260506200011_InitialAppDb.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-10T09:28:37.84Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 14,
               "Title": "Program.cs",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\TenantMigrator\\Program.cs",
               "RelativeDocumentMoniker": "src\\TenantMigrator\\Program.cs",
@@ -385,7 +401,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 28,
+              "DocumentIndex": 26,
               "Title": "ApplicationUser.cs",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Identity\\ApplicationUser.cs",
               "RelativeDocumentMoniker": "src\\Platform.Persistence\\Identity\\ApplicationUser.cs",
@@ -397,7 +413,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 29,
+              "DocumentIndex": 27,
               "Title": "DependencyInjection.cs",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\DependencyInjection.cs",
               "RelativeDocumentMoniker": "src\\Platform.Persistence\\DependencyInjection.cs",
@@ -409,19 +425,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
-              "Title": "TenantIdentityDbContextModelSnapshot.cs",
-              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\TenantIdentityDb\\TenantIdentityDbContextModelSnapshot.cs",
-              "RelativeDocumentMoniker": "src\\Platform.Persistence\\Migrations\\TenantIdentityDb\\TenantIdentityDbContextModelSnapshot.cs",
-              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\TenantIdentityDb\\TenantIdentityDbContextModelSnapshot.cs",
-              "RelativeToolTip": "src\\Platform.Persistence\\Migrations\\TenantIdentityDb\\TenantIdentityDbContextModelSnapshot.cs",
-              "ViewState": "AgIAAFIAAAAAAAAAAAAgwAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-06T20:12:34.514Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 30,
+              "DocumentIndex": 28,
               "Title": "ApplicationDbContext.cs",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\ApplicationDbContext.cs",
               "RelativeDocumentMoniker": "src\\Platform.Persistence\\ApplicationDbContext.cs",
@@ -433,19 +437,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 24,
-              "Title": "TenantProvisioningService.cs",
-              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Infrastructure\\MultiTenancy\\TenantProvisioningService.cs",
-              "RelativeDocumentMoniker": "src\\Platform.Infrastructure\\MultiTenancy\\TenantProvisioningService.cs",
-              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.Infrastructure\\MultiTenancy\\TenantProvisioningService.cs",
-              "RelativeToolTip": "src\\Platform.Infrastructure\\MultiTenancy\\TenantProvisioningService.cs",
-              "ViewState": "AgIAAFEAAAAAAAAAAAAkwGQAAAAMAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-10T09:19:41.211Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 27,
+              "DocumentIndex": 25,
               "Title": "TenantIdentityDbContext.cs",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Identity\\TenantIdentityDbContext.cs",
               "RelativeDocumentMoniker": "src\\Platform.Persistence\\Identity\\TenantIdentityDbContext.cs",
@@ -457,7 +449,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 32,
+              "DocumentIndex": 30,
               "Title": "TenantIdentityDbContextFactory.cs",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Identity\\TenantIdentityDbContextFactory.cs",
               "RelativeDocumentMoniker": "src\\Platform.Persistence\\Identity\\TenantIdentityDbContextFactory.cs",
@@ -469,7 +461,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 19,
               "Title": "appsettings.json",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.API\\appsettings.json",
               "RelativeDocumentMoniker": "src\\Platform.API\\appsettings.json",
@@ -481,31 +473,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
-              "Title": "20260510104913_AddLegalEntities.cs",
-              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\ApplicationDb\\20260510104913_AddLegalEntities.cs",
-              "RelativeDocumentMoniker": "src\\Platform.Persistence\\Migrations\\ApplicationDb\\20260510104913_AddLegalEntities.cs",
-              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\ApplicationDb\\20260510104913_AddLegalEntities.cs",
-              "RelativeToolTip": "src\\Platform.Persistence\\Migrations\\ApplicationDb\\20260510104913_AddLegalEntities.cs",
-              "ViewState": "AgIAAJkAAAAAAAAAAAAowAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-10T10:49:14.792Z"
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 22,
-              "Title": "TenantRegistryDbContextModelSnapshot.cs",
-              "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\TenantRegistryDbContextModelSnapshot.cs",
-              "RelativeDocumentMoniker": "src\\Platform.Persistence\\Migrations\\TenantRegistryDbContextModelSnapshot.cs",
-              "ToolTip": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Migrations\\TenantRegistryDbContextModelSnapshot.cs",
-              "RelativeToolTip": "src\\Platform.Persistence\\Migrations\\TenantRegistryDbContextModelSnapshot.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAABNAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-06T19:59:16.974Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 21,
               "Title": "TenantRegistryDbContext.cs",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\Tenants\\TenantRegistryDbContext.cs",
               "RelativeDocumentMoniker": "src\\Platform.Persistence\\Tenants\\TenantRegistryDbContext.cs",
@@ -517,7 +485,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 26,
+              "DocumentIndex": 24,
               "Title": "FeatureFlags.cs",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Shared\\FeatureFlags.cs",
               "RelativeDocumentMoniker": "src\\Platform.Shared\\FeatureFlags.cs",
@@ -529,7 +497,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 25,
+              "DocumentIndex": 23,
               "Title": "PermissionDefinitions.cs",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Shared\\PermissionDefinitions.cs",
               "RelativeDocumentMoniker": "src\\Platform.Shared\\PermissionDefinitions.cs",
@@ -541,7 +509,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 31,
+              "DocumentIndex": 29,
               "Title": "launchSettings.json",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.API\\Properties\\launchSettings.json",
               "RelativeDocumentMoniker": "src\\Platform.API\\Properties\\launchSettings.json",
@@ -553,7 +521,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 34,
+              "DocumentIndex": 32,
               "Title": "Platform.API",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.API\\Platform.API.csproj",
               "RelativeDocumentMoniker": "src\\Platform.API\\Platform.API.csproj",
@@ -564,7 +532,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 33,
+              "DocumentIndex": 31,
               "Title": "ApplicationDbContextFactory.cs",
               "DocumentMoniker": "F:\\projects\\TeethDen.Platform\\src\\Platform.Persistence\\ApplicationDbContextFactory.cs",
               "RelativeDocumentMoniker": "src\\Platform.Persistence\\ApplicationDbContextFactory.cs",

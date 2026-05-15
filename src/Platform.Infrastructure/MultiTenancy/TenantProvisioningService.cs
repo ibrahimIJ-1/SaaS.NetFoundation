@@ -29,13 +29,20 @@ namespace Platform.Infrastructure.MultiTenancy
         public async Task RegisterTenantAsync(RegisterTenantRequest request)
         {
             var tenantConnectionString = await SaveTenantAsync(request);
-            await using var tenantDb = CreateTenantDb(tenantConnectionString);
+            
+            // 1. Migrate Identity Context
+            await using var identityDb = CreateTenantDb(tenantConnectionString);
+            await identityDb.Database.MigrateAsync();
 
-            // 4️⃣ Create database + apply migrations
-            await tenantDb.Database.MigrateAsync();
+            // 2. Migrate Application Context
+            var appOptions = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseSqlServer(tenantConnectionString)
+                .Options;
+            await using var appDb = new ApplicationDbContext(appOptions);
+            await appDb.Database.MigrateAsync();
 
-            // 5️⃣ Seed permissions + roles + admin user
-            await SeedTenantAsync(tenantDb, tenantConnectionString, request.AdminEmail, request.AdminPassword);
+            // 3. Seed everything
+            await SeedTenantAsync(identityDb, tenantConnectionString, request.AdminEmail, request.AdminPassword);
         }
 
         public async Task EnsureTenantSeedsAsync(string connectionString)
@@ -224,17 +231,17 @@ namespace Platform.Infrastructure.MultiTenancy
                 .Options;
 
             await using var appDb = new ApplicationDbContext(appOptions);
-            await appDb.Database.MigrateAsync();
+            // Migrations moved to RegisterTenantAsync
 
-            var features = FeatureFlags.All
-                .Select(f => new TenantFeature
-                {
-                    FeatureKey = f,
-                    IsEnabled = true,
-                    Description = $"Enable/disable the {f} module"
-                }).ToList();
+            //var features = FeatureFlags.All
+            //    .Select(f => new TenantFeature
+            //    {
+            //        FeatureKey = f,
+            //        IsEnabled = true,
+            //        Description = $"Enable/disable the {f} module"
+            //    }).ToList();
 
-            await appDb.TenantFeatures.AddRangeAsync(features);
+            //await appDb.TenantFeatures.AddRangeAsync(features);
             await appDb.SaveChangesAsync();
 
             // Create admin user

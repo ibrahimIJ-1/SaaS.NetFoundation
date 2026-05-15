@@ -12,8 +12,8 @@ using Platform.Persistence;
 namespace Platform.Persistence.Migrations.ApplicationDb
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260513130136_AddMultiCurrency")]
-    partial class AddMultiCurrency
+    [Migration("20260515071600_InitialApplication")]
+    partial class InitialApplication
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,11 +25,59 @@ namespace Platform.Persistence.Migrations.ApplicationDb
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.Account", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AccountCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("AccountName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("Category")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("ParentAccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountCode")
+                        .IsUnique();
+
+                    b.HasIndex("ParentAccountId");
+
+                    b.ToTable("Accounts");
+                });
+
             modelBuilder.Entity("Platform.Domain.Entities.Legal.CaseDocument", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ConvertedPdfUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -66,6 +114,9 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                     b.Property<bool>("NeedsSignature")
                         .HasColumnType("bit");
 
+                    b.Property<string>("OcrStatus")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid?>("ParentDocumentId")
                         .HasColumnType("uniqueidentifier");
 
@@ -96,6 +147,9 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("CourtSessionId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -119,6 +173,8 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CourtSessionId");
 
                     b.HasIndex("LegalCaseId");
 
@@ -585,6 +641,51 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                     b.ToTable("DocumentSignatures");
                 });
 
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.DocumentVideoAnnotation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("DocumentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Label")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double>("TimeEnd")
+                        .HasColumnType("float");
+
+                    b.Property<double>("TimeStart")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentId");
+
+                    b.ToTable("DocumentVideoAnnotations");
+                });
+
             modelBuilder.Entity("Platform.Domain.Entities.Legal.Expense", b =>
                 {
                     b.Property<Guid>("Id")
@@ -605,9 +706,15 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid?>("CurrencyId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("ExchangeRate")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("ExpenseDate")
                         .HasColumnType("datetime2");
@@ -632,6 +739,8 @@ namespace Platform.Persistence.Migrations.ApplicationDb
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CurrencyId");
+
                     b.HasIndex("LegalCaseId");
 
                     b.ToTable("Expenses");
@@ -649,8 +758,14 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid?>("CurrencyId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<decimal>("ExchangeRate")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("InvoiceNumber")
                         .IsRequired()
@@ -687,6 +802,8 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CurrencyId");
 
                     b.HasIndex("LegalCaseId");
 
@@ -735,6 +852,92 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                     b.HasIndex("InvoiceId");
 
                     b.ToTable("InvoiceItems");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.JournalEntry", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("EntryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EntryNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsPosted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("ReferenceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ReferenceType")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EntryNumber")
+                        .IsUnique();
+
+                    b.ToTable("JournalEntries");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.JournalEntryLine", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Credit")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Debit")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<decimal>("ExchangeRate")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("JournalEntryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.HasIndex("JournalEntryId");
+
+                    b.ToTable("JournalEntryLines");
                 });
 
             modelBuilder.Entity("Platform.Domain.Entities.Legal.KnowledgeArticle", b =>
@@ -1078,6 +1281,12 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid?>("CurrencyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("ExchangeRate")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<Guid>("InvoiceId")
                         .HasColumnType("uniqueidentifier");
 
@@ -1100,6 +1309,8 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CurrencyId");
 
                     b.HasIndex("InvoiceId");
 
@@ -1196,7 +1407,7 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("StepDefinitionId")
+                    b.Property<Guid?>("StepDefinitionId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("StepName")
@@ -1232,9 +1443,15 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid?>("CurrencyId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("ExchangeRate")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1256,9 +1473,70 @@ namespace Platform.Persistence.Migrations.ApplicationDb
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CurrencyId");
+
                     b.HasIndex("LegalCaseId");
 
                     b.ToTable("TrustTransactions");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.VoiceRecording", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CourtSessionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DurationSeconds")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("FileSizeBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("FileUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("LegalCaseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("RecordedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TranscriptionStatus")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TranscriptionText")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourtSessionId");
+
+                    b.HasIndex("LegalCaseId");
+
+                    b.ToTable("VoiceRecordings");
                 });
 
             modelBuilder.Entity("Platform.Domain.Entities.Legal.WorkflowDefinition", b =>
@@ -1445,6 +1723,16 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                     b.ToTable("Notifications");
                 });
 
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.Account", b =>
+                {
+                    b.HasOne("Platform.Domain.Entities.Legal.Account", "ParentAccount")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentAccountId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ParentAccount");
+                });
+
             modelBuilder.Entity("Platform.Domain.Entities.Legal.CaseDocument", b =>
                 {
                     b.HasOne("Platform.Domain.Entities.Legal.LegalCase", "LegalCase")
@@ -1458,11 +1746,18 @@ namespace Platform.Persistence.Migrations.ApplicationDb
 
             modelBuilder.Entity("Platform.Domain.Entities.Legal.CaseNote", b =>
                 {
+                    b.HasOne("Platform.Domain.Entities.Legal.CourtSession", "CourtSession")
+                        .WithMany("SessionNotes")
+                        .HasForeignKey("CourtSessionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Platform.Domain.Entities.Legal.LegalCase", "LegalCase")
                         .WithMany("Notes")
                         .HasForeignKey("LegalCaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("CourtSession");
 
                     b.Navigation("LegalCase");
                 });
@@ -1542,24 +1837,49 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                     b.Navigation("Document");
                 });
 
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.DocumentVideoAnnotation", b =>
+                {
+                    b.HasOne("Platform.Domain.Entities.Legal.CaseDocument", "Document")
+                        .WithMany("VideoAnnotations")
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Document");
+                });
+
             modelBuilder.Entity("Platform.Domain.Entities.Legal.Expense", b =>
                 {
+                    b.HasOne("Platform.Domain.Entities.Legal.Currency", "Currency")
+                        .WithMany("Expenses")
+                        .HasForeignKey("CurrencyId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Platform.Domain.Entities.Legal.LegalCase", "LegalCase")
                         .WithMany("Expenses")
                         .HasForeignKey("LegalCaseId")
                         .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired();
 
+                    b.Navigation("Currency");
+
                     b.Navigation("LegalCase");
                 });
 
             modelBuilder.Entity("Platform.Domain.Entities.Legal.Invoice", b =>
                 {
+                    b.HasOne("Platform.Domain.Entities.Legal.Currency", "Currency")
+                        .WithMany("Invoices")
+                        .HasForeignKey("CurrencyId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Platform.Domain.Entities.Legal.LegalCase", "LegalCase")
                         .WithMany("Invoices")
                         .HasForeignKey("LegalCaseId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Currency");
 
                     b.Navigation("LegalCase");
                 });
@@ -1573,6 +1893,25 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                         .IsRequired();
 
                     b.Navigation("Invoice");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.JournalEntryLine", b =>
+                {
+                    b.HasOne("Platform.Domain.Entities.Legal.Account", "Account")
+                        .WithMany("JournalEntryLines")
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Platform.Domain.Entities.Legal.JournalEntry", "JournalEntry")
+                        .WithMany("Lines")
+                        .HasForeignKey("JournalEntryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+
+                    b.Navigation("JournalEntry");
                 });
 
             modelBuilder.Entity("Platform.Domain.Entities.Legal.LegalCase", b =>
@@ -1632,11 +1971,18 @@ namespace Platform.Persistence.Migrations.ApplicationDb
 
             modelBuilder.Entity("Platform.Domain.Entities.Legal.Payment", b =>
                 {
+                    b.HasOne("Platform.Domain.Entities.Legal.Currency", "Currency")
+                        .WithMany("Payments")
+                        .HasForeignKey("CurrencyId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Platform.Domain.Entities.Legal.Invoice", "Invoice")
                         .WithMany()
                         .HasForeignKey("InvoiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Currency");
 
                     b.Navigation("Invoice");
                 });
@@ -1657,8 +2003,7 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                     b.HasOne("Platform.Domain.Entities.Legal.WorkflowStepDefinition", "StepDefinition")
                         .WithMany()
                         .HasForeignKey("StepDefinitionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Currency");
 
@@ -1669,11 +2014,36 @@ namespace Platform.Persistence.Migrations.ApplicationDb
 
             modelBuilder.Entity("Platform.Domain.Entities.Legal.TrustTransaction", b =>
                 {
+                    b.HasOne("Platform.Domain.Entities.Legal.Currency", "Currency")
+                        .WithMany("TrustTransactions")
+                        .HasForeignKey("CurrencyId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Platform.Domain.Entities.Legal.LegalCase", "LegalCase")
                         .WithMany("TrustTransactions")
                         .HasForeignKey("LegalCaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Currency");
+
+                    b.Navigation("LegalCase");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.VoiceRecording", b =>
+                {
+                    b.HasOne("Platform.Domain.Entities.Legal.CourtSession", "CourtSession")
+                        .WithMany("VoiceRecordings")
+                        .HasForeignKey("CourtSessionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Platform.Domain.Entities.Legal.LegalCase", "LegalCase")
+                        .WithMany("VoiceRecordings")
+                        .HasForeignKey("LegalCaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CourtSession");
 
                     b.Navigation("LegalCase");
                 });
@@ -1699,11 +2069,20 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                     b.Navigation("WorkflowDefinition");
                 });
 
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.Account", b =>
+                {
+                    b.Navigation("Children");
+
+                    b.Navigation("JournalEntryLines");
+                });
+
             modelBuilder.Entity("Platform.Domain.Entities.Legal.CaseDocument", b =>
                 {
                     b.Navigation("Annotations");
 
                     b.Navigation("Highlights");
+
+                    b.Navigation("VideoAnnotations");
                 });
 
             modelBuilder.Entity("Platform.Domain.Entities.Legal.Contact", b =>
@@ -1713,11 +2092,26 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                     b.Navigation("Interactions");
                 });
 
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.CourtSession", b =>
+                {
+                    b.Navigation("SessionNotes");
+
+                    b.Navigation("VoiceRecordings");
+                });
+
             modelBuilder.Entity("Platform.Domain.Entities.Legal.Currency", b =>
                 {
+                    b.Navigation("Expenses");
+
+                    b.Navigation("Invoices");
+
+                    b.Navigation("Payments");
+
                     b.Navigation("TransactionStepInstances");
 
                     b.Navigation("Transactions");
+
+                    b.Navigation("TrustTransactions");
 
                     b.Navigation("WorkflowDefinitions");
                 });
@@ -1725,6 +2119,11 @@ namespace Platform.Persistence.Migrations.ApplicationDb
             modelBuilder.Entity("Platform.Domain.Entities.Legal.Invoice", b =>
                 {
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("Platform.Domain.Entities.Legal.JournalEntry", b =>
+                {
+                    b.Navigation("Lines");
                 });
 
             modelBuilder.Entity("Platform.Domain.Entities.Legal.LegalCase", b =>
@@ -1744,6 +2143,8 @@ namespace Platform.Persistence.Migrations.ApplicationDb
                     b.Navigation("Stages");
 
                     b.Navigation("TrustTransactions");
+
+                    b.Navigation("VoiceRecordings");
                 });
 
             modelBuilder.Entity("Platform.Domain.Entities.Legal.LegalTransaction", b =>

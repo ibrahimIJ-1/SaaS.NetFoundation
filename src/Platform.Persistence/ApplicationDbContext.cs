@@ -35,6 +35,7 @@ namespace Platform.Persistence
         public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
         public DbSet<DocumentSignature> DocumentSignatures => Set<DocumentSignature>();
         public DbSet<DocumentVideoAnnotation> DocumentVideoAnnotations => Set<DocumentVideoAnnotation>();
+        public DbSet<VoiceRecording> VoiceRecordings => Set<VoiceRecording>();
 
         // Workflow & Transactions
         public DbSet<WorkflowDefinition> WorkflowDefinitions => Set<WorkflowDefinition>();
@@ -162,7 +163,27 @@ namespace Platform.Persistence
                 .HasMany(c => c.Expenses)
                 .WithOne(e => e.LegalCase)
                 .HasForeignKey(e => e.LegalCaseId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Voice Recording
+            modelBuilder.Entity<VoiceRecording>()
+                .HasOne(v => v.LegalCase)
+                .WithMany(c => c.VoiceRecordings)
+                .HasForeignKey(v => v.LegalCaseId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<VoiceRecording>()
+                .HasOne(v => v.CourtSession)
+                .WithMany(s => s.VoiceRecordings)
+                .HasForeignKey(v => v.CourtSessionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // CaseNote -> CourtSession (session-scoped notes)
+            modelBuilder.Entity<CaseNote>()
+                .HasOne(n => n.CourtSession)
+                .WithMany(s => s.SessionNotes)
+                .HasForeignKey(n => n.CourtSessionId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Workflow Definitions
             modelBuilder.Entity<WorkflowDefinition>()

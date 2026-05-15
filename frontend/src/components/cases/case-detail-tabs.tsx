@@ -22,6 +22,7 @@ import {
   useDeleteCaseSession,
 } from "@/hooks/use-cases";
 import { EditSessionModal } from "./edit-session-modal";
+import { SessionNotes } from "./session-notes";
 
 import {
   FileText,
@@ -37,6 +38,8 @@ import {
   Edit2,
   Trash2,
   History,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -73,6 +76,7 @@ export function CaseDetailTabs({ caseData }: CaseDetailTabsProps) {
   const [editingNoteId, setEditingNoteId] = React.useState<string | null>(null);
   const [editNoteContent, setEditNoteContent] = React.useState("");
   const [selectedSession, setSelectedSession] = React.useState<any>(null);
+  const [expandedSessionId, setExpandedSessionId] = React.useState<string | null>(null);
   const [versioningDocId, setVersioningDocId] = React.useState<string | null>(
     null,
   );
@@ -577,50 +581,65 @@ export function CaseDetailTabs({ caseData }: CaseDetailTabsProps) {
             </h3>
             <div className="flex-1 space-y-4 mb-4">
               {caseData.sessions?.map((session) => (
-                <div
-                  key={session.id}
-                  className="p-4 bg-secondary/30 rounded-lg border border-border flex justify-between items-center group"
-                >
-                  <div className="flex gap-4 items-center">
-                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-col">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 text-muted-foreground hover:text-legal-gold"
-                        onClick={() => setSelectedSession(session)}
-                      >
-                        <Edit2 className="w-3.5 h-3.5" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 text-muted-foreground hover:text-red-500"
-                        onClick={() => {
-                          if (confirm("هل أنت متأكد من حذف هذه الجلسة؟")) {
-                            deleteSession.mutate(session.id);
-                          }
-                        }}
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
+                <div key={session.id}>
+                  <div
+                    className="p-4 bg-secondary/30 rounded-lg border border-border flex justify-between items-center group cursor-pointer"
+                    onClick={() => setExpandedSessionId(expandedSessionId === session.id ? null : session.id)}
+                  >
+                    <div className="flex gap-4 items-center">
+                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-col">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-muted-foreground hover:text-legal-gold"
+                          onClick={(e) => { e.stopPropagation(); setSelectedSession(session); }}
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-muted-foreground hover:text-red-500"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (confirm("هل أنت متأكد من حذف هذه الجلسة؟")) {
+                              deleteSession.mutate(session.id);
+                            }
+                          }}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-foreground">
+                          {session.courtName}
+                        </h4>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          القاضي: {session.judgeName || "غير محدد"}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-bold text-foreground">
-                        {session.courtName}
-                      </h4>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        القاضي: {session.judgeName || "غير محدد"}
-                      </p>
+                    <div className="flex items-center gap-3">
+                      <div className="text-left">
+                        <div className="font-semibold text-legal-danger" dir="ltr">
+                          {new Date(session.sessionDate).toLocaleString("ar-SA")}
+                        </div>
+                        <div className="text-sm text-muted-foreground mt-1">
+                          القاعة: {session.roomNumber || "-"}
+                        </div>
+                      </div>
+                      {expandedSessionId === session.id ? (
+                        <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                      )}
                     </div>
                   </div>
-                  <div className="text-left">
-                    <div className="font-semibold text-legal-danger" dir="ltr">
-                      {new Date(session.sessionDate).toLocaleString("ar-SA")}
+                  {expandedSessionId === session.id && (
+                    <div className="mt-2 mr-12 p-4 bg-background/50 rounded-lg border border-border/50">
+                      <SessionNotes sessionId={session.id} legalCaseId={caseData.id} />
                     </div>
-                    <div className="text-sm text-muted-foreground mt-1">
-                      القاعة: {session.roomNumber || "-"}
-                    </div>
-                  </div>
+                  )}
                 </div>
               ))}
 
